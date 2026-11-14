@@ -1,0 +1,4 @@
+descargas/
+*.log
+__pycache__/
+*.dump

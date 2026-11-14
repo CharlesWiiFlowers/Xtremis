@@ -1,0 +1,8 @@
+astroquery
+astropy
+numpy
+pandas
+pyarrow
+openpyxl
+PyYAML
+psycopg2-binary
