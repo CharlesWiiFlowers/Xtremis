@@ -1,7 +1,8 @@
--- Esquema Gaia DR3 v1 para SQLite (arreglos guardados como texto JSON, booleanos como 0/1).
+-- Esquema v2 (Gaia DR3 + SPHEREx) para SQLite (arreglos como texto JSON, booleanos como 0/1).
+-- En SQLite no hay esquemas: las tablas spherex.* y proyecto.* llevan prefijo spherex_ / proyecto_.
 -- Generado por scripts/02_generar_esquema.py
 
--- [Catálogo principal] gaia_source — acceso: TAP (ADQL)
+-- [Catálogo principal] gaiadr3.gaia_source — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaia_source (
     solution_id INTEGER,
     designation TEXT,
@@ -158,7 +159,7 @@ CREATE TABLE IF NOT EXISTS gaia_source (
 );
 CREATE INDEX IF NOT EXISTS gaia_source_source_id_idx ON gaia_source (source_id);
 
--- [Catálogo principal] gaia_source_lite — acceso: TAP (ADQL)
+-- [Catálogo principal] gaiadr3.gaia_source_lite — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaia_source_lite (
     source_id INTEGER,
     random_index INTEGER,
@@ -214,7 +215,7 @@ CREATE TABLE IF NOT EXISTS gaia_source_lite (
 );
 CREATE INDEX IF NOT EXISTS gaia_source_lite_source_id_idx ON gaia_source_lite (source_id);
 
--- [Parámetros astrofísicos] astrophysical_parameters — acceso: TAP (ADQL)
+-- [Parámetros astrofísicos] gaiadr3.astrophysical_parameters — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS astrophysical_parameters (
     solution_id INTEGER,
     source_id INTEGER,
@@ -445,7 +446,7 @@ CREATE TABLE IF NOT EXISTS astrophysical_parameters (
 );
 CREATE INDEX IF NOT EXISTS astrophysical_parameters_source_id_idx ON astrophysical_parameters (source_id);
 
--- [Parámetros astrofísicos] astrophysical_parameters_supp — acceso: TAP (ADQL)
+-- [Parámetros astrofísicos] gaiadr3.astrophysical_parameters_supp — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS astrophysical_parameters_supp (
     solution_id INTEGER,
     source_id INTEGER,
@@ -625,7 +626,7 @@ CREATE TABLE IF NOT EXISTS astrophysical_parameters_supp (
 );
 CREATE INDEX IF NOT EXISTS astrophysical_parameters_supp_source_id_idx ON astrophysical_parameters_supp (source_id);
 
--- [Parámetros astrofísicos] mcmc_samples_gsp_phot — acceso: DataLink (MCMC_GSPPHOT)
+-- [Parámetros astrofísicos] gaiadr3.mcmc_samples_gsp_phot — acceso: DataLink (MCMC_GSPPHOT)
 CREATE TABLE IF NOT EXISTS mcmc_samples_gsp_phot (
     solution_id INTEGER,
     source_id INTEGER,
@@ -646,7 +647,7 @@ CREATE TABLE IF NOT EXISTS mcmc_samples_gsp_phot (
 );
 CREATE INDEX IF NOT EXISTS mcmc_samples_gsp_phot_source_id_idx ON mcmc_samples_gsp_phot (source_id);
 
--- [Parámetros astrofísicos] mcmc_samples_msc — acceso: DataLink (MCMC_MSC)
+-- [Parámetros astrofísicos] gaiadr3.mcmc_samples_msc — acceso: DataLink (MCMC_MSC)
 CREATE TABLE IF NOT EXISTS mcmc_samples_msc (
     source_id INTEGER,
     solution_id INTEGER,
@@ -663,7 +664,7 @@ CREATE TABLE IF NOT EXISTS mcmc_samples_msc (
 );
 CREATE INDEX IF NOT EXISTS mcmc_samples_msc_source_id_idx ON mcmc_samples_msc (source_id);
 
--- [Parámetros astrofísicos] oa_neuron_information — acceso: TAP (ADQL)
+-- [Parámetros astrofísicos] gaiadr3.oa_neuron_information — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS oa_neuron_information (
     solution_id INTEGER,
     som_id INTEGER,
@@ -745,7 +746,7 @@ CREATE TABLE IF NOT EXISTS oa_neuron_information (
     bprp_colour_max REAL
 );
 
--- [Parámetros astrofísicos] oa_neuron_xp_spectra — acceso: TAP (ADQL)
+-- [Parámetros astrofísicos] gaiadr3.oa_neuron_xp_spectra — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS oa_neuron_xp_spectra (
     solution_id INTEGER,
     neuron_id INTEGER,
@@ -756,7 +757,7 @@ CREATE TABLE IF NOT EXISTS oa_neuron_xp_spectra (
     xp_spectrum_template_flux REAL
 );
 
--- [Parámetros astrofísicos] total_galactic_extinction_map — acceso: TAP (ADQL)
+-- [Parámetros astrofísicos] gaiadr3.total_galactic_extinction_map — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS total_galactic_extinction_map (
     solution_id INTEGER,
     healpix_id INTEGER,
@@ -770,7 +771,7 @@ CREATE TABLE IF NOT EXISTS total_galactic_extinction_map (
     status INTEGER
 );
 
--- [Parámetros astrofísicos] total_galactic_extinction_map_opt — acceso: TAP (ADQL)
+-- [Parámetros astrofísicos] gaiadr3.total_galactic_extinction_map_opt — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS total_galactic_extinction_map_opt (
     solution_id INTEGER,
     healpix_id INTEGER,
@@ -781,7 +782,7 @@ CREATE TABLE IF NOT EXISTS total_galactic_extinction_map_opt (
     optimum_hpx_level INTEGER
 );
 
--- [Cruce con catálogos externos] allwise_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.allwise_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS allwise_best_neighbour (
     source_id INTEGER,
     original_ext_source_id TEXT,
@@ -793,7 +794,7 @@ CREATE TABLE IF NOT EXISTS allwise_best_neighbour (
 );
 CREATE INDEX IF NOT EXISTS allwise_best_neighbour_source_id_idx ON allwise_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] allwise_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.allwise_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS allwise_neighbourhood (
     source_id INTEGER,
     original_ext_source_id TEXT,
@@ -804,7 +805,7 @@ CREATE TABLE IF NOT EXISTS allwise_neighbourhood (
 );
 CREATE INDEX IF NOT EXISTS allwise_neighbourhood_source_id_idx ON allwise_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] apassdr9_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.apassdr9_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS apassdr9_best_neighbour (
     source_id INTEGER,
     clean_apassdr9_oid INTEGER,
@@ -816,13 +817,13 @@ CREATE TABLE IF NOT EXISTS apassdr9_best_neighbour (
 );
 CREATE INDEX IF NOT EXISTS apassdr9_best_neighbour_source_id_idx ON apassdr9_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] apassdr9_join — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.apassdr9_join — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS apassdr9_join (
     original_ext_source_id INTEGER,
     clean_apassdr9_oid INTEGER
 );
 
--- [Cruce con catálogos externos] apassdr9_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.apassdr9_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS apassdr9_neighbourhood (
     source_id INTEGER,
     clean_apassdr9_oid INTEGER,
@@ -833,7 +834,7 @@ CREATE TABLE IF NOT EXISTS apassdr9_neighbourhood (
 );
 CREATE INDEX IF NOT EXISTS apassdr9_neighbourhood_source_id_idx ON apassdr9_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] dr2_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.dr2_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS dr2_neighbourhood (
     dr2_source_id INTEGER,
     dr3_source_id INTEGER,
@@ -842,7 +843,7 @@ CREATE TABLE IF NOT EXISTS dr2_neighbourhood (
     proper_motion_propagation INTEGER
 );
 
--- [Cruce con catálogos externos] gsc23_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.gsc23_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gsc23_best_neighbour (
     source_id INTEGER,
     original_ext_source_id TEXT,
@@ -854,13 +855,13 @@ CREATE TABLE IF NOT EXISTS gsc23_best_neighbour (
 );
 CREATE INDEX IF NOT EXISTS gsc23_best_neighbour_source_id_idx ON gsc23_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] gsc23_join — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.gsc23_join — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gsc23_join (
     original_ext_source_id TEXT,
     clean_gsc23_oid INTEGER
 );
 
--- [Cruce con catálogos externos] gsc23_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.gsc23_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gsc23_neighbourhood (
     source_id INTEGER,
     original_ext_source_id TEXT,
@@ -871,7 +872,7 @@ CREATE TABLE IF NOT EXISTS gsc23_neighbourhood (
 );
 CREATE INDEX IF NOT EXISTS gsc23_neighbourhood_source_id_idx ON gsc23_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] hipparcos2_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.hipparcos2_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS hipparcos2_best_neighbour (
     source_id INTEGER,
     original_ext_source_id INTEGER,
@@ -881,7 +882,7 @@ CREATE TABLE IF NOT EXISTS hipparcos2_best_neighbour (
 );
 CREATE INDEX IF NOT EXISTS hipparcos2_best_neighbour_source_id_idx ON hipparcos2_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] hipparcos2_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.hipparcos2_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS hipparcos2_neighbourhood (
     source_id INTEGER,
     original_ext_source_id INTEGER,
@@ -891,7 +892,7 @@ CREATE TABLE IF NOT EXISTS hipparcos2_neighbourhood (
 );
 CREATE INDEX IF NOT EXISTS hipparcos2_neighbourhood_source_id_idx ON hipparcos2_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] panstarrs1_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.panstarrs1_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS panstarrs1_best_neighbour (
     source_id INTEGER,
     clean_panstarrs1_oid INTEGER,
@@ -903,13 +904,13 @@ CREATE TABLE IF NOT EXISTS panstarrs1_best_neighbour (
 );
 CREATE INDEX IF NOT EXISTS panstarrs1_best_neighbour_source_id_idx ON panstarrs1_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] panstarrs1_join — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.panstarrs1_join — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS panstarrs1_join (
     original_ext_source_id INTEGER,
     clean_panstarrs1_oid INTEGER
 );
 
--- [Cruce con catálogos externos] panstarrs1_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.panstarrs1_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS panstarrs1_neighbourhood (
     source_id INTEGER,
     clean_panstarrs1_oid INTEGER,
@@ -920,7 +921,7 @@ CREATE TABLE IF NOT EXISTS panstarrs1_neighbourhood (
 );
 CREATE INDEX IF NOT EXISTS panstarrs1_neighbourhood_source_id_idx ON panstarrs1_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] ravedr5_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.ravedr5_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS ravedr5_best_neighbour (
     source_id INTEGER,
     original_ext_source_id TEXT,
@@ -931,13 +932,13 @@ CREATE TABLE IF NOT EXISTS ravedr5_best_neighbour (
 );
 CREATE INDEX IF NOT EXISTS ravedr5_best_neighbour_source_id_idx ON ravedr5_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] ravedr5_join — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.ravedr5_join — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS ravedr5_join (
     original_ext_source_id TEXT,
     clean_ravedr5_oid INTEGER
 );
 
--- [Cruce con catálogos externos] ravedr5_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.ravedr5_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS ravedr5_neighbourhood (
     source_id INTEGER,
     original_ext_source_id TEXT,
@@ -948,7 +949,7 @@ CREATE TABLE IF NOT EXISTS ravedr5_neighbourhood (
 );
 CREATE INDEX IF NOT EXISTS ravedr5_neighbourhood_source_id_idx ON ravedr5_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] ravedr6_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.ravedr6_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS ravedr6_best_neighbour (
     source_id INTEGER,
     original_ext_source_id TEXT,
@@ -959,13 +960,13 @@ CREATE TABLE IF NOT EXISTS ravedr6_best_neighbour (
 );
 CREATE INDEX IF NOT EXISTS ravedr6_best_neighbour_source_id_idx ON ravedr6_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] ravedr6_join — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.ravedr6_join — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS ravedr6_join (
     original_ext_source_id TEXT,
     ravedr6_oid INTEGER
 );
 
--- [Cruce con catálogos externos] ravedr6_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.ravedr6_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS ravedr6_neighbourhood (
     source_id INTEGER,
     original_ext_source_id TEXT,
@@ -976,7 +977,7 @@ CREATE TABLE IF NOT EXISTS ravedr6_neighbourhood (
 );
 CREATE INDEX IF NOT EXISTS ravedr6_neighbourhood_source_id_idx ON ravedr6_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] sdssdr13_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.sdssdr13_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS sdssdr13_best_neighbour (
     source_id INTEGER,
     clean_sdssdr13_oid INTEGER,
@@ -988,13 +989,13 @@ CREATE TABLE IF NOT EXISTS sdssdr13_best_neighbour (
 );
 CREATE INDEX IF NOT EXISTS sdssdr13_best_neighbour_source_id_idx ON sdssdr13_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] sdssdr13_join — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.sdssdr13_join — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS sdssdr13_join (
     original_ext_source_id INTEGER,
     clean_sdssdr13_oid INTEGER
 );
 
--- [Cruce con catálogos externos] sdssdr13_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.sdssdr13_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS sdssdr13_neighbourhood (
     source_id INTEGER,
     clean_sdssdr13_oid INTEGER,
@@ -1005,7 +1006,7 @@ CREATE TABLE IF NOT EXISTS sdssdr13_neighbourhood (
 );
 CREATE INDEX IF NOT EXISTS sdssdr13_neighbourhood_source_id_idx ON sdssdr13_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] skymapperdr2_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.skymapperdr2_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS skymapperdr2_best_neighbour (
     source_id INTEGER,
     original_ext_source_id INTEGER,
@@ -1016,12 +1017,12 @@ CREATE TABLE IF NOT EXISTS skymapperdr2_best_neighbour (
 );
 CREATE INDEX IF NOT EXISTS skymapperdr2_best_neighbour_source_id_idx ON skymapperdr2_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] skymapperdr2_join — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.skymapperdr2_join — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS skymapperdr2_join (
     original_ext_source_id INTEGER
 );
 
--- [Cruce con catálogos externos] skymapperdr2_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.skymapperdr2_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS skymapperdr2_neighbourhood (
     source_id INTEGER,
     original_ext_source_id INTEGER,
@@ -1031,7 +1032,7 @@ CREATE TABLE IF NOT EXISTS skymapperdr2_neighbourhood (
 );
 CREATE INDEX IF NOT EXISTS skymapperdr2_neighbourhood_source_id_idx ON skymapperdr2_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] tmass_psc_xsc_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.tmass_psc_xsc_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS tmass_psc_xsc_best_neighbour (
     source_id INTEGER,
     original_ext_source_id TEXT,
@@ -1043,14 +1044,14 @@ CREATE TABLE IF NOT EXISTS tmass_psc_xsc_best_neighbour (
 );
 CREATE INDEX IF NOT EXISTS tmass_psc_xsc_best_neighbour_source_id_idx ON tmass_psc_xsc_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] tmass_psc_xsc_join — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.tmass_psc_xsc_join — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS tmass_psc_xsc_join (
     original_psc_source_id TEXT,
     original_xsc_source_id TEXT,
     clean_tmass_psc_xsc_oid INTEGER
 );
 
--- [Cruce con catálogos externos] tmass_psc_xsc_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.tmass_psc_xsc_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS tmass_psc_xsc_neighbourhood (
     source_id INTEGER,
     original_ext_source_id TEXT,
@@ -1061,7 +1062,7 @@ CREATE TABLE IF NOT EXISTS tmass_psc_xsc_neighbourhood (
 );
 CREATE INDEX IF NOT EXISTS tmass_psc_xsc_neighbourhood_source_id_idx ON tmass_psc_xsc_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] tycho2tdsc_merge — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.tycho2tdsc_merge — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS tycho2tdsc_merge (
     id TEXT,
     hip INTEGER,
@@ -1118,7 +1119,7 @@ CREATE TABLE IF NOT EXISTS tycho2tdsc_merge (
     e_sep INTEGER
 );
 
--- [Cruce con catálogos externos] tycho2tdsc_merge_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.tycho2tdsc_merge_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS tycho2tdsc_merge_best_neighbour (
     source_id INTEGER,
     original_ext_source_id TEXT,
@@ -1129,7 +1130,7 @@ CREATE TABLE IF NOT EXISTS tycho2tdsc_merge_best_neighbour (
 );
 CREATE INDEX IF NOT EXISTS tycho2tdsc_merge_best_neighbour_source_id_idx ON tycho2tdsc_merge_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] tycho2tdsc_merge_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.tycho2tdsc_merge_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS tycho2tdsc_merge_neighbourhood (
     source_id INTEGER,
     original_ext_source_id TEXT,
@@ -1140,7 +1141,7 @@ CREATE TABLE IF NOT EXISTS tycho2tdsc_merge_neighbourhood (
 );
 CREATE INDEX IF NOT EXISTS tycho2tdsc_merge_neighbourhood_source_id_idx ON tycho2tdsc_merge_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] urat1_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.urat1_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS urat1_best_neighbour (
     source_id INTEGER,
     original_ext_source_id TEXT,
@@ -1152,7 +1153,7 @@ CREATE TABLE IF NOT EXISTS urat1_best_neighbour (
 );
 CREATE INDEX IF NOT EXISTS urat1_best_neighbour_source_id_idx ON urat1_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] urat1_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.urat1_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS urat1_neighbourhood (
     source_id INTEGER,
     original_ext_source_id TEXT,
@@ -1163,7 +1164,7 @@ CREATE TABLE IF NOT EXISTS urat1_neighbourhood (
 );
 CREATE INDEX IF NOT EXISTS urat1_neighbourhood_source_id_idx ON urat1_neighbourhood (source_id);
 
--- [Extragaláctico] galaxy_candidates — acceso: TAP (ADQL)
+-- [Extragaláctico] gaiadr3.galaxy_candidates — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS galaxy_candidates (
     solution_id INTEGER,
     source_id INTEGER,
@@ -1206,7 +1207,7 @@ CREATE TABLE IF NOT EXISTS galaxy_candidates (
 );
 CREATE INDEX IF NOT EXISTS galaxy_candidates_source_id_idx ON galaxy_candidates (source_id);
 
--- [Extragaláctico] galaxy_catalogue_name — acceso: TAP (ADQL)
+-- [Extragaláctico] gaiadr3.galaxy_catalogue_name — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS galaxy_catalogue_name (
     solution_id INTEGER,
     source_id INTEGER,
@@ -1214,7 +1215,7 @@ CREATE TABLE IF NOT EXISTS galaxy_catalogue_name (
 );
 CREATE INDEX IF NOT EXISTS galaxy_catalogue_name_source_id_idx ON galaxy_catalogue_name (source_id);
 
--- [Extragaláctico] qso_candidates — acceso: TAP (ADQL)
+-- [Extragaláctico] gaiadr3.qso_candidates — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS qso_candidates (
     solution_id INTEGER,
     source_id INTEGER,
@@ -1260,7 +1261,7 @@ CREATE TABLE IF NOT EXISTS qso_candidates (
 );
 CREATE INDEX IF NOT EXISTS qso_candidates_source_id_idx ON qso_candidates (source_id);
 
--- [Extragaláctico] qso_catalogue_name — acceso: TAP (ADQL)
+-- [Extragaláctico] gaiadr3.qso_catalogue_name — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS qso_catalogue_name (
     solution_id INTEGER,
     source_id INTEGER,
@@ -1268,7 +1269,7 @@ CREATE TABLE IF NOT EXISTS qso_catalogue_name (
 );
 CREATE INDEX IF NOT EXISTS qso_catalogue_name_source_id_idx ON qso_catalogue_name (source_id);
 
--- [Estrellas no simples (binarias)] nss_acceleration_astro — acceso: TAP (ADQL)
+-- [Estrellas no simples (binarias)] gaiadr3.nss_acceleration_astro — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS nss_acceleration_astro (
     solution_id INTEGER,
     source_id INTEGER,
@@ -1302,7 +1303,7 @@ CREATE TABLE IF NOT EXISTS nss_acceleration_astro (
 );
 CREATE INDEX IF NOT EXISTS nss_acceleration_astro_source_id_idx ON nss_acceleration_astro (source_id);
 
--- [Estrellas no simples (binarias)] nss_non_linear_spectro — acceso: TAP (ADQL)
+-- [Estrellas no simples (binarias)] gaiadr3.nss_non_linear_spectro — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS nss_non_linear_spectro (
     solution_id INTEGER,
     source_id INTEGER,
@@ -1323,7 +1324,7 @@ CREATE TABLE IF NOT EXISTS nss_non_linear_spectro (
 );
 CREATE INDEX IF NOT EXISTS nss_non_linear_spectro_source_id_idx ON nss_non_linear_spectro (source_id);
 
--- [Estrellas no simples (binarias)] nss_two_body_orbit — acceso: TAP (ADQL)
+-- [Estrellas no simples (binarias)] gaiadr3.nss_two_body_orbit — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS nss_two_body_orbit (
     solution_id INTEGER,
     source_id INTEGER,
@@ -1405,7 +1406,7 @@ CREATE TABLE IF NOT EXISTS nss_two_body_orbit (
 );
 CREATE INDEX IF NOT EXISTS nss_two_body_orbit_source_id_idx ON nss_two_body_orbit (source_id);
 
--- [Estrellas no simples (binarias)] nss_vim_fl — acceso: TAP (ADQL)
+-- [Estrellas no simples (binarias)] gaiadr3.nss_vim_fl — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS nss_vim_fl (
     solution_id INTEGER,
     source_id INTEGER,
@@ -1437,7 +1438,7 @@ CREATE TABLE IF NOT EXISTS nss_vim_fl (
 );
 CREATE INDEX IF NOT EXISTS nss_vim_fl_source_id_idx ON nss_vim_fl (source_id);
 
--- [Verificación de rendimiento] binary_masses — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.binary_masses — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS binary_masses (
     source_id INTEGER,
     m1 REAL,
@@ -1455,7 +1456,7 @@ CREATE TABLE IF NOT EXISTS binary_masses (
 );
 CREATE INDEX IF NOT EXISTS binary_masses_source_id_idx ON binary_masses (source_id);
 
--- [Verificación de rendimiento] chemical_cartography — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.chemical_cartography — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS chemical_cartography (
     solution_id INTEGER,
     source_id INTEGER,
@@ -1505,13 +1506,13 @@ CREATE TABLE IF NOT EXISTS chemical_cartography (
 );
 CREATE INDEX IF NOT EXISTS chemical_cartography_source_id_idx ON chemical_cartography (source_id);
 
--- [Verificación de rendimiento] gold_sample_carbon_stars — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.gold_sample_carbon_stars — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gold_sample_carbon_stars (
     source_id INTEGER
 );
 CREATE INDEX IF NOT EXISTS gold_sample_carbon_stars_source_id_idx ON gold_sample_carbon_stars (source_id);
 
--- [Verificación de rendimiento] gold_sample_fgkm_stars — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.gold_sample_fgkm_stars — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gold_sample_fgkm_stars (
     source_id INTEGER,
     teff_gspphot REAL,
@@ -1537,20 +1538,20 @@ CREATE TABLE IF NOT EXISTS gold_sample_fgkm_stars (
 );
 CREATE INDEX IF NOT EXISTS gold_sample_fgkm_stars_source_id_idx ON gold_sample_fgkm_stars (source_id);
 
--- [Verificación de rendimiento] gold_sample_oba_stars — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.gold_sample_oba_stars — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gold_sample_oba_stars (
     source_id INTEGER,
     vtan_flag INTEGER
 );
 CREATE INDEX IF NOT EXISTS gold_sample_oba_stars_source_id_idx ON gold_sample_oba_stars (source_id);
 
--- [Verificación de rendimiento] gold_sample_solar_analogues — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.gold_sample_solar_analogues — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gold_sample_solar_analogues (
     source_id INTEGER
 );
 CREATE INDEX IF NOT EXISTS gold_sample_solar_analogues_source_id_idx ON gold_sample_solar_analogues (source_id);
 
--- [Verificación de rendimiento] gold_sample_spss — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.gold_sample_spss — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gold_sample_spss (
     source_id INTEGER,
     spss_id INTEGER,
@@ -1590,7 +1591,7 @@ CREATE TABLE IF NOT EXISTS gold_sample_spss (
 );
 CREATE INDEX IF NOT EXISTS gold_sample_spss_source_id_idx ON gold_sample_spss (source_id);
 
--- [Verificación de rendimiento] gold_sample_ucd — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.gold_sample_ucd — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gold_sample_ucd (
     source_id INTEGER,
     ftot_fobs REAL,
@@ -1602,7 +1603,7 @@ CREATE TABLE IF NOT EXISTS gold_sample_ucd (
 );
 CREATE INDEX IF NOT EXISTS gold_sample_ucd_source_id_idx ON gold_sample_ucd (source_id);
 
--- [Verificación de rendimiento] sso_orbits — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.sso_orbits — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS sso_orbits (
     number_mp INTEGER,
     denomination TEXT,
@@ -1621,7 +1622,7 @@ CREATE TABLE IF NOT EXISTS sso_orbits (
     num_observations INTEGER
 );
 
--- [Verificación de rendimiento] synthetic_photometry_gspc — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.synthetic_photometry_gspc — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS synthetic_photometry_gspc (
     source_id INTEGER,
     c_star REAL,
@@ -1680,7 +1681,7 @@ CREATE TABLE IF NOT EXISTS synthetic_photometry_gspc (
 );
 CREATE INDEX IF NOT EXISTS synthetic_photometry_gspc_source_id_idx ON synthetic_photometry_gspc (source_id);
 
--- [Verificación de rendimiento] vari_spurious_signals — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.vari_spurious_signals — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS vari_spurious_signals (
     source_id INTEGER,
     phot_variable_flag TEXT,
@@ -1723,7 +1724,7 @@ CREATE TABLE IF NOT EXISTS vari_spurious_signals (
 );
 CREATE INDEX IF NOT EXISTS vari_spurious_signals_source_id_idx ON vari_spurious_signals (source_id);
 
--- [Fotometría por época] epoch_photometry — acceso: DataLink (EPOCH_PHOTOMETRY)
+-- [Fotometría por época] gaiadr3.epoch_photometry — acceso: DataLink (EPOCH_PHOTOMETRY)
 CREATE TABLE IF NOT EXISTS epoch_photometry (
     solution_id INTEGER,
     source_id INTEGER,
@@ -1776,7 +1777,7 @@ CREATE TABLE IF NOT EXISTS epoch_photometry (
 );
 CREATE INDEX IF NOT EXISTS epoch_photometry_source_id_idx ON epoch_photometry (source_id);
 
--- [Marco de referencia] agn_cross_id — acceso: TAP (ADQL)
+-- [Marco de referencia] gaiadr3.agn_cross_id — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS agn_cross_id (
     source_name_in_catalogue TEXT,
     source_id INTEGER,
@@ -1784,7 +1785,7 @@ CREATE TABLE IF NOT EXISTS agn_cross_id (
 );
 CREATE INDEX IF NOT EXISTS agn_cross_id_source_id_idx ON agn_cross_id (source_id);
 
--- [Marco de referencia] frame_rotator_source — acceso: TAP (ADQL)
+-- [Marco de referencia] gaiadr3.frame_rotator_source — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS frame_rotator_source (
     source_id INTEGER,
     considered_for_reference_frame_orientation INTEGER,
@@ -1794,7 +1795,7 @@ CREATE TABLE IF NOT EXISTS frame_rotator_source (
 );
 CREATE INDEX IF NOT EXISTS frame_rotator_source_source_id_idx ON frame_rotator_source (source_id);
 
--- [Marco de referencia] gaia_crf3_xm — acceso: TAP (ADQL)
+-- [Marco de referencia] gaiadr3.gaia_crf3_xm — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaia_crf3_xm (
     solution_id INTEGER,
     source_id INTEGER,
@@ -1836,14 +1837,14 @@ CREATE TABLE IF NOT EXISTS gaia_crf3_xm (
 );
 CREATE INDEX IF NOT EXISTS gaia_crf3_xm_source_id_idx ON gaia_crf3_xm (source_id);
 
--- [Alertas científicas] alerts_mixedin_sourceids — acceso: TAP (ADQL)
+-- [Alertas científicas] gaiadr3.alerts_mixedin_sourceids — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS alerts_mixedin_sourceids (
     solution_id INTEGER,
     alert_source_id INTEGER,
     mixed_in_source_id INTEGER
 );
 
--- [Alertas científicas] science_alerts — acceso: TAP (ADQL)
+-- [Alertas científicas] gaiadr3.science_alerts — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS science_alerts (
     source_id INTEGER,
     transit_id INTEGER,
@@ -1852,7 +1853,7 @@ CREATE TABLE IF NOT EXISTS science_alerts (
 );
 CREATE INDEX IF NOT EXISTS science_alerts_source_id_idx ON science_alerts (source_id);
 
--- [Sistema solar] sso_observation — acceso: TAP (ADQL)
+-- [Sistema solar] gaiadr3.sso_observation — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS sso_observation (
     solution_id INTEGER,
     source_id INTEGER,
@@ -1892,7 +1893,7 @@ CREATE TABLE IF NOT EXISTS sso_observation (
 );
 CREATE INDEX IF NOT EXISTS sso_observation_source_id_idx ON sso_observation (source_id);
 
--- [Sistema solar] sso_reflectance_spectrum — acceso: TAP (ADQL)
+-- [Sistema solar] gaiadr3.sso_reflectance_spectrum — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS sso_reflectance_spectrum (
     source_id INTEGER,
     solution_id INTEGER,
@@ -1907,7 +1908,7 @@ CREATE TABLE IF NOT EXISTS sso_reflectance_spectrum (
 );
 CREATE INDEX IF NOT EXISTS sso_reflectance_spectrum_source_id_idx ON sso_reflectance_spectrum (source_id);
 
--- [Sistema solar] sso_source — acceso: TAP (ADQL)
+-- [Sistema solar] gaiadr3.sso_source — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS sso_source (
     solution_id INTEGER,
     source_id INTEGER,
@@ -1918,7 +1919,7 @@ CREATE TABLE IF NOT EXISTS sso_source (
 );
 CREATE INDEX IF NOT EXISTS sso_source_source_id_idx ON sso_source (source_id);
 
--- [Espectroscopía] rvs_mean_spectrum — acceso: DataLink (RVS)
+-- [Espectroscopía] gaiadr3.rvs_mean_spectrum — acceso: DataLink (RVS)
 CREATE TABLE IF NOT EXISTS rvs_mean_spectrum (
     source_id INTEGER,
     solution_id INTEGER,
@@ -1932,7 +1933,7 @@ CREATE TABLE IF NOT EXISTS rvs_mean_spectrum (
 );
 CREATE INDEX IF NOT EXISTS rvs_mean_spectrum_source_id_idx ON rvs_mean_spectrum (source_id);
 
--- [Espectroscopía] xp_continuous_mean_spectrum — acceso: DataLink (XP_CONTINUOUS)
+-- [Espectroscopía] gaiadr3.xp_continuous_mean_spectrum — acceso: DataLink (XP_CONTINUOUS)
 CREATE TABLE IF NOT EXISTS xp_continuous_mean_spectrum (
     source_id INTEGER,
     solution_id INTEGER,
@@ -1963,7 +1964,7 @@ CREATE TABLE IF NOT EXISTS xp_continuous_mean_spectrum (
 );
 CREATE INDEX IF NOT EXISTS xp_continuous_mean_spectrum_source_id_idx ON xp_continuous_mean_spectrum (source_id);
 
--- [Espectroscopía] xp_sampled_mean_spectrum — acceso: DataLink (XP_SAMPLED)
+-- [Espectroscopía] gaiadr3.xp_sampled_mean_spectrum — acceso: DataLink (XP_SAMPLED)
 CREATE TABLE IF NOT EXISTS xp_sampled_mean_spectrum (
     source_id INTEGER,
     solution_id INTEGER,
@@ -1974,7 +1975,7 @@ CREATE TABLE IF NOT EXISTS xp_sampled_mean_spectrum (
 );
 CREATE INDEX IF NOT EXISTS xp_sampled_mean_spectrum_source_id_idx ON xp_sampled_mean_spectrum (source_id);
 
--- [Espectroscopía] xp_summary — acceso: TAP (ADQL)
+-- [Espectroscopía] gaiadr3.xp_summary — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS xp_summary (
     source_id INTEGER,
     solution_id INTEGER,
@@ -1999,7 +2000,7 @@ CREATE TABLE IF NOT EXISTS xp_summary (
 );
 CREATE INDEX IF NOT EXISTS xp_summary_source_id_idx ON xp_summary (source_id);
 
--- [Variabilidad] vari_agn — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_agn — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS vari_agn (
     solution_id INTEGER,
     source_id INTEGER,
@@ -2011,7 +2012,7 @@ CREATE TABLE IF NOT EXISTS vari_agn (
 );
 CREATE INDEX IF NOT EXISTS vari_agn_source_id_idx ON vari_agn (source_id);
 
--- [Variabilidad] vari_cepheid — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_cepheid — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS vari_cepheid (
     solution_id INTEGER,
     source_id INTEGER,
@@ -2097,7 +2098,7 @@ CREATE TABLE IF NOT EXISTS vari_cepheid (
 );
 CREATE INDEX IF NOT EXISTS vari_cepheid_source_id_idx ON vari_cepheid (source_id);
 
--- [Variabilidad] vari_classifier_class_definition — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_classifier_class_definition — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS vari_classifier_class_definition (
     solution_id INTEGER,
     classifier_name TEXT,
@@ -2105,14 +2106,14 @@ CREATE TABLE IF NOT EXISTS vari_classifier_class_definition (
     class_description TEXT
 );
 
--- [Variabilidad] vari_classifier_definition — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_classifier_definition — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS vari_classifier_definition (
     solution_id INTEGER,
     classifier_name TEXT,
     classifier_description TEXT
 );
 
--- [Variabilidad] vari_classifier_result — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_classifier_result — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS vari_classifier_result (
     solution_id INTEGER,
     source_id INTEGER,
@@ -2122,7 +2123,7 @@ CREATE TABLE IF NOT EXISTS vari_classifier_result (
 );
 CREATE INDEX IF NOT EXISTS vari_classifier_result_source_id_idx ON vari_classifier_result (source_id);
 
--- [Variabilidad] vari_compact_companion — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_compact_companion — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS vari_compact_companion (
     solution_id INTEGER,
     source_id INTEGER,
@@ -2153,7 +2154,7 @@ CREATE TABLE IF NOT EXISTS vari_compact_companion (
 );
 CREATE INDEX IF NOT EXISTS vari_compact_companion_source_id_idx ON vari_compact_companion (source_id);
 
--- [Variabilidad] vari_eclipsing_binary — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_eclipsing_binary — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS vari_eclipsing_binary (
     solution_id INTEGER,
     source_id INTEGER,
@@ -2197,7 +2198,7 @@ CREATE TABLE IF NOT EXISTS vari_eclipsing_binary (
 );
 CREATE INDEX IF NOT EXISTS vari_eclipsing_binary_source_id_idx ON vari_eclipsing_binary (source_id);
 
--- [Variabilidad] vari_epoch_radial_velocity — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_epoch_radial_velocity — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS vari_epoch_radial_velocity (
     source_id INTEGER,
     transit_id INTEGER,
@@ -2209,7 +2210,7 @@ CREATE TABLE IF NOT EXISTS vari_epoch_radial_velocity (
 );
 CREATE INDEX IF NOT EXISTS vari_epoch_radial_velocity_source_id_idx ON vari_epoch_radial_velocity (source_id);
 
--- [Variabilidad] vari_long_period_variable — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_long_period_variable — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS vari_long_period_variable (
     solution_id INTEGER,
     source_id INTEGER,
@@ -2221,7 +2222,7 @@ CREATE TABLE IF NOT EXISTS vari_long_period_variable (
 );
 CREATE INDEX IF NOT EXISTS vari_long_period_variable_source_id_idx ON vari_long_period_variable (source_id);
 
--- [Variabilidad] vari_microlensing — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_microlensing — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS vari_microlensing (
     solution_id INTEGER,
     source_id INTEGER,
@@ -2262,7 +2263,7 @@ CREATE TABLE IF NOT EXISTS vari_microlensing (
 );
 CREATE INDEX IF NOT EXISTS vari_microlensing_source_id_idx ON vari_microlensing (source_id);
 
--- [Variabilidad] vari_ms_oscillator — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_ms_oscillator — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS vari_ms_oscillator (
     solution_id INTEGER,
     source_id INTEGER,
@@ -2278,7 +2279,7 @@ CREATE TABLE IF NOT EXISTS vari_ms_oscillator (
 );
 CREATE INDEX IF NOT EXISTS vari_ms_oscillator_source_id_idx ON vari_ms_oscillator (source_id);
 
--- [Variabilidad] vari_planetary_transit — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_planetary_transit — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS vari_planetary_transit (
     solution_id INTEGER,
     source_id INTEGER,
@@ -2290,7 +2291,7 @@ CREATE TABLE IF NOT EXISTS vari_planetary_transit (
 );
 CREATE INDEX IF NOT EXISTS vari_planetary_transit_source_id_idx ON vari_planetary_transit (source_id);
 
--- [Variabilidad] vari_planetary_transit_13june2022 — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_planetary_transit_13june2022 — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS vari_planetary_transit_13june2022 (
     solution_id INTEGER,
     source_id INTEGER,
@@ -2302,7 +2303,7 @@ CREATE TABLE IF NOT EXISTS vari_planetary_transit_13june2022 (
 );
 CREATE INDEX IF NOT EXISTS vari_planetary_transit_13june2022_source_id_idx ON vari_planetary_transit_13june2022 (source_id);
 
--- [Variabilidad] vari_rad_vel_statistics — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_rad_vel_statistics — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS vari_rad_vel_statistics (
     solution_id INTEGER,
     source_id INTEGER,
@@ -2323,7 +2324,7 @@ CREATE TABLE IF NOT EXISTS vari_rad_vel_statistics (
 );
 CREATE INDEX IF NOT EXISTS vari_rad_vel_statistics_source_id_idx ON vari_rad_vel_statistics (source_id);
 
--- [Variabilidad] vari_rotation_modulation — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_rotation_modulation — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS vari_rotation_modulation (
     solution_id INTEGER,
     source_id INTEGER,
@@ -2394,7 +2395,7 @@ CREATE TABLE IF NOT EXISTS vari_rotation_modulation (
 );
 CREATE INDEX IF NOT EXISTS vari_rotation_modulation_source_id_idx ON vari_rotation_modulation (source_id);
 
--- [Variabilidad] vari_rrlyrae — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_rrlyrae — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS vari_rrlyrae (
     solution_id INTEGER,
     source_id INTEGER,
@@ -2477,7 +2478,7 @@ CREATE TABLE IF NOT EXISTS vari_rrlyrae (
 );
 CREATE INDEX IF NOT EXISTS vari_rrlyrae_source_id_idx ON vari_rrlyrae (source_id);
 
--- [Variabilidad] vari_short_timescale — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_short_timescale — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS vari_short_timescale (
     solution_id INTEGER,
     source_id INTEGER,
@@ -2491,7 +2492,7 @@ CREATE TABLE IF NOT EXISTS vari_short_timescale (
 );
 CREATE INDEX IF NOT EXISTS vari_short_timescale_source_id_idx ON vari_short_timescale (source_id);
 
--- [Variabilidad] vari_summary — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_summary — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS vari_summary (
     solution_id INTEGER,
     source_id INTEGER,
@@ -2564,7 +2565,7 @@ CREATE TABLE IF NOT EXISTS vari_summary (
 );
 CREATE INDEX IF NOT EXISTS vari_summary_source_id_idx ON vari_summary (source_id);
 
--- [Simulación] gaia_source_simulation — acceso: TAP (ADQL)
+-- [Simulación] gaiadr3.gaia_source_simulation — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaia_source_simulation (
     solution_id INTEGER,
     source_id INTEGER,
@@ -2607,7 +2608,7 @@ CREATE TABLE IF NOT EXISTS gaia_source_simulation (
 );
 CREATE INDEX IF NOT EXISTS gaia_source_simulation_source_id_idx ON gaia_source_simulation (source_id);
 
--- [Simulación] gaia_universe_model — acceso: TAP (ADQL)
+-- [Simulación] gaiadr3.gaia_universe_model — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaia_universe_model (
     source_extended_id TEXT,
     source_id INTEGER,
@@ -2655,7 +2656,7 @@ CREATE TABLE IF NOT EXISTS gaia_universe_model (
 );
 CREATE INDEX IF NOT EXISTS gaia_universe_model_source_id_idx ON gaia_universe_model (source_id);
 
--- [Auxiliar] commanded_scan_law — acceso: TAP (ADQL)
+-- [Auxiliar] gaiadr3.commanded_scan_law — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS commanded_scan_law (
     jd_time REAL,
     bjd_fov1 REAL,
@@ -2671,4 +2672,424 @@ CREATE TABLE IF NOT EXISTS commanded_scan_law (
     scan_angle_fov2 REAL,
     solution_id INTEGER
 );
+
+-- [SPHEREx: tablas TAP de IRSA] spherex.artifact — acceso: TAP IRSA (ADQL)
+CREATE TABLE IF NOT EXISTS spherex_artifact (
+    planeid TEXT,
+    artifactid TEXT,
+    uri TEXT,
+    producttype TEXT,
+    releasetype TEXT,
+    contenttype TEXT,
+    contentlength INTEGER,
+    contentchecksum TEXT,
+    ipac_gid INTEGER,
+    mission_id INTEGER,
+    ipac_pub_date TEXT,
+    lastmodified TEXT
+);
+
+-- [SPHEREx: tablas TAP de IRSA] spherex.obscore — acceso: TAP IRSA (ADQL)
+CREATE TABLE IF NOT EXISTS spherex_obscore (
+    obs_id TEXT,
+    obs_collection TEXT,
+    s_ra REAL,
+    s_dec REAL,
+    energy_bandpassname TEXT,
+    em_min REAL,
+    em_max REAL,
+    t_min REAL,
+    t_max REAL,
+    t_exptime REAL,
+    access_url TEXT,
+    access_format TEXT,
+    dataproduct_type TEXT,
+    calib_level INTEGER,
+    target_name TEXT,
+    obs_title TEXT,
+    facility_name TEXT,
+    instrument_name TEXT,
+    obs_creation_date TEXT,
+    obs_creator_name TEXT,
+    obs_release_date TEXT,
+    obs_publisher_did TEXT,
+    publisher_id TEXT,
+    bib_reference TEXT,
+    data_rights TEXT,
+    s_fov REAL,
+    s_region TEXT,
+    s_resolution REAL,
+    s_xel1 INTEGER,
+    s_xel2 INTEGER,
+    s_ucd TEXT,
+    s_unit TEXT,
+    s_resolution_min REAL,
+    s_resolution_max REAL,
+    s_calib_status TEXT,
+    s_pixel_scale REAL,
+    t_xel INTEGER,
+    t_resolution REAL,
+    em_xel INTEGER,
+    em_calib_status TEXT,
+    em_res_power REAL,
+    pol_xel INTEGER,
+    proposal_id TEXT,
+    energy_emband TEXT,
+    position_timedependent INTEGER,
+    obs_intent TEXT,
+    algorithm_name TEXT,
+    facility_keywords TEXT,
+    instrument_keywords TEXT,
+    environment_photometric INTEGER,
+    proposal_project TEXT,
+    target_type TEXT,
+    target_standard INTEGER,
+    target_moving INTEGER,
+    target_keywords TEXT,
+    proposal_pi TEXT,
+    access_estsize INTEGER,
+    o_ucd TEXT,
+    ipac_gid INTEGER,
+    ipac_pub_date TEXT,
+    pt TEXT,
+    poly TEXT
+);
+CREATE INDEX IF NOT EXISTS spherex_obscore_obs_publisher_did_idx ON spherex_obscore (obs_publisher_did);
+
+-- [SPHEREx: tablas TAP de IRSA] spherex.observation — acceso: TAP IRSA (ADQL)
+CREATE TABLE IF NOT EXISTS spherex_observation (
+    obsid TEXT,
+    collection TEXT,
+    observationid TEXT,
+    metarelease TEXT,
+    sequencenumber INTEGER,
+    type TEXT,
+    intent TEXT,
+    algorithm_name TEXT,
+    telescope_name TEXT,
+    telescope_geolocationx REAL,
+    telescope_geolocationy REAL,
+    telescope_geolocationz REAL,
+    telescope_keywords TEXT,
+    instrument_name TEXT,
+    instrument_keywords TEXT,
+    environment_seeing REAL,
+    environment_humidity REAL,
+    environment_elevation REAL,
+    environment_tau REAL,
+    environment_wavelengthtau REAL,
+    environment_ambienttemp REAL,
+    environment_photometric INTEGER,
+    proposal_id TEXT,
+    proposal_pi TEXT,
+    proposal_project TEXT,
+    proposal_title TEXT,
+    proposal_keywords TEXT,
+    target_name TEXT,
+    target_type TEXT,
+    target_redshift REAL,
+    target_standard INTEGER,
+    target_moving INTEGER,
+    target_keywords TEXT,
+    targetposition_coordinates TEXT,
+    targetposition_coordsys TEXT,
+    targetposition_equinox REAL,
+    requirements_flag TEXT,
+    ipac_gid INTEGER,
+    mission_id INTEGER,
+    ipac_pub_date TEXT,
+    lastmodified TEXT
+);
+
+-- [SPHEREx: tablas TAP de IRSA] spherex.plane — acceso: TAP IRSA (ADQL)
+CREATE TABLE IF NOT EXISTS spherex_plane (
+    obsid TEXT,
+    planeid TEXT,
+    productid TEXT,
+    creatorid TEXT,
+    metarelease TEXT,
+    datarelease TEXT,
+    calibrationlevel INTEGER,
+    dataproducttype TEXT,
+    quality_flag TEXT,
+    metrics_sourcenumberdensity REAL,
+    metrics_background REAL,
+    metrics_backgroundstddev REAL,
+    metrics_fluxdensitylimit REAL,
+    metrics_maglimit REAL,
+    position_dimension_naxis1 INTEGER,
+    position_dimension_naxis2 INTEGER,
+    position_resolution REAL,
+    position_samplesize REAL,
+    position_timedependent INTEGER,
+    energy_bounds_lower REAL,
+    energy_bounds_upper REAL,
+    energy_bounds_samples REAL,
+    energy_emband TEXT,
+    energy_dimension INTEGER,
+    energy_resolvingpower REAL,
+    energy_samplesize REAL,
+    energy_bandpassname TEXT,
+    energy_transition_species TEXT,
+    energy_transition_transition TEXT,
+    energy_restwav REAL,
+    time_bounds_lower REAL,
+    time_bounds_upper REAL,
+    time_bounds_samples REAL,
+    time_dimension INTEGER,
+    time_resolution REAL,
+    time_samplesize REAL,
+    time_exposure REAL,
+    polarization_states TEXT,
+    polarization_dimension INTEGER,
+    provenance_name TEXT,
+    provenance_reference TEXT,
+    provenance_version TEXT,
+    provenance_project TEXT,
+    provenance_producer TEXT,
+    provenance_runid TEXT,
+    provenance_lastexecuted TEXT,
+    provenance_keywords TEXT,
+    ipac_gid INTEGER,
+    mission_id INTEGER,
+    poly TEXT,
+    pt TEXT,
+    ipac_pub_date TEXT,
+    lastmodified TEXT,
+    obs_publisher_did TEXT
+);
+CREATE INDEX IF NOT EXISTS spherex_plane_obs_publisher_did_idx ON spherex_plane (obs_publisher_did);
+
+-- [SPHEREx: tablas TAP de IRSA] spherex.provenance_input — acceso: TAP IRSA (ADQL)
+CREATE TABLE IF NOT EXISTS spherex_provenance_input (
+    inputid TEXT,
+    outputid TEXT
+);
+
+-- [SPHEREx: tablas TAP de IRSA] spherex.splices — acceso: TAP IRSA (ADQL)
+CREATE TABLE IF NOT EXISTS spherex_splices (
+    source_id INTEGER,
+    designation TEXT,
+    ra REAL,
+    dec REAL,
+    gal_long REAL,
+    gal_lat REAL,
+    tmassdesignation TEXT,
+    tmassra REAL,
+    tmassdec REAL,
+    j REAL,
+    jerr REAL,
+    h REAL,
+    herr REAL,
+    k REAL,
+    kerr REAL,
+    ph_qual TEXT,
+    rd_flg INTEGER,
+    prox REAL,
+    w1 REAL,
+    w1err REAL,
+    w2 REAL,
+    w2err REAL,
+    w3 REAL,
+    w3err REAL,
+    w4 REAL,
+    w4err REAL,
+    cc_flags TEXT,
+    ext_flg INTEGER,
+    var_flg TEXT,
+    irac_designation TEXT,
+    ra_irac REAL,
+    dec_irac REAL,
+    mag3_6 REAL,
+    d3_6m REAL,
+    mag4_5 REAL,
+    d4_5m REAL,
+    mag5_8 REAL,
+    d5_8m REAL,
+    mag8_0 REAL,
+    d8_0m REAL,
+    sel_type TEXT,
+    class_1 TEXT,
+    yso_pub INTEGER,
+    stype_ml TEXT,
+    stype_ml_prob1 REAL,
+    stype_ml_prob2 REAL,
+    name TEXT,
+    gaia_dr3 INTEGER,
+    gaiadr3_g REAL,
+    gaiadr3_gerr REAL,
+    gaiadr3_b REAL,
+    gaiadr3_berr REAL,
+    gaiadr3_r REAL,
+    gaiadr3_rerr REAL,
+    plx REAL,
+    e_plx REAL,
+    pmra REAL,
+    pmra_err REAL,
+    pmdec REAL,
+    pmdec_err REAL,
+    gaiadist REAL,
+    e_dist_upper REAL,
+    e_dist_lower REAL,
+    classvar TEXT,
+    w1var INTEGER,
+    w1var_class TEXT,
+    w2var INTEGER,
+    w2var_class TEXT,
+    w1varavg REAL,
+    w2varavg REAL,
+    w1varamp REAL,
+    w2varamp REAL,
+    av REAL,
+    mc TEXT,
+    mc_lon REAL,
+    mc_lat REAL,
+    mc_dist REAL,
+    mc_avf REAL,
+    mc_los TEXT,
+    numgaianb INTEGER,
+    maxrmag REAL,
+    sumrflux REAL,
+    mainrflux REAL,
+    fluxratiogaia REAL,
+    mingaiadist REAL,
+    mindistgaiaflux REAL,
+    noc INTEGER,
+    noc_gl REAL,
+    noc_gb REAL,
+    numiracnbors INTEGER,
+    mindistirac REAL,
+    i1mag REAL,
+    maxi1mag REAL,
+    sumi1flux REAL,
+    maini1flux REAL,
+    mindisti1flux REAL,
+    i2mag REAL,
+    maxi2mag REAL,
+    sumi2flux REAL,
+    maini2flux REAL,
+    mindisti2flux REAL,
+    fluxratioi1 REAL,
+    fluxratioi2 REAL,
+    numvvvneighbors INTEGER,
+    mindistvvv REAL,
+    vvvjmag REAL,
+    maxvvvjmag REAL,
+    sumvvvjflux REAL,
+    mainvvvjflux REAL,
+    mindistvvvjflux REAL,
+    vvvhmag REAL,
+    maxvvvhmag REAL,
+    sumvvvhflux REAL,
+    mainvvvhflux REAL,
+    mindistvvvhflux REAL,
+    vvvkmag REAL,
+    maxvvvkmag REAL,
+    sumvvvkflux REAL,
+    mainvvvkflux REAL,
+    mindistvvvkflux REAL,
+    fluxratiovvvj REAL,
+    fluxratiovvvh REAL,
+    fluxratiovvvk REAL,
+    numuksnbors INTEGER,
+    mindistuks REAL,
+    uksjmag REAL,
+    maxuksjmag REAL,
+    sumuksjflux REAL,
+    mainuksjflux REAL,
+    mindistuksjflux REAL,
+    ukshmag REAL,
+    maxukshmag REAL,
+    sumukshflux REAL,
+    mainukshflux REAL,
+    mindistukshflux REAL,
+    ukskmag REAL,
+    maxukskmag REAL,
+    sumukskflux REAL,
+    mainukskflux REAL,
+    mindistukskflux REAL,
+    fluxratiouksj REAL,
+    fluxratiouksh REAL,
+    fluxratiouksk REAL,
+    varclassgaia TEXT,
+    varclassgaiasc REAL,
+    sv_w1 TEXT,
+    sv_w1_v REAL,
+    sv_w1_t REAL,
+    sv_w2 TEXT,
+    sv_w2_v REAL,
+    sv_w2_t REAL,
+    x REAL,
+    y REAL,
+    z REAL,
+    spt_ind INTEGER,
+    htm20 INTEGER,
+    cntr INTEGER
+);
+CREATE INDEX IF NOT EXISTS spherex_splices_source_id_idx ON spherex_splices (source_id);
+
+-- [SPHEREx: resultados de API guardados localmente] spherex.imagenes — acceso: SIA2 IRSA (spherex_api.py imagenes)
+CREATE TABLE IF NOT EXISTS spherex_imagenes (
+    obs_publisher_did TEXT,
+    obs_id TEXT,
+    obs_collection TEXT,
+    energy_bandpassname TEXT,
+    dataproduct_type TEXT,
+    calib_level INTEGER,
+    s_ra REAL,
+    s_dec REAL,
+    s_fov REAL,
+    s_region TEXT,
+    s_pixel_scale REAL,
+    em_min REAL,
+    em_max REAL,
+    em_res_power REAL,
+    t_min REAL,
+    t_max REAL,
+    t_exptime REAL,
+    target_name TEXT,
+    obs_release_date TEXT,
+    access_url TEXT,
+    access_estsize INTEGER,
+    cloud_access TEXT
+);
+CREATE INDEX IF NOT EXISTS spherex_imagenes_obs_publisher_did_idx ON spherex_imagenes (obs_publisher_did);
+
+-- [SPHEREx: resultados de API guardados localmente] spherex.recortes — acceso: IBE Cutouts IRSA (spherex_api.py recorte)
+CREATE TABLE IF NOT EXISTS spherex_recortes (
+    obs_publisher_did TEXT,
+    obs_id TEXT,
+    energy_bandpassname TEXT,
+    ra REAL,
+    dec REAL,
+    tamano_deg REAL,
+    url_recorte TEXT,
+    archivo TEXT,
+    bytes INTEGER
+);
+CREATE INDEX IF NOT EXISTS spherex_recortes_obs_publisher_did_idx ON spherex_recortes (obs_publisher_did);
+
+-- [Integración Gaia DR3 + SPHEREx] proyecto.espectro_spherex — acceso: Calculado (spherex_api.py espectro)
+CREATE TABLE IF NOT EXISTS proyecto_espectro_spherex (
+    source_id INTEGER,
+    obs_publisher_did TEXT,
+    obs_collection TEXT,
+    detector INTEGER,
+    mjd REAL,
+    ra_epoca REAL,
+    dec_epoca REAL,
+    x_pix REAL,
+    y_pix REAL,
+    longitud_onda_um REAL,
+    ancho_banda_um REAL,
+    flujo_ujy REAL,
+    error_flujo_ujy REAL,
+    brillo_pico_mjy_sr REAL,
+    fondo_mjy_sr REAL,
+    zodi_mjy_sr REAL,
+    radio_apertura_pix REAL,
+    flags INTEGER,
+    flag_malo INTEGER
+);
+CREATE INDEX IF NOT EXISTS proyecto_espectro_spherex_source_id_idx ON proyecto_espectro_spherex (source_id);
 

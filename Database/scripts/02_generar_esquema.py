@@ -1,9 +1,10 @@
 """Genera el esquema SQL (PostgreSQL y SQLite), el catálogo de tablas y el diccionario de columnas.
 
-Entradas: data/tap_tables.csv, data/tap_columns.csv, data/cabeceras_datalink/*.ecsv, data/tamanos_cdn.json
+Entradas: data/tap_tables.csv, data/tap_columns.csv, data/cabeceras_datalink/*.ecsv, data/tamanos_cdn.json,
+          data/spherex/tap_tables.csv, data/spherex/tap_columns.csv, comun.TABLAS_V2
 Salidas:  sql/01_esquema_postgres.sql, sql/01_esquema_sqlite.sql, sql/02_metadatos_postgres.sql,
           sql/02_metadatos_sqlite.sql, docs/catalogo_tablas.{csv,md}, docs/diccionario_columnas.csv,
-          docs/gaia_dr3_v1.xlsx
+          docs/gaia_spherex_v2.xlsx
 """
 import csv
 import json
@@ -11,7 +12,8 @@ import json
 import pandas as pd
 import yaml
 
-from comun import (CARPETA_DATALINK, CATEGORIAS_ES, DATA, DATALINK, DOCS, ESQUEMA, SQL, TIPOS)
+from comun import (CARPETA_DATALINK, CATEGORIAS_ES, DATA, DATALINK, DOCS, ESQUEMA, ESQUEMA_SPHEREX, IRSA_TAP, SQL,
+                   TABLAS_V2, TIPOS)
 
 DATALINK_INV = {v: k for k, v in DATALINK.items()}
 
@@ -39,16 +41,17 @@ def limpiar(texto):
     return " ".join(str(texto if texto is not None and texto == texto else "").split())
 
 
-def leer_tap():
+def leer_tap(carpeta=DATA, esquema=ESQUEMA, acceso="TAP Gaia (ADQL)", campo_filas="size"):
     tablas = {}
-    for r in csv.DictReader(open(DATA / "tap_tables.csv")):
-        tablas[r["table_name"].split(".", 1)[1]] = {"descripcion": limpiar(r["description"]),
-                                                     "filas": int(r["size"]) if r["size"] else None,
-                                                     "acceso": "TAP (ADQL)", "columnas": []}
-    for r in sorted(csv.DictReader(open(DATA / "tap_columns.csv")), key=lambda r: int(r["column_index"] or 0)):
+    for r in csv.DictReader(open(carpeta / "tap_tables.csv")):
+        filas = r.get(campo_filas)
+        tablas[r["table_name"].split(".")[-1]] = {"descripcion": limpiar(r["description"]), "esquema": esquema,
+                                                  "filas": int(filas) if filas and filas != "0" else None,
+                                                  "acceso": acceso, "columnas": []}
+    for r in sorted(csv.DictReader(open(carpeta / "tap_columns.csv")), key=lambda r: int(r["column_index"] or 0)):
         base = r["datatype"]
         arreglo = r["arraysize"] == "*" and base != "char"
-        tablas[r["table_name"].split(".", 1)[1]]["columnas"].append({
+        tablas[r["table_name"].split(".")[-1]]["columnas"].append({
             "columna": r["column_name"], "tipo_origen": base + ("[]" if arreglo else ""),
             "base": base, "arreglo": arreglo, "unidad": limpiar(r["unit"]), "ucd": limpiar(r["ucd"]),
             "descripcion": limpiar(r["description"]), "indexada_en_archivo": r["indexed"] == "1"})
@@ -69,7 +72,7 @@ def leer_datalink(tablas):
                          "arreglo": bool(sub), "unidad": limpiar(c.get("unit")),
                          "ucd": limpiar((c.get("meta") or {}).get("ucd")),
                          "descripcion": limpiar(c.get("description")), "indexada_en_archivo": False})
-        tablas[tabla] = {"descripcion": limpiar(info.get("DESCRIPTION")), "filas": None,
+        tablas[tabla] = {"descripcion": limpiar(info.get("DESCRIPTION")), "filas": None, "esquema": ESQUEMA,
                          "acceso": f"DataLink ({DATALINK_INV[tabla]})", "columnas": cols}
 
 
@@ -84,51 +87,78 @@ def lit(texto):
     return "'" + limpiar(texto).replace("'", "''") + "'"
 
 
+def leer_v2():
+    spherex = leer_tap(DATA / "spherex", ESQUEMA_SPHEREX, "TAP IRSA (ADQL)", "irsa_nrows")
+    propias = {}
+    for esquema, tabla, cat, acceso, desc, cols in TABLAS_V2:
+        propias[tabla] = {"descripcion": desc, "esquema": esquema, "filas": None, "acceso": acceso, "categoria": cat,
+                          "columnas": [{"columna": c, "tipo_origen": t, "base": t, "arreglo": False, "unidad": u,
+                                        "ucd": "", "descripcion": d, "indexada_en_archivo": False}
+                                       for c, t, u, d in cols]}
+    for t in spherex.values():
+        t["categoria"] = "SPHEREx_TAP"
+    return {**spherex, **propias}
+
+
+def nombre_sqlite(t, n):
+    return n if t["esquema"] == ESQUEMA else f"{t['esquema']}_{n}"
+
+
 def main():
     tablas = leer_tap()
     leer_datalink(tablas)
+    tablas.update(leer_v2())
     tamanos = json.loads((DATA / "tamanos_cdn.json").read_text())
     # En el CDN la tabla se llama science_alert; en el archivo, science_alerts.
     tamanos["science_alerts"] = tamanos.pop("science_alert")
 
     catalogo, diccionario = [], []
     for nombre, t in tablas.items():
-        cdn = tamanos.get(nombre, {})
-        cat = categoria(nombre, cdn.get("carpeta"))
+        cdn = tamanos.get(nombre, {}) if t["esquema"] == ESQUEMA else {}
+        cat = t.get("categoria") or categoria(nombre, cdn.get("carpeta"))
+        if t["esquema"] != ESQUEMA:
+            url = IRSA_TAP if cat == "SPHEREx_TAP" else "(local: se llena con scripts/spherex_api.py)"
+        elif cdn:
+            url = "https://cdn.gea.esac.esa.int/?prefix=" + cdn["carpeta"]
+        else:
+            url = "(solo en el Archivo Gaia; bulk en https://cdn.gea.esac.esa.int/?prefix=Gaia/gedr3/)"
         catalogo.append({
-            "categoria": cat, "categoria_es": CATEGORIAS_ES[cat], "tabla": nombre, "acceso": t["acceso"],
-            "descripcion": t["descripcion"], "columnas": len(t["columnas"]), "filas_gaia_dr3": t["filas"],
-            "gb_comprimido_cdn": round(cdn["bytes"] / 1e9, 3) if cdn else None,
-            "url_cdn": "https://cdn.gea.esac.esa.int/?prefix=" + cdn["carpeta"] if cdn else
-            "(solo en el Archivo Gaia; bulk en https://cdn.gea.esac.esa.int/?prefix=Gaia/gedr3/)",
+            "categoria": cat, "categoria_es": CATEGORIAS_ES[cat], "esquema": t["esquema"], "tabla": nombre,
+            "acceso": t["acceso"], "descripcion": t["descripcion"], "columnas": len(t["columnas"]),
+            "filas_origen": t["filas"], "gb_comprimido_cdn": round(cdn["bytes"] / 1e9, 3) if cdn else None,
+            "url": url,
         })
         for i, c in enumerate(t["columnas"], 1):
-            diccionario.append({"tabla": nombre, "posicion": i, "columna": c["columna"],
+            diccionario.append({"esquema": t["esquema"], "tabla": nombre, "posicion": i, "columna": c["columna"],
                                 "tipo_origen": c["tipo_origen"], "tipo_postgres": tipo(c, "pg"),
                                 "tipo_sqlite": tipo(c, "lite"), "unidad": c["unidad"], "ucd": c["ucd"],
                                 "indexada_en_archivo": c["indexada_en_archivo"], "descripcion": c["descripcion"]})
     catalogo.sort(key=lambda f: (list(CATEGORIAS_ES).index(f["categoria"]), f["tabla"]))
 
-    pg = ["-- Esquema Gaia DR3 v1 para PostgreSQL. Generado por scripts/02_generar_esquema.py",
-          f"CREATE SCHEMA IF NOT EXISTS {ESQUEMA};", "CREATE SCHEMA IF NOT EXISTS proyecto;", ""]
-    lite = ["-- Esquema Gaia DR3 v1 para SQLite (arreglos guardados como texto JSON, booleanos como 0/1).",
+    pg = ["-- Esquema v2 (Gaia DR3 + SPHEREx) para PostgreSQL. Generado por scripts/02_generar_esquema.py",
+          f"CREATE SCHEMA IF NOT EXISTS {ESQUEMA};", f"CREATE SCHEMA IF NOT EXISTS {ESQUEMA_SPHEREX};",
+          "CREATE SCHEMA IF NOT EXISTS proyecto;", ""]
+    lite = ["-- Esquema v2 (Gaia DR3 + SPHEREx) para SQLite (arreglos como texto JSON, booleanos como 0/1).",
+            "-- En SQLite no hay esquemas: las tablas spherex.* y proyecto.* llevan prefijo spherex_ / proyecto_.",
             "-- Generado por scripts/02_generar_esquema.py", ""]
     for f in catalogo:
         n, t = f["tabla"], tablas[f["tabla"]]
-        cabecera = f"-- [{f['categoria_es']}] {n} — acceso: {f['acceso']}"
-        pg += [cabecera, f"CREATE TABLE IF NOT EXISTS {ESQUEMA}.{n} (",
+        e, nl = t["esquema"], nombre_sqlite(t, f["tabla"])
+        cabecera = f"-- [{f['categoria_es']}] {e}.{n} — acceso: {f['acceso']}"
+        pg += [cabecera, f"CREATE TABLE IF NOT EXISTS {e}.{n} (",
                ",\n".join(f"    {c['columna']} {tipo(c, 'pg')}" for c in t["columnas"]), ");",
-               f"COMMENT ON TABLE {ESQUEMA}.{n} IS {lit(t['descripcion'])};"]
+               f"COMMENT ON TABLE {e}.{n} IS {lit(t['descripcion'])};"]
         for c in t["columnas"]:
             comentario = c["descripcion"] + (f" [{c['unidad']}]" if c["unidad"] else "")
-            pg.append(f"COMMENT ON COLUMN {ESQUEMA}.{n}.{c['columna']} IS {lit(comentario)};")
-        if any(c["columna"] == "source_id" for c in t["columnas"]):
-            pg.append(f"CREATE INDEX IF NOT EXISTS {n}_source_id_idx ON {ESQUEMA}.{n} (source_id);")
-            lite_idx = f"CREATE INDEX IF NOT EXISTS {n}_source_id_idx ON {n} (source_id);"
+            pg.append(f"COMMENT ON COLUMN {e}.{n}.{c['columna']} IS {lit(comentario)};")
+        llave = next((k for k in ("source_id", "obs_publisher_did") if any(c["columna"] == k for c in t["columnas"])), None)
+        if llave:
+            pg.append(f"CREATE INDEX IF NOT EXISTS {e}_{n}_{llave}_idx ON {e}.{n} ({llave});")
+            lite_idx = f"CREATE INDEX IF NOT EXISTS {nl}_{llave}_idx ON {nl} ({llave});"
         else:
             lite_idx = None
         pg.append("")
-        lite += [cabecera, f"CREATE TABLE IF NOT EXISTS {n} (",
+        lite += [cabecera, f"CREATE TABLE IF NOT EXISTS {nl} (",
                  ",\n".join(f"    {c['columna']} {tipo(c, 'lite')}" for c in t["columnas"]), ");"]
         lite += [lite_idx, ""] if lite_idx else [""]
 
@@ -144,7 +174,7 @@ def main():
             w.writerows(filas)
     escribir_metadatos_sql(catalogo, diccionario)
     escribir_markdown(catalogo)
-    with pd.ExcelWriter(DOCS / "gaia_dr3_v1.xlsx", engine="openpyxl") as xw:
+    with pd.ExcelWriter(DOCS / "gaia_spherex_v2.xlsx", engine="openpyxl") as xw:
         pd.DataFrame(catalogo).to_excel(xw, sheet_name="catalogo_tablas", index=False)
         pd.DataFrame(diccionario).to_excel(xw, sheet_name="diccionario_columnas", index=False)
         for hoja in xw.sheets.values():
@@ -164,15 +194,15 @@ def valor_sql(v, dialecto):
 
 
 def escribir_metadatos_sql(catalogo, diccionario):
-    tipos_cat = {"columnas": "integer", "filas_gaia_dr3": "bigint", "gb_comprimido_cdn": "numeric"}
+    tipos_cat = {"columnas": "integer", "filas_origen": "bigint", "gb_comprimido_cdn": "numeric"}
     tipos_dic = {"posicion": "integer", "indexada_en_archivo": "boolean"}
     for dialecto, prefijo, archivo in (("pg", "meta.", "02_metadatos_postgres.sql"),
                                        ("lite", "meta_", "02_metadatos_sqlite.sql")):
-        out = ["-- Catálogo de tablas y diccionario de columnas Gaia DR3 (consultables con SQL)."]
+        out = ["-- Catálogo de tablas y diccionario de columnas Gaia DR3 + SPHEREx (consultables con SQL)."]
         if dialecto == "pg":
             out.append("CREATE SCHEMA IF NOT EXISTS meta;")
-        for nombre, filas, tipos, pk in (("catalogo_tablas", catalogo, tipos_cat, "tabla"),
-                                         ("diccionario_columnas", diccionario, tipos_dic, "tabla, columna")):
+        for nombre, filas, tipos, pk in (("catalogo_tablas", catalogo, tipos_cat, "esquema, tabla"),
+                                         ("diccionario_columnas", diccionario, tipos_dic, "esquema, tabla, columna")):
             cols = list(filas[0])
             defs = ", ".join(f"{c} {tipos.get(c, 'text')}" for c in cols)
             out += [f"DROP TABLE IF EXISTS {prefijo}{nombre};",
@@ -184,21 +214,22 @@ def escribir_metadatos_sql(catalogo, diccionario):
 
 
 def escribir_markdown(catalogo):
-    md = ["# Catálogo de tablas Gaia DR3", "",
-          "Generado por `scripts/02_generar_esquema.py`. **Acceso**: `TAP (ADQL)` = se consulta con SQL/ADQL "
-          "en el Archivo Gaia; `DataLink (TIPO)` = se pide por `source_id` con `gaia_api.py datalink --tipos TIPO`.", ""]
+    md = ["# Catálogo de tablas v2: Gaia DR3 + SPHEREx", "",
+          "Generado por `scripts/02_generar_esquema.py`. **Acceso**: `TAP Gaia (ADQL)` = `gaia_api.py adql`; "
+          "`DataLink (TIPO)` = `gaia_api.py datalink --tipos TIPO`; `TAP IRSA (ADQL)` = `spherex_api.py tap`; "
+          "las tablas locales SPHEREx y de proyecto se llenan con `spherex_api.py imagenes|recorte|espectro`.", ""]
     actual = None
     for f in catalogo:
         if f["categoria"] != actual:
             actual = f["categoria"]
             md += ["", f"## {f['categoria_es']} (`{actual}`)", "",
-                   "| Tabla | Acceso | Columnas | Filas en DR3 | GB en CDN (gz) | Descripción |",
+                   "| Tabla | Acceso | Columnas | Filas en origen | GB en CDN Gaia (gz) | Descripción |",
                    "|---|---|---:|---:|---:|---|"]
         desc = f["descripcion"].replace("|", "/")
         desc = desc[:180] + ("…" if len(desc) > 180 else "")
-        filas = f"{f['filas_gaia_dr3']:,}" if f["filas_gaia_dr3"] is not None else "—"
+        filas = f"{f['filas_origen']:,}" if f["filas_origen"] is not None else "—"
         gb = f["gb_comprimido_cdn"] if f["gb_comprimido_cdn"] is not None else "—"
-        md.append(f"| `{f['tabla']}` | {f['acceso']} | {f['columnas']} | {filas} | {gb} | {desc} |")
+        md.append(f"| `{f['esquema']}.{f['tabla']}` | {f['acceso']} | {f['columnas']} | {filas} | {gb} | {desc} |")
     (DOCS / "catalogo_tablas.md").write_text("\n".join(md) + "\n")
 
 

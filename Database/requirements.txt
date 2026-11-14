@@ -1,8 +1,11 @@
 astroquery
+pyvo
 astropy
 numpy
 pandas
 pyarrow
+s3fs
 openpyxl
 PyYAML
 psycopg2-binary
+markdown

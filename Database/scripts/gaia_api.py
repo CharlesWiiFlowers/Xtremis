@@ -156,7 +156,9 @@ class Destino:
             sys.exit("--db debe empezar con postgresql:// o sqlite:///")
 
     def nombre(self, esquema, tabla):
-        return f"{esquema}.{tabla}" if self.dialecto == "pg" else tabla
+        if self.dialecto == "pg":
+            return f"{esquema}.{tabla}"
+        return tabla if esquema == ESQUEMA else f"{esquema}_{tabla}"
 
     def columnas(self, esquema, tabla):
         cur = self.conn.cursor()
@@ -164,7 +166,7 @@ class Destino:
             cur.execute("SELECT column_name FROM information_schema.columns WHERE table_schema=%s AND table_name=%s",
                         (esquema, tabla))
             return {r[0] for r in cur.fetchall()}
-        return {r[1] for r in cur.execute(f"PRAGMA table_info({tabla})")}
+        return {r[1] for r in cur.execute(f"PRAGMA table_info({self.nombre(esquema, tabla)})")}
 
     def crear(self, esquema, tabla, datos):
         defs = ", ".join(f"{c} {tipo_columna(datos[c], self.dialecto)}" for c in datos.colnames)
@@ -193,17 +195,17 @@ class Destino:
         self.conn.commit()
         print(f"{len(datos)} filas guardadas en {destino}", file=sys.stderr)
 
-    def guardar(self, datos, tabla_gaia=None, tabla_propia=None, reemplazar=False):
+    def guardar(self, datos, tabla_gaia=None, tabla_propia=None, reemplazar=False, esquema_origen=ESQUEMA):
         cols = set(datos.colnames)
         if tabla_propia:
             esquema, _, tabla = tabla_propia.rpartition(".")
             esquema = esquema or ESQUEMA_PROYECTO
             if not self.columnas(esquema, tabla):
                 self.crear(esquema, tabla, datos)
-        elif tabla_gaia and cols <= self.columnas(ESQUEMA, tabla_gaia):
-            esquema, tabla = ESQUEMA, tabla_gaia
+        elif tabla_gaia and cols <= self.columnas(esquema_origen, tabla_gaia):
+            esquema, tabla = esquema_origen, tabla_gaia
         else:
-            sys.exit("Las columnas no coinciden con una tabla gaiadr3 local (¿cargaste sql/01_esquema_*.sql?). "
+            sys.exit(f"Las columnas no coinciden con una tabla {esquema_origen} local (¿cargaste sql/01_esquema_*.sql?). "
                      "Usa --tabla NOMBRE para guardarlas en una tabla propia.")
         self.insertar(esquema, tabla, datos, reemplazar)
 
@@ -237,7 +239,7 @@ def main():
     d.add_argument("--ids-archivo", help="archivo de texto con un source_id por línea")
     d.add_argument("--ids-adql", help="consulta ADQL que devuelve una columna source_id")
     d.add_argument("--tipos", nargs="*", choices=list(DATALINK), default=list(DATALINK))
-    d.add_argument("--lote", type=int, default=500, help="fuentes por petición")
+    d.add_argument("--lote", type=int, default=50, help="fuentes por petición (anónimo: máx. 50; con cuenta: 5000)")
 
     for p in (a, d):
         p.add_argument("--db", help="postgresql://usuario@host/base  o  sqlite:///ruta/archivo.db")

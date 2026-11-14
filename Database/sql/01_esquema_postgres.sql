@@ -1,8 +1,9 @@
--- Esquema Gaia DR3 v1 para PostgreSQL. Generado por scripts/02_generar_esquema.py
+-- Esquema v2 (Gaia DR3 + SPHEREx) para PostgreSQL. Generado por scripts/02_generar_esquema.py
 CREATE SCHEMA IF NOT EXISTS gaiadr3;
+CREATE SCHEMA IF NOT EXISTS spherex;
 CREATE SCHEMA IF NOT EXISTS proyecto;
 
--- [Catálogo principal] gaia_source — acceso: TAP (ADQL)
+-- [Catálogo principal] gaiadr3.gaia_source — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.gaia_source (
     solution_id bigint,
     designation text,
@@ -310,9 +311,9 @@ COMMENT ON COLUMN gaiadr3.gaia_source.ebpminrp_gspphot IS 'Reddening $E(G_{\rm B
 COMMENT ON COLUMN gaiadr3.gaia_source.ebpminrp_gspphot_lower IS 'Lower confidence level (16%) of reddening $E(G_{\rm BP} - G_{\rm RP})$ from GSP-Phot Aeneas best library using BP/RP spectra [mag]';
 COMMENT ON COLUMN gaiadr3.gaia_source.ebpminrp_gspphot_upper IS 'Upper confidence level (84%) of reddening $E(G_{\rm BP} - G_{\rm RP})$ from GSP-Phot Aeneas best library using BP/RP spectra [mag]';
 COMMENT ON COLUMN gaiadr3.gaia_source.libname_gspphot IS 'Name of library that achieves the highest mean log-posterior in MCMC samples and was used to derive GSP-Phot parameters in this table';
-CREATE INDEX IF NOT EXISTS gaia_source_source_id_idx ON gaiadr3.gaia_source (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_gaia_source_source_id_idx ON gaiadr3.gaia_source (source_id);
 
--- [Catálogo principal] gaia_source_lite — acceso: TAP (ADQL)
+-- [Catálogo principal] gaiadr3.gaia_source_lite — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.gaia_source_lite (
     source_id bigint,
     random_index bigint,
@@ -418,9 +419,9 @@ COMMENT ON COLUMN gaiadr3.gaia_source_lite.mh_gspphot IS 'Iron abundance from GS
 COMMENT ON COLUMN gaiadr3.gaia_source_lite.distance_gspphot IS 'Distance from GSP-Phot Aeneas best library using BP/RP spectra [pc]';
 COMMENT ON COLUMN gaiadr3.gaia_source_lite.ag_gspphot IS 'Extinction in G band from GSP-Phot Aeneas best library using BP/RP spectra [mag]';
 COMMENT ON COLUMN gaiadr3.gaia_source_lite.ebpminrp_gspphot IS 'Reddening $E(G_{\rm BP} - G_{\rm RP})$ from GSP-Phot Aeneas best library using BP/RP spectra [mag]';
-CREATE INDEX IF NOT EXISTS gaia_source_lite_source_id_idx ON gaiadr3.gaia_source_lite (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_gaia_source_lite_source_id_idx ON gaiadr3.gaia_source_lite (source_id);
 
--- [Parámetros astrofísicos] astrophysical_parameters — acceso: TAP (ADQL)
+-- [Parámetros astrofísicos] gaiadr3.astrophysical_parameters — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.astrophysical_parameters (
     solution_id bigint,
     source_id bigint,
@@ -876,9 +877,9 @@ COMMENT ON COLUMN gaiadr3.astrophysical_parameters.neuron_oa_id IS 'Identifier o
 COMMENT ON COLUMN gaiadr3.astrophysical_parameters.neuron_oa_dist IS 'Distance between the source XP spectra and the OA neuron XP prototype that represents the source';
 COMMENT ON COLUMN gaiadr3.astrophysical_parameters.neuron_oa_dist_percentile_rank IS 'Percentile rank according to the distance distribution of the OA neuron that represents the source';
 COMMENT ON COLUMN gaiadr3.astrophysical_parameters.flags_oa IS 'Flags indicating quality and processing information from OA';
-CREATE INDEX IF NOT EXISTS astrophysical_parameters_source_id_idx ON gaiadr3.astrophysical_parameters (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_astrophysical_parameters_source_id_idx ON gaiadr3.astrophysical_parameters (source_id);
 
--- [Parámetros astrofísicos] astrophysical_parameters_supp — acceso: TAP (ADQL)
+-- [Parámetros astrofísicos] gaiadr3.astrophysical_parameters_supp — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.astrophysical_parameters_supp (
     solution_id bigint,
     source_id bigint,
@@ -1232,9 +1233,9 @@ COMMENT ON COLUMN gaiadr3.astrophysical_parameters_supp.gravredshift_flame_spec 
 COMMENT ON COLUMN gaiadr3.astrophysical_parameters_supp.gravredshift_flame_spec_lower IS 'Lower confidence interval of {\tt gravredshiftFlameSpec} [km.s**-1]';
 COMMENT ON COLUMN gaiadr3.astrophysical_parameters_supp.gravredshift_flame_spec_upper IS 'Upper confidence interval of {\tt gravredshiftFlameSpec} [km.s**-1]';
 COMMENT ON COLUMN gaiadr3.astrophysical_parameters_supp.bc_flame_spec IS 'Bolometric correction applied to derive {\tt lumFlameSpec} using GSP-Spec parameters [mag]';
-CREATE INDEX IF NOT EXISTS astrophysical_parameters_supp_source_id_idx ON gaiadr3.astrophysical_parameters_supp (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_astrophysical_parameters_supp_source_id_idx ON gaiadr3.astrophysical_parameters_supp (source_id);
 
--- [Parámetros astrofísicos] mcmc_samples_gsp_phot — acceso: DataLink (MCMC_GSPPHOT)
+-- [Parámetros astrofísicos] gaiadr3.mcmc_samples_gsp_phot — acceso: DataLink (MCMC_GSPPHOT)
 CREATE TABLE IF NOT EXISTS gaiadr3.mcmc_samples_gsp_phot (
     solution_id bigint,
     source_id bigint,
@@ -1270,9 +1271,9 @@ COMMENT ON COLUMN gaiadr3.mcmc_samples_gsp_phot.ebpminrp IS 'MCMC samples for re
 COMMENT ON COLUMN gaiadr3.mcmc_samples_gsp_phot.log_pos IS 'MCMC samples for the log-posterior from GSP-Phot';
 COMMENT ON COLUMN gaiadr3.mcmc_samples_gsp_phot.log_lik IS 'MCMC samples for the log-likelihood from GSP-Phot';
 COMMENT ON COLUMN gaiadr3.mcmc_samples_gsp_phot.radius IS 'MCMC samples for stellar radius from GSP-Phot [solRad]';
-CREATE INDEX IF NOT EXISTS mcmc_samples_gsp_phot_source_id_idx ON gaiadr3.mcmc_samples_gsp_phot (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_mcmc_samples_gsp_phot_source_id_idx ON gaiadr3.mcmc_samples_gsp_phot (source_id);
 
--- [Parámetros astrofísicos] mcmc_samples_msc — acceso: DataLink (MCMC_MSC)
+-- [Parámetros astrofísicos] gaiadr3.mcmc_samples_msc — acceso: DataLink (MCMC_MSC)
 CREATE TABLE IF NOT EXISTS gaiadr3.mcmc_samples_msc (
     source_id bigint,
     solution_id bigint,
@@ -1300,9 +1301,9 @@ COMMENT ON COLUMN gaiadr3.mcmc_samples_msc.mh IS 'MCMC samples for the metallici
 COMMENT ON COLUMN gaiadr3.mcmc_samples_msc.distancepc IS 'MCMC samples for distance from MSC [pc]';
 COMMENT ON COLUMN gaiadr3.mcmc_samples_msc.log_pos IS 'MCMC samples for the log-posterior from MSC';
 COMMENT ON COLUMN gaiadr3.mcmc_samples_msc.log_lik IS 'MCMC samples for the log-likelihood from MSC';
-CREATE INDEX IF NOT EXISTS mcmc_samples_msc_source_id_idx ON gaiadr3.mcmc_samples_msc (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_mcmc_samples_msc_source_id_idx ON gaiadr3.mcmc_samples_msc (source_id);
 
--- [Parámetros astrofísicos] oa_neuron_information — acceso: TAP (ADQL)
+-- [Parámetros astrofísicos] gaiadr3.oa_neuron_information — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.oa_neuron_information (
     solution_id bigint,
     som_id bigint,
@@ -1463,7 +1464,7 @@ COMMENT ON COLUMN gaiadr3.oa_neuron_information.bprp_colour_std_dev IS 'Standard
 COMMENT ON COLUMN gaiadr3.oa_neuron_information.bprp_colour_min IS 'Minimum value of the $G_{\rm BP}-G_{\rm RP}$ colour for the sources that belong to the neuron [mag]';
 COMMENT ON COLUMN gaiadr3.oa_neuron_information.bprp_colour_max IS 'Maximum value of the $G_{\rm BP}-G_{\rm RP}$ colour for the sources that belong to the neuron [mag]';
 
--- [Parámetros astrofísicos] oa_neuron_xp_spectra — acceso: TAP (ADQL)
+-- [Parámetros astrofísicos] gaiadr3.oa_neuron_xp_spectra — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.oa_neuron_xp_spectra (
     solution_id bigint,
     neuron_id bigint,
@@ -1482,7 +1483,7 @@ COMMENT ON COLUMN gaiadr3.oa_neuron_xp_spectra.xp_spectrum_prototype_flux IS 'No
 COMMENT ON COLUMN gaiadr3.oa_neuron_xp_spectra.xp_spectrum_prototype_wavelength IS 'Wavelength associated with the XP spectrum flux values [nm]';
 COMMENT ON COLUMN gaiadr3.oa_neuron_xp_spectra.xp_spectrum_template_flux IS 'Normalised flux at wavelength {\tt xpSpectrumPrototypeWavelength} for the preprocessed XP spectrum corresponding to the neuron template';
 
--- [Parámetros astrofísicos] total_galactic_extinction_map — acceso: TAP (ADQL)
+-- [Parámetros astrofísicos] gaiadr3.total_galactic_extinction_map — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.total_galactic_extinction_map (
     solution_id bigint,
     healpix_id bigint,
@@ -1507,7 +1508,7 @@ COMMENT ON COLUMN gaiadr3.total_galactic_extinction_map.num_tracers_used IS 'Num
 COMMENT ON COLUMN gaiadr3.total_galactic_extinction_map.optimum_hpx_flag IS 'Flag to indicate whether a given HEALPix level is the optimum (True) or not (False)';
 COMMENT ON COLUMN gaiadr3.total_galactic_extinction_map.status IS 'Exit status for TGE';
 
--- [Parámetros astrofísicos] total_galactic_extinction_map_opt — acceso: TAP (ADQL)
+-- [Parámetros astrofísicos] gaiadr3.total_galactic_extinction_map_opt — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.total_galactic_extinction_map_opt (
     solution_id bigint,
     healpix_id bigint,
@@ -1526,7 +1527,7 @@ COMMENT ON COLUMN gaiadr3.total_galactic_extinction_map_opt.num_tracers_used IS 
 COMMENT ON COLUMN gaiadr3.total_galactic_extinction_map_opt.status IS 'Exit status for TGE';
 COMMENT ON COLUMN gaiadr3.total_galactic_extinction_map_opt.optimum_hpx_level IS 'Number indicating which HEALPix level was chosen to populate this HEALPix';
 
--- [Cruce con catálogos externos] allwise_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.allwise_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.allwise_best_neighbour (
     source_id bigint,
     original_ext_source_id text,
@@ -1544,9 +1545,9 @@ COMMENT ON COLUMN gaiadr3.allwise_best_neighbour.xm_flag IS 'Cross-match algorit
 COMMENT ON COLUMN gaiadr3.allwise_best_neighbour.allwise_oid IS 'External Catalogue source identifier';
 COMMENT ON COLUMN gaiadr3.allwise_best_neighbour.number_of_neighbours IS 'Number of neighbours in External Catalogue';
 COMMENT ON COLUMN gaiadr3.allwise_best_neighbour.number_of_mates IS 'Number of mates in Gaia Catalogue';
-CREATE INDEX IF NOT EXISTS allwise_best_neighbour_source_id_idx ON gaiadr3.allwise_best_neighbour (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_allwise_best_neighbour_source_id_idx ON gaiadr3.allwise_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] allwise_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.allwise_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.allwise_neighbourhood (
     source_id bigint,
     original_ext_source_id text,
@@ -1562,9 +1563,9 @@ COMMENT ON COLUMN gaiadr3.allwise_neighbourhood.angular_distance IS 'Angular Dis
 COMMENT ON COLUMN gaiadr3.allwise_neighbourhood.score IS 'Score of neighbours';
 COMMENT ON COLUMN gaiadr3.allwise_neighbourhood.xm_flag IS 'Cross-match algorithm flag';
 COMMENT ON COLUMN gaiadr3.allwise_neighbourhood.allwise_oid IS 'External Catalogue source identifier';
-CREATE INDEX IF NOT EXISTS allwise_neighbourhood_source_id_idx ON gaiadr3.allwise_neighbourhood (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_allwise_neighbourhood_source_id_idx ON gaiadr3.allwise_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] apassdr9_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.apassdr9_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.apassdr9_best_neighbour (
     source_id bigint,
     clean_apassdr9_oid bigint,
@@ -1582,9 +1583,9 @@ COMMENT ON COLUMN gaiadr3.apassdr9_best_neighbour.angular_distance IS 'Angular D
 COMMENT ON COLUMN gaiadr3.apassdr9_best_neighbour.number_of_neighbours IS 'Number of neighbours in External Catalogue';
 COMMENT ON COLUMN gaiadr3.apassdr9_best_neighbour.number_of_mates IS 'Number of mates in Gaia Catalogue';
 COMMENT ON COLUMN gaiadr3.apassdr9_best_neighbour.xm_flag IS 'Cross-match algorithm flag';
-CREATE INDEX IF NOT EXISTS apassdr9_best_neighbour_source_id_idx ON gaiadr3.apassdr9_best_neighbour (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_apassdr9_best_neighbour_source_id_idx ON gaiadr3.apassdr9_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] apassdr9_join — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.apassdr9_join — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.apassdr9_join (
     original_ext_source_id bigint,
     clean_apassdr9_oid integer
@@ -1593,7 +1594,7 @@ COMMENT ON TABLE gaiadr3.apassdr9_join IS 'Convenience table to be used to join 
 COMMENT ON COLUMN gaiadr3.apassdr9_join.original_ext_source_id IS 'Original External Catalogue source identifier';
 COMMENT ON COLUMN gaiadr3.apassdr9_join.clean_apassdr9_oid IS 'External Catalogue source identifier';
 
--- [Cruce con catálogos externos] apassdr9_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.apassdr9_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.apassdr9_neighbourhood (
     source_id bigint,
     clean_apassdr9_oid bigint,
@@ -1609,9 +1610,9 @@ COMMENT ON COLUMN gaiadr3.apassdr9_neighbourhood.original_ext_source_id IS 'Orig
 COMMENT ON COLUMN gaiadr3.apassdr9_neighbourhood.angular_distance IS 'Angular Distance between the two sources [arcsec]';
 COMMENT ON COLUMN gaiadr3.apassdr9_neighbourhood.score IS 'Score of neighbours';
 COMMENT ON COLUMN gaiadr3.apassdr9_neighbourhood.xm_flag IS 'Cross-match algorithm flag';
-CREATE INDEX IF NOT EXISTS apassdr9_neighbourhood_source_id_idx ON gaiadr3.apassdr9_neighbourhood (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_apassdr9_neighbourhood_source_id_idx ON gaiadr3.apassdr9_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] dr2_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.dr2_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.dr2_neighbourhood (
     dr2_source_id bigint,
     dr3_source_id bigint,
@@ -1626,7 +1627,7 @@ COMMENT ON COLUMN gaiadr3.dr2_neighbourhood.angular_distance IS 'Angular distanc
 COMMENT ON COLUMN gaiadr3.dr2_neighbourhood.magnitude_difference IS 'G band magnitude difference between the sources [mag]';
 COMMENT ON COLUMN gaiadr3.dr2_neighbourhood.proper_motion_propagation IS 'Flag indicating whether E/DR3 coordinates were proper motion corrected';
 
--- [Cruce con catálogos externos] gsc23_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.gsc23_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.gsc23_best_neighbour (
     source_id bigint,
     original_ext_source_id text,
@@ -1644,9 +1645,9 @@ COMMENT ON COLUMN gaiadr3.gsc23_best_neighbour.xm_flag IS 'Cross-match algorithm
 COMMENT ON COLUMN gaiadr3.gsc23_best_neighbour.clean_gsc23_oid IS 'External Catalogue source identifier';
 COMMENT ON COLUMN gaiadr3.gsc23_best_neighbour.number_of_neighbours IS 'Number of neighbours in External Catalogue';
 COMMENT ON COLUMN gaiadr3.gsc23_best_neighbour.number_of_mates IS 'Number of mates in Gaia Catalogue';
-CREATE INDEX IF NOT EXISTS gsc23_best_neighbour_source_id_idx ON gaiadr3.gsc23_best_neighbour (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_gsc23_best_neighbour_source_id_idx ON gaiadr3.gsc23_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] gsc23_join — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.gsc23_join — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.gsc23_join (
     original_ext_source_id text,
     clean_gsc23_oid integer
@@ -1655,7 +1656,7 @@ COMMENT ON TABLE gaiadr3.gsc23_join IS 'Convenience table to be used to join GSC
 COMMENT ON COLUMN gaiadr3.gsc23_join.original_ext_source_id IS 'Original External Catalogue source identifier';
 COMMENT ON COLUMN gaiadr3.gsc23_join.clean_gsc23_oid IS 'External Catalogue source identifier';
 
--- [Cruce con catálogos externos] gsc23_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.gsc23_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.gsc23_neighbourhood (
     source_id bigint,
     original_ext_source_id text,
@@ -1671,9 +1672,9 @@ COMMENT ON COLUMN gaiadr3.gsc23_neighbourhood.angular_distance IS 'Angular Dista
 COMMENT ON COLUMN gaiadr3.gsc23_neighbourhood.score IS 'Score of neighbours';
 COMMENT ON COLUMN gaiadr3.gsc23_neighbourhood.xm_flag IS 'Cross-match algorithm flag';
 COMMENT ON COLUMN gaiadr3.gsc23_neighbourhood.clean_gsc23_oid IS 'External Catalogue source identifier';
-CREATE INDEX IF NOT EXISTS gsc23_neighbourhood_source_id_idx ON gaiadr3.gsc23_neighbourhood (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_gsc23_neighbourhood_source_id_idx ON gaiadr3.gsc23_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] hipparcos2_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.hipparcos2_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.hipparcos2_best_neighbour (
     source_id bigint,
     original_ext_source_id integer,
@@ -1687,9 +1688,9 @@ COMMENT ON COLUMN gaiadr3.hipparcos2_best_neighbour.original_ext_source_id IS 'O
 COMMENT ON COLUMN gaiadr3.hipparcos2_best_neighbour.angular_distance IS 'Angular Distance between the two sources [arcsec]';
 COMMENT ON COLUMN gaiadr3.hipparcos2_best_neighbour.number_of_neighbours IS 'Number of neighbours in Gaia Catalogue';
 COMMENT ON COLUMN gaiadr3.hipparcos2_best_neighbour.xm_flag IS 'Cross-match algorithm flag';
-CREATE INDEX IF NOT EXISTS hipparcos2_best_neighbour_source_id_idx ON gaiadr3.hipparcos2_best_neighbour (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_hipparcos2_best_neighbour_source_id_idx ON gaiadr3.hipparcos2_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] hipparcos2_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.hipparcos2_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.hipparcos2_neighbourhood (
     source_id bigint,
     original_ext_source_id integer,
@@ -1703,9 +1704,9 @@ COMMENT ON COLUMN gaiadr3.hipparcos2_neighbourhood.original_ext_source_id IS 'Or
 COMMENT ON COLUMN gaiadr3.hipparcos2_neighbourhood.angular_distance IS 'Angular Distance between the two sources [arcsec]';
 COMMENT ON COLUMN gaiadr3.hipparcos2_neighbourhood.score IS 'Score of neighbours';
 COMMENT ON COLUMN gaiadr3.hipparcos2_neighbourhood.xm_flag IS 'Cross-match algorithm flag';
-CREATE INDEX IF NOT EXISTS hipparcos2_neighbourhood_source_id_idx ON gaiadr3.hipparcos2_neighbourhood (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_hipparcos2_neighbourhood_source_id_idx ON gaiadr3.hipparcos2_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] panstarrs1_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.panstarrs1_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.panstarrs1_best_neighbour (
     source_id bigint,
     clean_panstarrs1_oid bigint,
@@ -1723,9 +1724,9 @@ COMMENT ON COLUMN gaiadr3.panstarrs1_best_neighbour.angular_distance IS 'Angular
 COMMENT ON COLUMN gaiadr3.panstarrs1_best_neighbour.number_of_neighbours IS 'Number of neighbours in External Catalogue';
 COMMENT ON COLUMN gaiadr3.panstarrs1_best_neighbour.number_of_mates IS 'Number of mates in Gaia Catalogue';
 COMMENT ON COLUMN gaiadr3.panstarrs1_best_neighbour.xm_flag IS 'Cross-match algorithm flag';
-CREATE INDEX IF NOT EXISTS panstarrs1_best_neighbour_source_id_idx ON gaiadr3.panstarrs1_best_neighbour (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_panstarrs1_best_neighbour_source_id_idx ON gaiadr3.panstarrs1_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] panstarrs1_join — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.panstarrs1_join — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.panstarrs1_join (
     original_ext_source_id bigint,
     clean_panstarrs1_oid bigint
@@ -1734,7 +1735,7 @@ COMMENT ON TABLE gaiadr3.panstarrs1_join IS 'Convenience table to be used to joi
 COMMENT ON COLUMN gaiadr3.panstarrs1_join.original_ext_source_id IS 'Original External Catalogue source identifier';
 COMMENT ON COLUMN gaiadr3.panstarrs1_join.clean_panstarrs1_oid IS 'External Catalogue source identifier';
 
--- [Cruce con catálogos externos] panstarrs1_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.panstarrs1_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.panstarrs1_neighbourhood (
     source_id bigint,
     clean_panstarrs1_oid bigint,
@@ -1750,9 +1751,9 @@ COMMENT ON COLUMN gaiadr3.panstarrs1_neighbourhood.original_ext_source_id IS 'Or
 COMMENT ON COLUMN gaiadr3.panstarrs1_neighbourhood.angular_distance IS 'Angular Distance between the two sources [arcsec]';
 COMMENT ON COLUMN gaiadr3.panstarrs1_neighbourhood.score IS 'Score of neighbours';
 COMMENT ON COLUMN gaiadr3.panstarrs1_neighbourhood.xm_flag IS 'Cross-match algorithm flag';
-CREATE INDEX IF NOT EXISTS panstarrs1_neighbourhood_source_id_idx ON gaiadr3.panstarrs1_neighbourhood (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_panstarrs1_neighbourhood_source_id_idx ON gaiadr3.panstarrs1_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] ravedr5_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.ravedr5_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.ravedr5_best_neighbour (
     source_id bigint,
     original_ext_source_id text,
@@ -1768,9 +1769,9 @@ COMMENT ON COLUMN gaiadr3.ravedr5_best_neighbour.angular_distance IS 'Angular Di
 COMMENT ON COLUMN gaiadr3.ravedr5_best_neighbour.xm_flag IS 'Cross-match algorithm flag';
 COMMENT ON COLUMN gaiadr3.ravedr5_best_neighbour.clean_ravedr5_oid IS 'External Catalogue source identifier';
 COMMENT ON COLUMN gaiadr3.ravedr5_best_neighbour.number_of_neighbours IS 'Number of neighbours in Gaia Catalogue';
-CREATE INDEX IF NOT EXISTS ravedr5_best_neighbour_source_id_idx ON gaiadr3.ravedr5_best_neighbour (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_ravedr5_best_neighbour_source_id_idx ON gaiadr3.ravedr5_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] ravedr5_join — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.ravedr5_join — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.ravedr5_join (
     original_ext_source_id text,
     clean_ravedr5_oid integer
@@ -1779,7 +1780,7 @@ COMMENT ON TABLE gaiadr3.ravedr5_join IS 'Convenience table to be used to join R
 COMMENT ON COLUMN gaiadr3.ravedr5_join.original_ext_source_id IS 'Original External Catalogue source identifier';
 COMMENT ON COLUMN gaiadr3.ravedr5_join.clean_ravedr5_oid IS 'External Catalogue source identifier';
 
--- [Cruce con catálogos externos] ravedr5_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.ravedr5_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.ravedr5_neighbourhood (
     source_id bigint,
     original_ext_source_id text,
@@ -1795,9 +1796,9 @@ COMMENT ON COLUMN gaiadr3.ravedr5_neighbourhood.angular_distance IS 'Angular Dis
 COMMENT ON COLUMN gaiadr3.ravedr5_neighbourhood.score IS 'Score of neighbours';
 COMMENT ON COLUMN gaiadr3.ravedr5_neighbourhood.xm_flag IS 'Cross-match algorithm flag';
 COMMENT ON COLUMN gaiadr3.ravedr5_neighbourhood.clean_ravedr5_oid IS 'External Catalogue source identifier';
-CREATE INDEX IF NOT EXISTS ravedr5_neighbourhood_source_id_idx ON gaiadr3.ravedr5_neighbourhood (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_ravedr5_neighbourhood_source_id_idx ON gaiadr3.ravedr5_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] ravedr6_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.ravedr6_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.ravedr6_best_neighbour (
     source_id bigint,
     original_ext_source_id text,
@@ -1813,9 +1814,9 @@ COMMENT ON COLUMN gaiadr3.ravedr6_best_neighbour.angular_distance IS 'Angular Di
 COMMENT ON COLUMN gaiadr3.ravedr6_best_neighbour.xm_flag IS 'Cross-match algorithm flag';
 COMMENT ON COLUMN gaiadr3.ravedr6_best_neighbour.ravedr6_oid IS 'External Catalogue source identifier';
 COMMENT ON COLUMN gaiadr3.ravedr6_best_neighbour.number_of_neighbours IS 'Number of neighbours in Gaia Catalogue';
-CREATE INDEX IF NOT EXISTS ravedr6_best_neighbour_source_id_idx ON gaiadr3.ravedr6_best_neighbour (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_ravedr6_best_neighbour_source_id_idx ON gaiadr3.ravedr6_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] ravedr6_join — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.ravedr6_join — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.ravedr6_join (
     original_ext_source_id text,
     ravedr6_oid integer
@@ -1824,7 +1825,7 @@ COMMENT ON TABLE gaiadr3.ravedr6_join IS 'Convenience table to be used to join R
 COMMENT ON COLUMN gaiadr3.ravedr6_join.original_ext_source_id IS 'Original External Catalogue source identifier';
 COMMENT ON COLUMN gaiadr3.ravedr6_join.ravedr6_oid IS 'External Catalogue source identifier';
 
--- [Cruce con catálogos externos] ravedr6_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.ravedr6_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.ravedr6_neighbourhood (
     source_id bigint,
     original_ext_source_id text,
@@ -1840,9 +1841,9 @@ COMMENT ON COLUMN gaiadr3.ravedr6_neighbourhood.angular_distance IS 'Angular Dis
 COMMENT ON COLUMN gaiadr3.ravedr6_neighbourhood.score IS 'Score of neighbours';
 COMMENT ON COLUMN gaiadr3.ravedr6_neighbourhood.xm_flag IS 'Cross-match algorithm flag';
 COMMENT ON COLUMN gaiadr3.ravedr6_neighbourhood.ravedr6_oid IS 'External Catalogue source identifier';
-CREATE INDEX IF NOT EXISTS ravedr6_neighbourhood_source_id_idx ON gaiadr3.ravedr6_neighbourhood (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_ravedr6_neighbourhood_source_id_idx ON gaiadr3.ravedr6_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] sdssdr13_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.sdssdr13_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.sdssdr13_best_neighbour (
     source_id bigint,
     clean_sdssdr13_oid integer,
@@ -1860,9 +1861,9 @@ COMMENT ON COLUMN gaiadr3.sdssdr13_best_neighbour.angular_distance IS 'Angular D
 COMMENT ON COLUMN gaiadr3.sdssdr13_best_neighbour.number_of_neighbours IS 'Number of neighbours in External Catalogue';
 COMMENT ON COLUMN gaiadr3.sdssdr13_best_neighbour.number_of_mates IS 'Number of mates in Gaia Catalogue';
 COMMENT ON COLUMN gaiadr3.sdssdr13_best_neighbour.xm_flag IS 'Cross-match algorithm flag';
-CREATE INDEX IF NOT EXISTS sdssdr13_best_neighbour_source_id_idx ON gaiadr3.sdssdr13_best_neighbour (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_sdssdr13_best_neighbour_source_id_idx ON gaiadr3.sdssdr13_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] sdssdr13_join — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.sdssdr13_join — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.sdssdr13_join (
     original_ext_source_id bigint,
     clean_sdssdr13_oid integer
@@ -1871,7 +1872,7 @@ COMMENT ON TABLE gaiadr3.sdssdr13_join IS 'Convenience table to be used to join 
 COMMENT ON COLUMN gaiadr3.sdssdr13_join.original_ext_source_id IS 'Original External Catalogue source identifier';
 COMMENT ON COLUMN gaiadr3.sdssdr13_join.clean_sdssdr13_oid IS 'External Catalogue source identifier';
 
--- [Cruce con catálogos externos] sdssdr13_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.sdssdr13_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.sdssdr13_neighbourhood (
     source_id bigint,
     clean_sdssdr13_oid integer,
@@ -1887,9 +1888,9 @@ COMMENT ON COLUMN gaiadr3.sdssdr13_neighbourhood.original_ext_source_id IS 'Orig
 COMMENT ON COLUMN gaiadr3.sdssdr13_neighbourhood.angular_distance IS 'Angular Distance between the two sources [arcsec]';
 COMMENT ON COLUMN gaiadr3.sdssdr13_neighbourhood.score IS 'Score of neighbours';
 COMMENT ON COLUMN gaiadr3.sdssdr13_neighbourhood.xm_flag IS 'Cross-match algorithm flag';
-CREATE INDEX IF NOT EXISTS sdssdr13_neighbourhood_source_id_idx ON gaiadr3.sdssdr13_neighbourhood (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_sdssdr13_neighbourhood_source_id_idx ON gaiadr3.sdssdr13_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] skymapperdr2_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.skymapperdr2_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.skymapperdr2_best_neighbour (
     source_id bigint,
     original_ext_source_id bigint,
@@ -1905,16 +1906,16 @@ COMMENT ON COLUMN gaiadr3.skymapperdr2_best_neighbour.angular_distance IS 'Angul
 COMMENT ON COLUMN gaiadr3.skymapperdr2_best_neighbour.number_of_neighbours IS 'Number of neighbours in External Catalogue';
 COMMENT ON COLUMN gaiadr3.skymapperdr2_best_neighbour.number_of_mates IS 'Number of mates in Gaia Catalogue';
 COMMENT ON COLUMN gaiadr3.skymapperdr2_best_neighbour.xm_flag IS 'Cross-match algorithm flag';
-CREATE INDEX IF NOT EXISTS skymapperdr2_best_neighbour_source_id_idx ON gaiadr3.skymapperdr2_best_neighbour (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_skymapperdr2_best_neighbour_source_id_idx ON gaiadr3.skymapperdr2_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] skymapperdr2_join — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.skymapperdr2_join — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.skymapperdr2_join (
     original_ext_source_id bigint
 );
 COMMENT ON TABLE gaiadr3.skymapperdr2_join IS 'Convenience table to be used to join SkyMapper DR2 catalogue with the cross-match results. It lists all the SkyMapper DR2 sources which were used in the cross-match. See Documentation, [chap:crossmatch], for more details on the catalogue.';
 COMMENT ON COLUMN gaiadr3.skymapperdr2_join.original_ext_source_id IS 'Original External Catalogue source identifier';
 
--- [Cruce con catálogos externos] skymapperdr2_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.skymapperdr2_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.skymapperdr2_neighbourhood (
     source_id bigint,
     original_ext_source_id bigint,
@@ -1928,9 +1929,9 @@ COMMENT ON COLUMN gaiadr3.skymapperdr2_neighbourhood.original_ext_source_id IS '
 COMMENT ON COLUMN gaiadr3.skymapperdr2_neighbourhood.angular_distance IS 'Angular Distance between the two sources [arcsec]';
 COMMENT ON COLUMN gaiadr3.skymapperdr2_neighbourhood.score IS 'Score of neighbours';
 COMMENT ON COLUMN gaiadr3.skymapperdr2_neighbourhood.xm_flag IS 'Cross-match algorithm flag';
-CREATE INDEX IF NOT EXISTS skymapperdr2_neighbourhood_source_id_idx ON gaiadr3.skymapperdr2_neighbourhood (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_skymapperdr2_neighbourhood_source_id_idx ON gaiadr3.skymapperdr2_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] tmass_psc_xsc_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.tmass_psc_xsc_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.tmass_psc_xsc_best_neighbour (
     source_id bigint,
     original_ext_source_id text,
@@ -1948,9 +1949,9 @@ COMMENT ON COLUMN gaiadr3.tmass_psc_xsc_best_neighbour.xm_flag IS 'Cross-match a
 COMMENT ON COLUMN gaiadr3.tmass_psc_xsc_best_neighbour.clean_tmass_psc_xsc_oid IS 'External Catalogue source identifier';
 COMMENT ON COLUMN gaiadr3.tmass_psc_xsc_best_neighbour.number_of_neighbours IS 'Number of neighbours in External Catalogue';
 COMMENT ON COLUMN gaiadr3.tmass_psc_xsc_best_neighbour.number_of_mates IS 'Number of mates in Gaia Catalogue';
-CREATE INDEX IF NOT EXISTS tmass_psc_xsc_best_neighbour_source_id_idx ON gaiadr3.tmass_psc_xsc_best_neighbour (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_tmass_psc_xsc_best_neighbour_source_id_idx ON gaiadr3.tmass_psc_xsc_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] tmass_psc_xsc_join — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.tmass_psc_xsc_join — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.tmass_psc_xsc_join (
     original_psc_source_id text,
     original_xsc_source_id text,
@@ -1961,7 +1962,7 @@ COMMENT ON COLUMN gaiadr3.tmass_psc_xsc_join.original_psc_source_id IS 'Original
 COMMENT ON COLUMN gaiadr3.tmass_psc_xsc_join.original_xsc_source_id IS 'Original 2MASS XSC source identifier';
 COMMENT ON COLUMN gaiadr3.tmass_psc_xsc_join.clean_tmass_psc_xsc_oid IS 'External Catalogue source identifier';
 
--- [Cruce con catálogos externos] tmass_psc_xsc_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.tmass_psc_xsc_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.tmass_psc_xsc_neighbourhood (
     source_id bigint,
     original_ext_source_id text,
@@ -1977,9 +1978,9 @@ COMMENT ON COLUMN gaiadr3.tmass_psc_xsc_neighbourhood.angular_distance IS 'Angul
 COMMENT ON COLUMN gaiadr3.tmass_psc_xsc_neighbourhood.score IS 'Score of neighbours';
 COMMENT ON COLUMN gaiadr3.tmass_psc_xsc_neighbourhood.xm_flag IS 'Cross-match algorithm flag';
 COMMENT ON COLUMN gaiadr3.tmass_psc_xsc_neighbourhood.clean_tmass_psc_xsc_oid IS 'External Catalogue source identifier';
-CREATE INDEX IF NOT EXISTS tmass_psc_xsc_neighbourhood_source_id_idx ON gaiadr3.tmass_psc_xsc_neighbourhood (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_tmass_psc_xsc_neighbourhood_source_id_idx ON gaiadr3.tmass_psc_xsc_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] tycho2tdsc_merge — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.tycho2tdsc_merge — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.tycho2tdsc_merge (
     id text,
     hip integer,
@@ -2090,7 +2091,7 @@ COMMENT ON COLUMN gaiadr3.tycho2tdsc_merge.e_pa IS 'Uncertainty of the position 
 COMMENT ON COLUMN gaiadr3.tycho2tdsc_merge.e_pa_sep IS 'Uncertainty of the position angle * separation';
 COMMENT ON COLUMN gaiadr3.tycho2tdsc_merge.e_sep IS 'Uncertainty of the separation [mas]';
 
--- [Cruce con catálogos externos] tycho2tdsc_merge_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.tycho2tdsc_merge_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.tycho2tdsc_merge_best_neighbour (
     source_id bigint,
     original_ext_source_id text,
@@ -2106,9 +2107,9 @@ COMMENT ON COLUMN gaiadr3.tycho2tdsc_merge_best_neighbour.angular_distance IS 'A
 COMMENT ON COLUMN gaiadr3.tycho2tdsc_merge_best_neighbour.xm_flag IS 'Cross-match algorithm flag';
 COMMENT ON COLUMN gaiadr3.tycho2tdsc_merge_best_neighbour.tycho2tdsc_merge_oid IS 'External Catalogue source identifier';
 COMMENT ON COLUMN gaiadr3.tycho2tdsc_merge_best_neighbour.number_of_neighbours IS 'Number of neighbours in Gaia Catalogue';
-CREATE INDEX IF NOT EXISTS tycho2tdsc_merge_best_neighbour_source_id_idx ON gaiadr3.tycho2tdsc_merge_best_neighbour (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_tycho2tdsc_merge_best_neighbour_source_id_idx ON gaiadr3.tycho2tdsc_merge_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] tycho2tdsc_merge_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.tycho2tdsc_merge_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.tycho2tdsc_merge_neighbourhood (
     source_id bigint,
     original_ext_source_id text,
@@ -2124,9 +2125,9 @@ COMMENT ON COLUMN gaiadr3.tycho2tdsc_merge_neighbourhood.angular_distance IS 'An
 COMMENT ON COLUMN gaiadr3.tycho2tdsc_merge_neighbourhood.score IS 'Score of neighbours';
 COMMENT ON COLUMN gaiadr3.tycho2tdsc_merge_neighbourhood.xm_flag IS 'Cross-match algorithm flag';
 COMMENT ON COLUMN gaiadr3.tycho2tdsc_merge_neighbourhood.tycho2tdsc_merge_oid IS 'External Catalogue source identifier';
-CREATE INDEX IF NOT EXISTS tycho2tdsc_merge_neighbourhood_source_id_idx ON gaiadr3.tycho2tdsc_merge_neighbourhood (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_tycho2tdsc_merge_neighbourhood_source_id_idx ON gaiadr3.tycho2tdsc_merge_neighbourhood (source_id);
 
--- [Cruce con catálogos externos] urat1_best_neighbour — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.urat1_best_neighbour — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.urat1_best_neighbour (
     source_id bigint,
     original_ext_source_id text,
@@ -2144,9 +2145,9 @@ COMMENT ON COLUMN gaiadr3.urat1_best_neighbour.xm_flag IS 'Cross-match algorithm
 COMMENT ON COLUMN gaiadr3.urat1_best_neighbour.urat1_oid IS 'External Catalogue source identifier';
 COMMENT ON COLUMN gaiadr3.urat1_best_neighbour.number_of_neighbours IS 'Number of neighbours in External Catalogue';
 COMMENT ON COLUMN gaiadr3.urat1_best_neighbour.number_of_mates IS 'Number of mates in Gaia Catalogue';
-CREATE INDEX IF NOT EXISTS urat1_best_neighbour_source_id_idx ON gaiadr3.urat1_best_neighbour (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_urat1_best_neighbour_source_id_idx ON gaiadr3.urat1_best_neighbour (source_id);
 
--- [Cruce con catálogos externos] urat1_neighbourhood — acceso: TAP (ADQL)
+-- [Cruce con catálogos externos] gaiadr3.urat1_neighbourhood — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.urat1_neighbourhood (
     source_id bigint,
     original_ext_source_id text,
@@ -2162,9 +2163,9 @@ COMMENT ON COLUMN gaiadr3.urat1_neighbourhood.angular_distance IS 'Angular Dista
 COMMENT ON COLUMN gaiadr3.urat1_neighbourhood.score IS 'Score of neighbours';
 COMMENT ON COLUMN gaiadr3.urat1_neighbourhood.xm_flag IS 'Cross-match algorithm flag';
 COMMENT ON COLUMN gaiadr3.urat1_neighbourhood.urat1_oid IS 'External Catalogue source identifier';
-CREATE INDEX IF NOT EXISTS urat1_neighbourhood_source_id_idx ON gaiadr3.urat1_neighbourhood (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_urat1_neighbourhood_source_id_idx ON gaiadr3.urat1_neighbourhood (source_id);
 
--- [Extragaláctico] galaxy_candidates — acceso: TAP (ADQL)
+-- [Extragaláctico] gaiadr3.galaxy_candidates — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.galaxy_candidates (
     solution_id bigint,
     source_id bigint,
@@ -2244,9 +2245,9 @@ COMMENT ON COLUMN gaiadr3.galaxy_candidates.l2_de_vaucouleurs IS 'L2 norm for th
 COMMENT ON COLUMN gaiadr3.galaxy_candidates.morph_params_corr_vec_de_vaucouleurs IS 'Vector form of the upper triangle of the correlation matrix for the fitted parameters for the de Vaucouleurs Profile';
 COMMENT ON COLUMN gaiadr3.galaxy_candidates.flags_de_vaucouleurs IS 'Flag indicative of processing or scientific quality for the morphological parameters fitting for the de Vaucouleurs Profile';
 COMMENT ON COLUMN gaiadr3.galaxy_candidates.source_selection_flags IS 'Bit indicative of whether the input data from a given module met the source list eligibility criteria for the source of interest';
-CREATE INDEX IF NOT EXISTS galaxy_candidates_source_id_idx ON gaiadr3.galaxy_candidates (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_galaxy_candidates_source_id_idx ON gaiadr3.galaxy_candidates (source_id);
 
--- [Extragaláctico] galaxy_catalogue_name — acceso: TAP (ADQL)
+-- [Extragaláctico] gaiadr3.galaxy_catalogue_name — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.galaxy_catalogue_name (
     solution_id bigint,
     source_id bigint,
@@ -2256,9 +2257,9 @@ COMMENT ON TABLE gaiadr3.galaxy_catalogue_name IS 'This table provides the list 
 COMMENT ON COLUMN gaiadr3.galaxy_catalogue_name.solution_id IS 'Solution Identifier';
 COMMENT ON COLUMN gaiadr3.galaxy_catalogue_name.source_id IS 'Unique source identifier (unique within a particular Data Release)';
 COMMENT ON COLUMN gaiadr3.galaxy_catalogue_name.catalogue_id IS 'The unique identifier for the catalogue(s) used to select the sources in the morphological analysis';
-CREATE INDEX IF NOT EXISTS galaxy_catalogue_name_source_id_idx ON gaiadr3.galaxy_catalogue_name (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_galaxy_catalogue_name_source_id_idx ON gaiadr3.galaxy_catalogue_name (source_id);
 
--- [Extragaláctico] qso_candidates — acceso: TAP (ADQL)
+-- [Extragaláctico] gaiadr3.qso_candidates — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.qso_candidates (
     solution_id bigint,
     source_id bigint,
@@ -2344,9 +2345,9 @@ COMMENT ON COLUMN gaiadr3.qso_candidates.l2_norm IS 'L2 norm for the fitted Sers
 COMMENT ON COLUMN gaiadr3.qso_candidates.morph_params_corr_vec IS 'Vector form of the upper triangle of the correlation matrix for the fitted morphological parameters';
 COMMENT ON COLUMN gaiadr3.qso_candidates.host_galaxy_flag IS 'Flag indicative of processing or scientific quality for the morphological parameters fitting';
 COMMENT ON COLUMN gaiadr3.qso_candidates.source_selection_flags IS 'Bit indicative of whether the input data from a given module met the source list eligibility criteria for the source of interest';
-CREATE INDEX IF NOT EXISTS qso_candidates_source_id_idx ON gaiadr3.qso_candidates (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_qso_candidates_source_id_idx ON gaiadr3.qso_candidates (source_id);
 
--- [Extragaláctico] qso_catalogue_name — acceso: TAP (ADQL)
+-- [Extragaláctico] gaiadr3.qso_catalogue_name — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.qso_catalogue_name (
     solution_id bigint,
     source_id bigint,
@@ -2356,9 +2357,9 @@ COMMENT ON TABLE gaiadr3.qso_catalogue_name IS 'This table provides the list of 
 COMMENT ON COLUMN gaiadr3.qso_catalogue_name.solution_id IS 'Solution Identifier';
 COMMENT ON COLUMN gaiadr3.qso_catalogue_name.source_id IS 'Unique source identifier (unique within a particular Data Release)';
 COMMENT ON COLUMN gaiadr3.qso_catalogue_name.catalogue_id IS 'The unique identifier for the catalogue(s) used to select the sources in the morphological analysis';
-CREATE INDEX IF NOT EXISTS qso_catalogue_name_source_id_idx ON gaiadr3.qso_catalogue_name (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_qso_catalogue_name_source_id_idx ON gaiadr3.qso_catalogue_name (source_id);
 
--- [Estrellas no simples (binarias)] nss_acceleration_astro — acceso: TAP (ADQL)
+-- [Estrellas no simples (binarias)] gaiadr3.nss_acceleration_astro — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.nss_acceleration_astro (
     solution_id bigint,
     source_id bigint,
@@ -2420,9 +2421,9 @@ COMMENT ON COLUMN gaiadr3.nss_acceleration_astro.obj_func IS 'Value of the objec
 COMMENT ON COLUMN gaiadr3.nss_acceleration_astro.goodness_of_fit IS 'Goodness of fit in the Hipparcos sense';
 COMMENT ON COLUMN gaiadr3.nss_acceleration_astro.significance IS 'The significance of the solution (i.e. how worth keeping a model is)';
 COMMENT ON COLUMN gaiadr3.nss_acceleration_astro.flags IS 'Quality flag for the achieved NSS solution';
-CREATE INDEX IF NOT EXISTS nss_acceleration_astro_source_id_idx ON gaiadr3.nss_acceleration_astro (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_nss_acceleration_astro_source_id_idx ON gaiadr3.nss_acceleration_astro (source_id);
 
--- [Estrellas no simples (binarias)] nss_non_linear_spectro — acceso: TAP (ADQL)
+-- [Estrellas no simples (binarias)] gaiadr3.nss_non_linear_spectro — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.nss_non_linear_spectro (
     solution_id bigint,
     source_id bigint,
@@ -2458,9 +2459,9 @@ COMMENT ON COLUMN gaiadr3.nss_non_linear_spectro.corr_vec IS 'Vector form of the
 COMMENT ON COLUMN gaiadr3.nss_non_linear_spectro.obj_func IS 'Value of the objective function at the solution';
 COMMENT ON COLUMN gaiadr3.nss_non_linear_spectro.goodness_of_fit IS 'Goodness of fit in the Hipparcos sense';
 COMMENT ON COLUMN gaiadr3.nss_non_linear_spectro.flags IS 'Quality flag for the achieved NSS solution';
-CREATE INDEX IF NOT EXISTS nss_non_linear_spectro_source_id_idx ON gaiadr3.nss_non_linear_spectro (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_nss_non_linear_spectro_source_id_idx ON gaiadr3.nss_non_linear_spectro (source_id);
 
--- [Estrellas no simples (binarias)] nss_two_body_orbit — acceso: TAP (ADQL)
+-- [Estrellas no simples (binarias)] gaiadr3.nss_two_body_orbit — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.nss_two_body_orbit (
     solution_id bigint,
     source_id bigint,
@@ -2618,9 +2619,9 @@ COMMENT ON COLUMN gaiadr3.nss_two_body_orbit.g_luminosity_ratio IS 'Ratio of the
 COMMENT ON COLUMN gaiadr3.nss_two_body_orbit.input_period_error IS 'Standard error of the period taken from VariEclipsingBinary.frequencyError [d]';
 COMMENT ON COLUMN gaiadr3.nss_two_body_orbit.g_rank IS 'Rank of the G-band solution';
 COMMENT ON COLUMN gaiadr3.nss_two_body_orbit.astrometric_jitter IS 'Uncorrelated astrometric jitter term [mas]';
-CREATE INDEX IF NOT EXISTS nss_two_body_orbit_source_id_idx ON gaiadr3.nss_two_body_orbit (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_nss_two_body_orbit_source_id_idx ON gaiadr3.nss_two_body_orbit (source_id);
 
--- [Estrellas no simples (binarias)] nss_vim_fl — acceso: TAP (ADQL)
+-- [Estrellas no simples (binarias)] gaiadr3.nss_vim_fl — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.nss_vim_fl (
     solution_id bigint,
     source_id bigint,
@@ -2678,9 +2679,9 @@ COMMENT ON COLUMN gaiadr3.nss_vim_fl.goodness_of_fit IS 'Goodness of fit in the 
 COMMENT ON COLUMN gaiadr3.nss_vim_fl.efficiency IS 'Efficiency of the solution';
 COMMENT ON COLUMN gaiadr3.nss_vim_fl.significance IS 'The significance of the solution (i.e. how worth keeping a model is)';
 COMMENT ON COLUMN gaiadr3.nss_vim_fl.flags IS 'Quality flag for the achieved NSS solution';
-CREATE INDEX IF NOT EXISTS nss_vim_fl_source_id_idx ON gaiadr3.nss_vim_fl (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_nss_vim_fl_source_id_idx ON gaiadr3.nss_vim_fl (source_id);
 
--- [Verificación de rendimiento] binary_masses — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.binary_masses — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.binary_masses (
     source_id bigint,
     m1 real,
@@ -2710,9 +2711,9 @@ COMMENT ON COLUMN gaiadr3.binary_masses.fluxratio_upper IS 'Upper value of the f
 COMMENT ON COLUMN gaiadr3.binary_masses.combination_method IS 'Combination of NSS solutions used';
 COMMENT ON COLUMN gaiadr3.binary_masses.m1_ref IS 'Reference for the primary mass';
 COMMENT ON COLUMN gaiadr3.binary_masses.flag IS 'Flag';
-CREATE INDEX IF NOT EXISTS binary_masses_source_id_idx ON gaiadr3.binary_masses (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_binary_masses_source_id_idx ON gaiadr3.binary_masses (source_id);
 
--- [Verificación de rendimiento] chemical_cartography — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.chemical_cartography — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.chemical_cartography (
     solution_id bigint,
     source_id bigint,
@@ -2806,17 +2807,17 @@ COMMENT ON COLUMN gaiadr3.chemical_cartography.ecc_lo IS 'Lower confidence limit
 COMMENT ON COLUMN gaiadr3.chemical_cartography.x_lo IS 'Lower confidence limit of the Cartesian coordinate X. [kpc]';
 COMMENT ON COLUMN gaiadr3.chemical_cartography.y_lo IS 'Lower confidence limit of the Cartesian coordinate Y. [kpc]';
 COMMENT ON COLUMN gaiadr3.chemical_cartography.z_lo IS 'Lower confidence limit of the Cartesian coordinate Z. [kpc]';
-CREATE INDEX IF NOT EXISTS chemical_cartography_source_id_idx ON gaiadr3.chemical_cartography (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_chemical_cartography_source_id_idx ON gaiadr3.chemical_cartography (source_id);
 
--- [Verificación de rendimiento] gold_sample_carbon_stars — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.gold_sample_carbon_stars — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.gold_sample_carbon_stars (
     source_id bigint
 );
 COMMENT ON TABLE gaiadr3.gold_sample_carbon_stars IS 'List of \textit{Gaia} DR3 source IDs for carbon stars extracted from the main list of candidate carbon stars for having C2 and CN molecular bands significantly stronger than usual M stars \citep{DR3-DPACP-123}.';
 COMMENT ON COLUMN gaiadr3.gold_sample_carbon_stars.source_id IS 'Unique source identifier (unique within a particular Data Release)';
-CREATE INDEX IF NOT EXISTS gold_sample_carbon_stars_source_id_idx ON gaiadr3.gold_sample_carbon_stars (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_gold_sample_carbon_stars_source_id_idx ON gaiadr3.gold_sample_carbon_stars (source_id);
 
--- [Verificación de rendimiento] gold_sample_fgkm_stars — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.gold_sample_fgkm_stars — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.gold_sample_fgkm_stars (
     source_id bigint,
     teff_gspphot real,
@@ -2862,9 +2863,9 @@ COMMENT ON COLUMN gaiadr3.gold_sample_fgkm_stars.mass_flame_spec IS 'Mass of the
 COMMENT ON COLUMN gaiadr3.gold_sample_fgkm_stars.age_flame_spec IS 'Age of the star from FLAME using stellar models, see massFlameSpec for details [Gyr]';
 COMMENT ON COLUMN gaiadr3.gold_sample_fgkm_stars.evolstage_flame_spec IS 'Evolutionary stage of the star derived from FLAME using stellar models, see massFlameSpec for details';
 COMMENT ON COLUMN gaiadr3.gold_sample_fgkm_stars.spectraltype_esphs IS 'Spectral type from ESP-HS';
-CREATE INDEX IF NOT EXISTS gold_sample_fgkm_stars_source_id_idx ON gaiadr3.gold_sample_fgkm_stars (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_gold_sample_fgkm_stars_source_id_idx ON gaiadr3.gold_sample_fgkm_stars (source_id);
 
--- [Verificación de rendimiento] gold_sample_oba_stars — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.gold_sample_oba_stars — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.gold_sample_oba_stars (
     source_id bigint,
     vtan_flag integer
@@ -2872,17 +2873,17 @@ CREATE TABLE IF NOT EXISTS gaiadr3.gold_sample_oba_stars (
 COMMENT ON TABLE gaiadr3.gold_sample_oba_stars IS 'List of \textit{Gaia} DR3 source IDs of O, B, and A-type stars having an effective temperature estimate provided by ESP-HS or/and GSP-Phot greater than 7\,500~K. Based on the information available in the \textit{Gaia} DR3 catalogue, various filters were applied in order to reduce as much as possible the pollution from other types of targets. See \cite{DR3-DPACP-123} for more details.';
 COMMENT ON COLUMN gaiadr3.gold_sample_oba_stars.source_id IS 'Unique source identifier (unique within a particular Data Release)';
 COMMENT ON COLUMN gaiadr3.gold_sample_oba_stars.vtan_flag IS 'Flag indicating whether the tangential velocity is above 180 km/s';
-CREATE INDEX IF NOT EXISTS gold_sample_oba_stars_source_id_idx ON gaiadr3.gold_sample_oba_stars (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_gold_sample_oba_stars_source_id_idx ON gaiadr3.gold_sample_oba_stars (source_id);
 
--- [Verificación de rendimiento] gold_sample_solar_analogues — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.gold_sample_solar_analogues — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.gold_sample_solar_analogues (
     source_id bigint
 );
 COMMENT ON TABLE gaiadr3.gold_sample_solar_analogues IS '\textit{Gaia} DR3 source IDs of candidates for solar analogues selected from GSP-Spec via effective temperature, surface gravity and metallicity and from FLAME via mass and radius. For more details please refer to \cite{DR3-DPACP-123}.';
 COMMENT ON COLUMN gaiadr3.gold_sample_solar_analogues.source_id IS 'Unique source identifier (unique within a particular Data Release)';
-CREATE INDEX IF NOT EXISTS gold_sample_solar_analogues_source_id_idx ON gaiadr3.gold_sample_solar_analogues (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_gold_sample_solar_analogues_source_id_idx ON gaiadr3.gold_sample_solar_analogues (source_id);
 
--- [Verificación de rendimiento] gold_sample_spss — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.gold_sample_spss — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.gold_sample_spss (
     source_id bigint,
     spss_id integer,
@@ -2956,9 +2957,9 @@ COMMENT ON COLUMN gaiadr3.gold_sample_spss.radial_velocity_error IS 'Uncertainty
 COMMENT ON COLUMN gaiadr3.gold_sample_spss.vsini IS 'Best projected rotation [km.s**-1]';
 COMMENT ON COLUMN gaiadr3.gold_sample_spss.vsin_error IS 'Uncertainty on the best projected rotation [km.s**-1]';
 COMMENT ON COLUMN gaiadr3.gold_sample_spss.notes IS 'Free text notes on this object';
-CREATE INDEX IF NOT EXISTS gold_sample_spss_source_id_idx ON gaiadr3.gold_sample_spss (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_gold_sample_spss_source_id_idx ON gaiadr3.gold_sample_spss (source_id);
 
--- [Verificación de rendimiento] gold_sample_ucd — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.gold_sample_ucd — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.gold_sample_ucd (
     source_id bigint,
     ftot_fobs real,
@@ -2976,9 +2977,9 @@ COMMENT ON COLUMN gaiadr3.gold_sample_ucd.lum_uncertainty IS 'Uncertainty in bol
 COMMENT ON COLUMN gaiadr3.gold_sample_ucd.radius IS 'Radius in solar unit [solRad]';
 COMMENT ON COLUMN gaiadr3.gold_sample_ucd.radius_uncertainty IS 'Uncertainty in radius [solRad]';
 COMMENT ON COLUMN gaiadr3.gold_sample_ucd.reduced_chi2 IS 'Reduced chi-square of the SED fit';
-CREATE INDEX IF NOT EXISTS gold_sample_ucd_source_id_idx ON gaiadr3.gold_sample_ucd (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_gold_sample_ucd_source_id_idx ON gaiadr3.gold_sample_ucd (source_id);
 
--- [Verificación de rendimiento] sso_orbits — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.sso_orbits — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.sso_orbits (
     number_mp integer,
     denomination text,
@@ -3013,7 +3014,7 @@ COMMENT ON COLUMN gaiadr3.sso_orbits.h_state_vector_var_covar_matrix IS 'Covaria
 COMMENT ON COLUMN gaiadr3.sso_orbits.arc_length IS 'Orbital arc length spanned by the observations [d]';
 COMMENT ON COLUMN gaiadr3.sso_orbits.num_observations IS 'Number of observations';
 
--- [Verificación de rendimiento] synthetic_photometry_gspc — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.synthetic_photometry_gspc — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.synthetic_photometry_gspc (
     source_id bigint,
     c_star real,
@@ -3125,9 +3126,9 @@ COMMENT ON COLUMN gaiadr3.synthetic_photometry_gspc.f814w_acswfc_flux IS 'F814W 
 COMMENT ON COLUMN gaiadr3.synthetic_photometry_gspc.f814w_acswfc_flux_error IS 'Error on the F814W flux in the HST ACS/WFC system [W.m**-2.nm**-1]';
 COMMENT ON COLUMN gaiadr3.synthetic_photometry_gspc.f814w_acswfc_mag IS 'F814W magnitude in the HST ACS/WFC system [mag]';
 COMMENT ON COLUMN gaiadr3.synthetic_photometry_gspc.f814w_acswfc_flag IS 'Flag indicating if G mag and BP-RP color of the source lie in the validated range';
-CREATE INDEX IF NOT EXISTS synthetic_photometry_gspc_source_id_idx ON gaiadr3.synthetic_photometry_gspc (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_synthetic_photometry_gspc_source_id_idx ON gaiadr3.synthetic_photometry_gspc (source_id);
 
--- [Verificación de rendimiento] vari_spurious_signals — acceso: TAP (ADQL)
+-- [Verificación de rendimiento] gaiadr3.vari_spurious_signals — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.vari_spurious_signals (
     source_id bigint,
     phot_variable_flag text,
@@ -3207,9 +3208,9 @@ COMMENT ON COLUMN gaiadr3.vari_spurious_signals.scan_angle_model_ampl_sig_rp IS 
 COMMENT ON COLUMN gaiadr3.vari_spurious_signals.scan_angle_model_phase_rp IS 'Phase of the scan angle model fit to RP-band photometry [deg]';
 COMMENT ON COLUMN gaiadr3.vari_spurious_signals.scan_angle_model_red_chi2_rp IS 'Reduced Chi2 of the scan angle model fit to RP-band photometry';
 COMMENT ON COLUMN gaiadr3.vari_spurious_signals.scan_angle_model_f2_rp IS 'F2 goodness-of-fit of the scan angle model fit to RP-band photometry';
-CREATE INDEX IF NOT EXISTS vari_spurious_signals_source_id_idx ON gaiadr3.vari_spurious_signals (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_vari_spurious_signals_source_id_idx ON gaiadr3.vari_spurious_signals (source_id);
 
--- [Fotometría por época] epoch_photometry — acceso: DataLink (EPOCH_PHOTOMETRY)
+-- [Fotometría por época] gaiadr3.epoch_photometry — acceso: DataLink (EPOCH_PHOTOMETRY)
 CREATE TABLE IF NOT EXISTS gaiadr3.epoch_photometry (
     solution_id bigint,
     source_id bigint,
@@ -3309,9 +3310,9 @@ COMMENT ON COLUMN gaiadr3.epoch_photometry.photometry_flag_rp_reject IS 'RP tran
 COMMENT ON COLUMN gaiadr3.epoch_photometry.variability_flag_g_reject IS 'Average G transit photometry rejected by variability processing';
 COMMENT ON COLUMN gaiadr3.epoch_photometry.variability_flag_bp_reject IS 'BP transit photometry rejected by variability processing';
 COMMENT ON COLUMN gaiadr3.epoch_photometry.variability_flag_rp_reject IS 'RP transit photometry rejected by variability processing';
-CREATE INDEX IF NOT EXISTS epoch_photometry_source_id_idx ON gaiadr3.epoch_photometry (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_epoch_photometry_source_id_idx ON gaiadr3.epoch_photometry (source_id);
 
--- [Marco de referencia] agn_cross_id — acceso: TAP (ADQL)
+-- [Marco de referencia] gaiadr3.agn_cross_id — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.agn_cross_id (
     source_name_in_catalogue text,
     source_id bigint,
@@ -3321,9 +3322,9 @@ COMMENT ON TABLE gaiadr3.agn_cross_id IS '<p>Table <tt>AgnCrossId</tt> lists sou
 COMMENT ON COLUMN gaiadr3.agn_cross_id.source_name_in_catalogue IS 'Identifier in the external catalogue';
 COMMENT ON COLUMN gaiadr3.agn_cross_id.source_id IS 'Gaia source identifier';
 COMMENT ON COLUMN gaiadr3.agn_cross_id.catalogue_name IS 'Name of the external catalogue';
-CREATE INDEX IF NOT EXISTS agn_cross_id_source_id_idx ON gaiadr3.agn_cross_id (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_agn_cross_id_source_id_idx ON gaiadr3.agn_cross_id (source_id);
 
--- [Marco de referencia] frame_rotator_source — acceso: TAP (ADQL)
+-- [Marco de referencia] gaiadr3.frame_rotator_source — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.frame_rotator_source (
     source_id bigint,
     considered_for_reference_frame_orientation boolean,
@@ -3337,9 +3338,9 @@ COMMENT ON COLUMN gaiadr3.frame_rotator_source.considered_for_reference_frame_or
 COMMENT ON COLUMN gaiadr3.frame_rotator_source.used_for_reference_frame_orientation IS 'Used for the reference frame orientation';
 COMMENT ON COLUMN gaiadr3.frame_rotator_source.considered_for_reference_frame_spin IS 'Considered for the reference frame spin';
 COMMENT ON COLUMN gaiadr3.frame_rotator_source.used_for_reference_frame_spin IS 'Used for the reference frame spin';
-CREATE INDEX IF NOT EXISTS frame_rotator_source_source_id_idx ON gaiadr3.frame_rotator_source (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_frame_rotator_source_source_id_idx ON gaiadr3.frame_rotator_source (source_id);
 
--- [Marco de referencia] gaia_crf3_xm — acceso: TAP (ADQL)
+-- [Marco de referencia] gaiadr3.gaia_crf3_xm — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.gaia_crf3_xm (
     solution_id bigint,
     source_id bigint,
@@ -3417,9 +3418,9 @@ COMMENT ON COLUMN gaiadr3.gaia_crf3_xm.guw IS 'The flag describing if the Gaia-C
 COMMENT ON COLUMN gaiadr3.gaia_crf3_xm.guw_name IS 'The name for this source in Gaia-unWISE';
 COMMENT ON COLUMN gaiadr3.gaia_crf3_xm.b19 IS 'The flag describing if the Gaia-CRF3 source was found in the Gaia DR2 quasar and galaxy classification catalogue';
 COMMENT ON COLUMN gaiadr3.gaia_crf3_xm.b19_name IS 'The name for this source in the Gaia DR2 quasar and galaxy classification catalogue';
-CREATE INDEX IF NOT EXISTS gaia_crf3_xm_source_id_idx ON gaiadr3.gaia_crf3_xm (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_gaia_crf3_xm_source_id_idx ON gaiadr3.gaia_crf3_xm (source_id);
 
--- [Alertas científicas] alerts_mixedin_sourceids — acceso: TAP (ADQL)
+-- [Alertas científicas] gaiadr3.alerts_mixedin_sourceids — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.alerts_mixedin_sourceids (
     solution_id bigint,
     alert_source_id bigint,
@@ -3430,7 +3431,7 @@ COMMENT ON COLUMN gaiadr3.alerts_mixedin_sourceids.solution_id IS 'Solution Iden
 COMMENT ON COLUMN gaiadr3.alerts_mixedin_sourceids.alert_source_id IS 'Primary sourceId associated to the alert';
 COMMENT ON COLUMN gaiadr3.alerts_mixedin_sourceids.mixed_in_source_id IS 'Additional sourceId, if any, associated to the alert';
 
--- [Alertas científicas] science_alerts — acceso: TAP (ADQL)
+-- [Alertas científicas] gaiadr3.science_alerts — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.science_alerts (
     source_id bigint,
     transit_id bigint,
@@ -3442,9 +3443,9 @@ COMMENT ON COLUMN gaiadr3.science_alerts.source_id IS 'Unique source identifier 
 COMMENT ON COLUMN gaiadr3.science_alerts.transit_id IS 'Alerting transit identifier';
 COMMENT ON COLUMN gaiadr3.science_alerts.name IS 'Name of alert';
 COMMENT ON COLUMN gaiadr3.science_alerts.solution_id IS 'Solution Identifier';
-CREATE INDEX IF NOT EXISTS science_alerts_source_id_idx ON gaiadr3.science_alerts (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_science_alerts_source_id_idx ON gaiadr3.science_alerts (source_id);
 
--- [Sistema solar] sso_observation — acceso: TAP (ADQL)
+-- [Sistema solar] gaiadr3.sso_observation — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.sso_observation (
     solution_id bigint,
     source_id bigint,
@@ -3518,9 +3519,9 @@ COMMENT ON COLUMN gaiadr3.sso_observation.vz_gaia_geocentric IS 'Geocentric z ve
 COMMENT ON COLUMN gaiadr3.sso_observation.position_angle_scan IS 'Position angle of the scanning direction [deg]';
 COMMENT ON COLUMN gaiadr3.sso_observation.astrometric_outcome_ccd IS 'Result of processing the CCDs';
 COMMENT ON COLUMN gaiadr3.sso_observation.astrometric_outcome_transit IS 'Result of processing the transit';
-CREATE INDEX IF NOT EXISTS sso_observation_source_id_idx ON gaiadr3.sso_observation (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_sso_observation_source_id_idx ON gaiadr3.sso_observation (source_id);
 
--- [Sistema solar] sso_reflectance_spectrum — acceso: TAP (ADQL)
+-- [Sistema solar] gaiadr3.sso_reflectance_spectrum — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.sso_reflectance_spectrum (
     source_id bigint,
     solution_id bigint,
@@ -3544,9 +3545,9 @@ COMMENT ON COLUMN gaiadr3.sso_reflectance_spectrum.reflectance_spectrum IS 'Refl
 COMMENT ON COLUMN gaiadr3.sso_reflectance_spectrum.reflectance_spectrum_err IS 'Error in reflectance spectrum';
 COMMENT ON COLUMN gaiadr3.sso_reflectance_spectrum.wavelength IS 'Internally-calibrated wavelength of reflectance spectrum [nm]';
 COMMENT ON COLUMN gaiadr3.sso_reflectance_spectrum.reflectance_spectrum_flag IS 'Reflectance spectrum value flag';
-CREATE INDEX IF NOT EXISTS sso_reflectance_spectrum_source_id_idx ON gaiadr3.sso_reflectance_spectrum (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_sso_reflectance_spectrum_source_id_idx ON gaiadr3.sso_reflectance_spectrum (source_id);
 
--- [Sistema solar] sso_source — acceso: TAP (ADQL)
+-- [Sistema solar] gaiadr3.sso_source — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.sso_source (
     solution_id bigint,
     source_id bigint,
@@ -3562,9 +3563,9 @@ COMMENT ON COLUMN gaiadr3.sso_source.num_of_obs IS 'number of observations';
 COMMENT ON COLUMN gaiadr3.sso_source.number_mp IS 'Minor Planet number';
 COMMENT ON COLUMN gaiadr3.sso_source.denomination IS 'standard MPC denomination of the asteroid';
 COMMENT ON COLUMN gaiadr3.sso_source.num_of_spectra IS 'Number of epoch spectra used to compute the average';
-CREATE INDEX IF NOT EXISTS sso_source_source_id_idx ON gaiadr3.sso_source (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_sso_source_source_id_idx ON gaiadr3.sso_source (source_id);
 
--- [Espectroscopía] rvs_mean_spectrum — acceso: DataLink (RVS)
+-- [Espectroscopía] gaiadr3.rvs_mean_spectrum — acceso: DataLink (RVS)
 CREATE TABLE IF NOT EXISTS gaiadr3.rvs_mean_spectrum (
     source_id bigint,
     solution_id bigint,
@@ -3586,9 +3587,9 @@ COMMENT ON COLUMN gaiadr3.rvs_mean_spectrum.flux_error IS 'array of uncertaintie
 COMMENT ON COLUMN gaiadr3.rvs_mean_spectrum.combined_transits IS 'number of combined transits';
 COMMENT ON COLUMN gaiadr3.rvs_mean_spectrum.combined_ccds IS 'number of combined CCD spectra';
 COMMENT ON COLUMN gaiadr3.rvs_mean_spectrum.deblended_ccds IS 'number of deblended CCD spectra';
-CREATE INDEX IF NOT EXISTS rvs_mean_spectrum_source_id_idx ON gaiadr3.rvs_mean_spectrum (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_rvs_mean_spectrum_source_id_idx ON gaiadr3.rvs_mean_spectrum (source_id);
 
--- [Espectroscopía] xp_continuous_mean_spectrum — acceso: DataLink (XP_CONTINUOUS)
+-- [Espectroscopía] gaiadr3.xp_continuous_mean_spectrum — acceso: DataLink (XP_CONTINUOUS)
 CREATE TABLE IF NOT EXISTS gaiadr3.xp_continuous_mean_spectrum (
     source_id bigint,
     solution_id bigint,
@@ -3644,9 +3645,9 @@ COMMENT ON COLUMN gaiadr3.xp_continuous_mean_spectrum.rp_coefficient_errors IS '
 COMMENT ON COLUMN gaiadr3.xp_continuous_mean_spectrum.rp_coefficient_correlations IS 'Correlation matrix for RP coefficients';
 COMMENT ON COLUMN gaiadr3.xp_continuous_mean_spectrum.rp_n_relevant_bases IS 'Number of bases that are relevant for the representation of this mean RP spectrum';
 COMMENT ON COLUMN gaiadr3.xp_continuous_mean_spectrum.rp_relative_shrinking IS 'Measure of the relative shrinking of the coefficient vector when truncation is applied for the mean RP spectrum';
-CREATE INDEX IF NOT EXISTS xp_continuous_mean_spectrum_source_id_idx ON gaiadr3.xp_continuous_mean_spectrum (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_xp_continuous_mean_spectrum_source_id_idx ON gaiadr3.xp_continuous_mean_spectrum (source_id);
 
--- [Espectroscopía] xp_sampled_mean_spectrum — acceso: DataLink (XP_SAMPLED)
+-- [Espectroscopía] gaiadr3.xp_sampled_mean_spectrum — acceso: DataLink (XP_SAMPLED)
 CREATE TABLE IF NOT EXISTS gaiadr3.xp_sampled_mean_spectrum (
     source_id bigint,
     solution_id bigint,
@@ -3662,9 +3663,9 @@ COMMENT ON COLUMN gaiadr3.xp_sampled_mean_spectrum.ra IS 'Right Ascension [deg]'
 COMMENT ON COLUMN gaiadr3.xp_sampled_mean_spectrum.dec IS 'Declination [deg]';
 COMMENT ON COLUMN gaiadr3.xp_sampled_mean_spectrum.flux IS 'mean BP + RP combined spectrum flux [W.m**-2.nm**-1]';
 COMMENT ON COLUMN gaiadr3.xp_sampled_mean_spectrum.flux_error IS 'mean BP + RP combined spectrum flux error [W.m**-2.nm**-1]';
-CREATE INDEX IF NOT EXISTS xp_sampled_mean_spectrum_source_id_idx ON gaiadr3.xp_sampled_mean_spectrum (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_xp_sampled_mean_spectrum_source_id_idx ON gaiadr3.xp_sampled_mean_spectrum (source_id);
 
--- [Espectroscopía] xp_summary — acceso: TAP (ADQL)
+-- [Espectroscopía] gaiadr3.xp_summary — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.xp_summary (
     source_id bigint,
     solution_id bigint,
@@ -3708,9 +3709,9 @@ COMMENT ON COLUMN gaiadr3.xp_summary.rp_chi_squared IS 'Chi squared for the RP s
 COMMENT ON COLUMN gaiadr3.xp_summary.rp_n_transits IS 'Number of transits contributing to the mean in RP';
 COMMENT ON COLUMN gaiadr3.xp_summary.rp_n_contaminated_transits IS 'Number of contaminated transits in RP';
 COMMENT ON COLUMN gaiadr3.xp_summary.rp_n_blended_transits IS 'Number of blended transits in RP';
-CREATE INDEX IF NOT EXISTS xp_summary_source_id_idx ON gaiadr3.xp_summary (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_xp_summary_source_id_idx ON gaiadr3.xp_summary (source_id);
 
--- [Variabilidad] vari_agn — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_agn — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.vari_agn (
     solution_id bigint,
     source_id bigint,
@@ -3728,9 +3729,9 @@ COMMENT ON COLUMN gaiadr3.vari_agn.structure_function_index IS 'Index of the fir
 COMMENT ON COLUMN gaiadr3.vari_agn.structure_function_index_scatter IS 'Standard deviation of the index of the structure function';
 COMMENT ON COLUMN gaiadr3.vari_agn.qso_variability IS 'Quasar variability metric in the G band';
 COMMENT ON COLUMN gaiadr3.vari_agn.non_qso_variability IS 'Non-quasar variability metric in the G band';
-CREATE INDEX IF NOT EXISTS vari_agn_source_id_idx ON gaiadr3.vari_agn (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_vari_agn_source_id_idx ON gaiadr3.vari_agn (source_id);
 
--- [Variabilidad] vari_cepheid — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_cepheid — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.vari_cepheid (
     solution_id bigint,
     source_id bigint,
@@ -3896,9 +3897,9 @@ COMMENT ON COLUMN gaiadr3.vari_cepheid.type_best_classification IS 'Best type cl
 COMMENT ON COLUMN gaiadr3.vari_cepheid.type2_best_sub_classification IS 'Best subclassification estimate for typeBestClassification=`T2CEP out of: `BL_HER, `W_VIR,`RV_TAU';
 COMMENT ON COLUMN gaiadr3.vari_cepheid.mode_best_classification IS 'Best mode classification estimate out of: `FUNDAMENTAL, `FIRST_OVERTONE, `SECOND_OVERTONE, `MULTI,`UNDEFINED, `NOT_APPLICABLE';
 COMMENT ON COLUMN gaiadr3.vari_cepheid.multi_mode_best_classification IS 'Best multi mode DCEP classification out of: `F/1O, `F/2O, `1O/2O, `1O/3O, `2O/3O, `F/1O/2O, `1O/2O/3O';
-CREATE INDEX IF NOT EXISTS vari_cepheid_source_id_idx ON gaiadr3.vari_cepheid (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_vari_cepheid_source_id_idx ON gaiadr3.vari_cepheid (source_id);
 
--- [Variabilidad] vari_classifier_class_definition — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_classifier_class_definition — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.vari_classifier_class_definition (
     solution_id bigint,
     classifier_name text,
@@ -3911,7 +3912,7 @@ COMMENT ON COLUMN gaiadr3.vari_classifier_class_definition.classifier_name IS 'N
 COMMENT ON COLUMN gaiadr3.vari_classifier_class_definition.class_name IS 'Name of the published class from this classifier';
 COMMENT ON COLUMN gaiadr3.vari_classifier_class_definition.class_description IS 'Description of the published class from this classifier';
 
--- [Variabilidad] vari_classifier_definition — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_classifier_definition — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.vari_classifier_definition (
     solution_id bigint,
     classifier_name text,
@@ -3922,7 +3923,7 @@ COMMENT ON COLUMN gaiadr3.vari_classifier_definition.solution_id IS 'Solution Id
 COMMENT ON COLUMN gaiadr3.vari_classifier_definition.classifier_name IS 'Name of the classifier that is detailed in this entry';
 COMMENT ON COLUMN gaiadr3.vari_classifier_definition.classifier_description IS 'Description of this classifier';
 
--- [Variabilidad] vari_classifier_result — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_classifier_result — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.vari_classifier_result (
     solution_id bigint,
     source_id bigint,
@@ -3936,9 +3937,9 @@ COMMENT ON COLUMN gaiadr3.vari_classifier_result.source_id IS 'Unique source ide
 COMMENT ON COLUMN gaiadr3.vari_classifier_result.classifier_name IS 'Classifier name used to produce this result, use for lookup in \texttt{VariClassifierDefinition} table';
 COMMENT ON COLUMN gaiadr3.vari_classifier_result.best_class_name IS 'Name of best class, see table \texttt{VariClassifierClassDefinition} for details of the class';
 COMMENT ON COLUMN gaiadr3.vari_classifier_result.best_class_score IS 'Score of the best class';
-CREATE INDEX IF NOT EXISTS vari_classifier_result_source_id_idx ON gaiadr3.vari_classifier_result (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_vari_classifier_result_source_id_idx ON gaiadr3.vari_classifier_result (source_id);
 
--- [Variabilidad] vari_compact_companion — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_compact_companion — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.vari_compact_companion (
     solution_id bigint,
     source_id bigint,
@@ -3994,9 +3995,9 @@ COMMENT ON COLUMN gaiadr3.vari_compact_companion.mod_min_mass_ratio IS 'Modified
 COMMENT ON COLUMN gaiadr3.vari_compact_companion.mod_min_mass_ratio_one_sigma IS '15.9 percentile modified minimum mass ratio';
 COMMENT ON COLUMN gaiadr3.vari_compact_companion.mod_min_mass_ratio_three_sigma IS '0.135 percentile modified minimum mass ratio';
 COMMENT ON COLUMN gaiadr3.vari_compact_companion.alpha IS 'alpha ellipsoidal coefficient';
-CREATE INDEX IF NOT EXISTS vari_compact_companion_source_id_idx ON gaiadr3.vari_compact_companion (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_vari_compact_companion_source_id_idx ON gaiadr3.vari_compact_companion (source_id);
 
--- [Variabilidad] vari_eclipsing_binary — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_eclipsing_binary — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.vari_eclipsing_binary (
     solution_id bigint,
     source_id bigint,
@@ -4078,9 +4079,9 @@ COMMENT ON COLUMN gaiadr3.vari_eclipsing_binary.derived_secondary_ecl_duration I
 COMMENT ON COLUMN gaiadr3.vari_eclipsing_binary.derived_secondary_ecl_duration_error IS 'Secondary eclipse: uncertainty of \texttt{derivedSecondaryEclDuration}';
 COMMENT ON COLUMN gaiadr3.vari_eclipsing_binary.derived_secondary_ecl_depth IS 'Secondary eclipse: depth [mag]';
 COMMENT ON COLUMN gaiadr3.vari_eclipsing_binary.derived_secondary_ecl_depth_error IS 'Secondary eclipse: uncertainty of \texttt{derivedSecondaryEclDepth} [mag]';
-CREATE INDEX IF NOT EXISTS vari_eclipsing_binary_source_id_idx ON gaiadr3.vari_eclipsing_binary (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_vari_eclipsing_binary_source_id_idx ON gaiadr3.vari_eclipsing_binary (source_id);
 
--- [Variabilidad] vari_epoch_radial_velocity — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_epoch_radial_velocity — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.vari_epoch_radial_velocity (
     source_id bigint,
     transit_id bigint,
@@ -4098,9 +4099,9 @@ COMMENT ON COLUMN gaiadr3.vari_epoch_radial_velocity.radial_velocity IS 'Barycen
 COMMENT ON COLUMN gaiadr3.vari_epoch_radial_velocity.radial_velocity_error IS 'Barycentric radial velocity error [km.s**-1]';
 COMMENT ON COLUMN gaiadr3.vari_epoch_radial_velocity.rejected_by_variability IS 'Rejected by DPAC variability processing (or variability analysis)';
 COMMENT ON COLUMN gaiadr3.vari_epoch_radial_velocity.solution_id IS 'Solution Identifier';
-CREATE INDEX IF NOT EXISTS vari_epoch_radial_velocity_source_id_idx ON gaiadr3.vari_epoch_radial_velocity (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_vari_epoch_radial_velocity_source_id_idx ON gaiadr3.vari_epoch_radial_velocity (source_id);
 
--- [Variabilidad] vari_long_period_variable — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_long_period_variable — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.vari_long_period_variable (
     solution_id bigint,
     source_id bigint,
@@ -4118,9 +4119,9 @@ COMMENT ON COLUMN gaiadr3.vari_long_period_variable.frequency_error IS 'Error on
 COMMENT ON COLUMN gaiadr3.vari_long_period_variable.amplitude IS 'Amplitude of the LPV variability [mag]';
 COMMENT ON COLUMN gaiadr3.vari_long_period_variable.median_delta_wl_rp IS 'Median of the pseudo-wavelength separations between the two highest peaks in RP spectra';
 COMMENT ON COLUMN gaiadr3.vari_long_period_variable.is_cstar IS 'Flag to mark C-stars';
-CREATE INDEX IF NOT EXISTS vari_long_period_variable_source_id_idx ON gaiadr3.vari_long_period_variable (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_vari_long_period_variable_source_id_idx ON gaiadr3.vari_long_period_variable (source_id);
 
--- [Variabilidad] vari_microlensing — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_microlensing — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.vari_microlensing (
     solution_id bigint,
     source_id bigint,
@@ -4196,9 +4197,9 @@ COMMENT ON COLUMN gaiadr3.vari_microlensing.paczynski1_fs_rp IS 'Blending factor
 COMMENT ON COLUMN gaiadr3.vari_microlensing.paczynski1_fs_rp_error IS 'Error of blending factor in RP-band (level 1)';
 COMMENT ON COLUMN gaiadr3.vari_microlensing.paczynski1_chi2 IS 'Chi square of level 1 Paczynski fit';
 COMMENT ON COLUMN gaiadr3.vari_microlensing.paczynski1_chi2_dof IS 'Reduced chi square of level 1 Paczynski fit';
-CREATE INDEX IF NOT EXISTS vari_microlensing_source_id_idx ON gaiadr3.vari_microlensing (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_vari_microlensing_source_id_idx ON gaiadr3.vari_microlensing (source_id);
 
--- [Variabilidad] vari_ms_oscillator — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_ms_oscillator — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.vari_ms_oscillator (
     solution_id bigint,
     source_id bigint,
@@ -4224,9 +4225,9 @@ COMMENT ON COLUMN gaiadr3.vari_ms_oscillator.amplitude_g_freq1_harm2 IS 'Half pe
 COMMENT ON COLUMN gaiadr3.vari_ms_oscillator.phase_g_freq1_harm2 IS 'Phase of the oscillation in the G band corresponding to the second harmonic of the best frequency [rad]';
 COMMENT ON COLUMN gaiadr3.vari_ms_oscillator.amplitude_g_freq1_harm3 IS 'Half peak-to-peak amplitude in the G band of the third harmonic of the best frequency [mag]';
 COMMENT ON COLUMN gaiadr3.vari_ms_oscillator.phase_g_freq1_harm3 IS 'Phase of the oscillation in the G band corresponding to the third harmonic of the best frequency [rad]';
-CREATE INDEX IF NOT EXISTS vari_ms_oscillator_source_id_idx ON gaiadr3.vari_ms_oscillator (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_vari_ms_oscillator_source_id_idx ON gaiadr3.vari_ms_oscillator (source_id);
 
--- [Variabilidad] vari_planetary_transit — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_planetary_transit — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.vari_planetary_transit (
     solution_id bigint,
     source_id bigint,
@@ -4244,9 +4245,9 @@ COMMENT ON COLUMN gaiadr3.vari_planetary_transit.transit_period IS 'Most probabl
 COMMENT ON COLUMN gaiadr3.vari_planetary_transit.transit_depth IS 'Transit depth [mmag]';
 COMMENT ON COLUMN gaiadr3.vari_planetary_transit.transit_duration IS 'Transit duration [d]';
 COMMENT ON COLUMN gaiadr3.vari_planetary_transit.num_in_transit IS 'Number of in-transit observations';
-CREATE INDEX IF NOT EXISTS vari_planetary_transit_source_id_idx ON gaiadr3.vari_planetary_transit (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_vari_planetary_transit_source_id_idx ON gaiadr3.vari_planetary_transit (source_id);
 
--- [Variabilidad] vari_planetary_transit_13june2022 — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_planetary_transit_13june2022 — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.vari_planetary_transit_13june2022 (
     solution_id bigint,
     source_id bigint,
@@ -4264,9 +4265,9 @@ COMMENT ON COLUMN gaiadr3.vari_planetary_transit_13june2022.transit_period IS 'M
 COMMENT ON COLUMN gaiadr3.vari_planetary_transit_13june2022.transit_depth IS 'Transit depth [mmag]';
 COMMENT ON COLUMN gaiadr3.vari_planetary_transit_13june2022.transit_duration IS 'Transit duration [d]';
 COMMENT ON COLUMN gaiadr3.vari_planetary_transit_13june2022.num_in_transit IS 'Number of in-transit observations';
-CREATE INDEX IF NOT EXISTS vari_planetary_transit_13june2022_source_id_idx ON gaiadr3.vari_planetary_transit_13june2022 (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_vari_planetary_transit_13june2022_source_id_idx ON gaiadr3.vari_planetary_transit_13june2022 (source_id);
 
--- [Variabilidad] vari_rad_vel_statistics — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_rad_vel_statistics — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.vari_rad_vel_statistics (
     solution_id bigint,
     source_id bigint,
@@ -4302,9 +4303,9 @@ COMMENT ON COLUMN gaiadr3.vari_rad_vel_statistics.kurtosis_rv IS 'Standardized u
 COMMENT ON COLUMN gaiadr3.vari_rad_vel_statistics.mad_rv IS 'Median Absolute Deviation (MAD) for radial velocity transits [km.s**-1]';
 COMMENT ON COLUMN gaiadr3.vari_rad_vel_statistics.abbe_rv IS 'Abbe value for radial velocity transits';
 COMMENT ON COLUMN gaiadr3.vari_rad_vel_statistics.iqr_rv IS 'Interquartile range for radial velocity transits [km.s**-1]';
-CREATE INDEX IF NOT EXISTS vari_rad_vel_statistics_source_id_idx ON gaiadr3.vari_rad_vel_statistics (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_vari_rad_vel_statistics_source_id_idx ON gaiadr3.vari_rad_vel_statistics (source_id);
 
--- [Variabilidad] vari_rotation_modulation — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_rotation_modulation — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.vari_rotation_modulation (
     solution_id bigint,
     source_id bigint,
@@ -4440,9 +4441,9 @@ COMMENT ON COLUMN gaiadr3.vari_rotation_modulation.segments_model_reference_time
 COMMENT ON COLUMN gaiadr3.vari_rotation_modulation.segments_g_chi_square IS 'Array of chisquares for linear models (G band)';
 COMMENT ON COLUMN gaiadr3.vari_rotation_modulation.segments_bp_chi_square IS 'Array of chisquares for linear models (BP band)';
 COMMENT ON COLUMN gaiadr3.vari_rotation_modulation.segments_rp_chi_square IS 'Array of chisquares for linear models (RP band)';
-CREATE INDEX IF NOT EXISTS vari_rotation_modulation_source_id_idx ON gaiadr3.vari_rotation_modulation (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_vari_rotation_modulation_source_id_idx ON gaiadr3.vari_rotation_modulation (source_id);
 
--- [Variabilidad] vari_rrlyrae — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_rrlyrae — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.vari_rrlyrae (
     solution_id bigint,
     source_id bigint,
@@ -4602,9 +4603,9 @@ COMMENT ON COLUMN gaiadr3.vari_rrlyrae.fund_freq1_harmonic_phase_rv_error IS 'Er
 COMMENT ON COLUMN gaiadr3.vari_rrlyrae.best_classification IS 'Best RR Lyrae classification estimate out of: {`RRc, `RRab, `RRd}';
 COMMENT ON COLUMN gaiadr3.vari_rrlyrae.g_absorption IS 'Interstellar absorption in the G-band [mag]';
 COMMENT ON COLUMN gaiadr3.vari_rrlyrae.g_absorption_error IS 'Error on the interstellar absorption in the G-band [mag]';
-CREATE INDEX IF NOT EXISTS vari_rrlyrae_source_id_idx ON gaiadr3.vari_rrlyrae (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_vari_rrlyrae_source_id_idx ON gaiadr3.vari_rrlyrae (source_id);
 
--- [Variabilidad] vari_short_timescale — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_short_timescale — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.vari_short_timescale (
     solution_id bigint,
     source_id bigint,
@@ -4626,9 +4627,9 @@ COMMENT ON COLUMN gaiadr3.vari_short_timescale.variogram_num_points IS 'Number o
 COMMENT ON COLUMN gaiadr3.vari_short_timescale.variogram_char_timescales IS 'Characteristic timescale(s) of variability [d]';
 COMMENT ON COLUMN gaiadr3.vari_short_timescale.variogram_values IS 'Variogram values associated with the {\tt variogramCharTimescales} [mag**2]';
 COMMENT ON COLUMN gaiadr3.vari_short_timescale.frequency IS 'Frequency search result for either G CCD, G FoV, BP or RP photometry [d**-1]';
-CREATE INDEX IF NOT EXISTS vari_short_timescale_source_id_idx ON gaiadr3.vari_short_timescale (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_vari_short_timescale_source_id_idx ON gaiadr3.vari_short_timescale (source_id);
 
--- [Variabilidad] vari_summary — acceso: TAP (ADQL)
+-- [Variabilidad] gaiadr3.vari_summary — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.vari_summary (
     solution_id bigint,
     source_id bigint,
@@ -4768,9 +4769,9 @@ COMMENT ON COLUMN gaiadr3.vari_summary.in_vari_ms_oscillator IS 'Source is prese
 COMMENT ON COLUMN gaiadr3.vari_summary.in_vari_agn IS 'Source is present in \texttt{VariAgn}';
 COMMENT ON COLUMN gaiadr3.vari_summary.in_vari_microlensing IS 'Source is present in \texttt{VariMicrolensing}';
 COMMENT ON COLUMN gaiadr3.vari_summary.in_vari_compact_companion IS 'Source is present in \texttt{VariCompactCompanion}';
-CREATE INDEX IF NOT EXISTS vari_summary_source_id_idx ON gaiadr3.vari_summary (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_vari_summary_source_id_idx ON gaiadr3.vari_summary (source_id);
 
--- [Simulación] gaia_source_simulation — acceso: TAP (ADQL)
+-- [Simulación] gaiadr3.gaia_source_simulation — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.gaia_source_simulation (
     solution_id bigint,
     source_id bigint,
@@ -4850,9 +4851,9 @@ COMMENT ON COLUMN gaiadr3.gaia_source_simulation.feh IS 'Iron abundance [''dex''
 COMMENT ON COLUMN gaiadr3.gaia_source_simulation.feh_error IS 'Iron abundance error [''dex'']';
 COMMENT ON COLUMN gaiadr3.gaia_source_simulation.logg IS 'Surface gravity [log(cm.s**-2)]';
 COMMENT ON COLUMN gaiadr3.gaia_source_simulation.logg_error IS 'Surface gravity Error [log(cm.s**-2)]';
-CREATE INDEX IF NOT EXISTS gaia_source_simulation_source_id_idx ON gaiadr3.gaia_source_simulation (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_gaia_source_simulation_source_id_idx ON gaiadr3.gaia_source_simulation (source_id);
 
--- [Simulación] gaia_universe_model — acceso: TAP (ADQL)
+-- [Simulación] gaiadr3.gaia_universe_model — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.gaia_universe_model (
     source_extended_id text,
     source_id bigint,
@@ -4942,9 +4943,9 @@ COMMENT ON COLUMN gaiadr3.gaia_universe_model.variability_amplitude IS 'Amplitud
 COMMENT ON COLUMN gaiadr3.gaia_universe_model.variability_period IS 'Period of variability [d]';
 COMMENT ON COLUMN gaiadr3.gaia_universe_model.variability_phase IS 'Phase of variability';
 COMMENT ON COLUMN gaiadr3.gaia_universe_model.r_env_r_star IS 'Envelope characterisic for Be stars';
-CREATE INDEX IF NOT EXISTS gaia_universe_model_source_id_idx ON gaiadr3.gaia_universe_model (source_id);
+CREATE INDEX IF NOT EXISTS gaiadr3_gaia_universe_model_source_id_idx ON gaiadr3.gaia_universe_model (source_id);
 
--- [Auxiliar] commanded_scan_law — acceso: TAP (ADQL)
+-- [Auxiliar] gaiadr3.commanded_scan_law — acceso: TAP Gaia (ADQL)
 CREATE TABLE IF NOT EXISTS gaiadr3.commanded_scan_law (
     jd_time double precision,
     bjd_fov1 double precision,
@@ -4974,4 +4975,811 @@ COMMENT ON COLUMN gaiadr3.commanded_scan_law.dec_fov2 IS 'Declination of FOV2 ce
 COMMENT ON COLUMN gaiadr3.commanded_scan_law.heal_pix_fov2 IS 'FOV2 HEALPix level 12';
 COMMENT ON COLUMN gaiadr3.commanded_scan_law.scan_angle_fov2 IS 'Scan position angle of FOV2 [deg]';
 COMMENT ON COLUMN gaiadr3.commanded_scan_law.solution_id IS 'Solution Identifier';
+
+-- [SPHEREx: tablas TAP de IRSA] spherex.artifact — acceso: TAP IRSA (ADQL)
+CREATE TABLE IF NOT EXISTS spherex.artifact (
+    planeid text,
+    artifactid text,
+    uri text,
+    producttype text,
+    releasetype text,
+    contenttype text,
+    contentlength bigint,
+    contentchecksum text,
+    ipac_gid integer,
+    mission_id integer,
+    ipac_pub_date text,
+    lastmodified text
+);
+COMMENT ON TABLE spherex.artifact IS 'SPHEREx CAOM Artifact Table';
+COMMENT ON COLUMN spherex.artifact.planeid IS 'foreign key: caom.plane.planeid';
+COMMENT ON COLUMN spherex.artifact.artifactid IS 'unique artifact identifier: 32-bit UUID';
+COMMENT ON COLUMN spherex.artifact.uri IS 'artifact access url';
+COMMENT ON COLUMN spherex.artifact.producttype IS 'product type (e.g. science, calibration, auxiliary, preview, info)';
+COMMENT ON COLUMN spherex.artifact.releasetype IS 'release type (data, meta)';
+COMMENT ON COLUMN spherex.artifact.contenttype IS 'artifact file type';
+COMMENT ON COLUMN spherex.artifact.contentlength IS 'artifact size in bytes [byte]';
+COMMENT ON COLUMN spherex.artifact.contentchecksum IS 'checksum of the content (URI of the form {algorithm}:{hex value})';
+COMMENT ON COLUMN spherex.artifact.ipac_gid IS 'IRSA access control identifier: group ID';
+COMMENT ON COLUMN spherex.artifact.mission_id IS 'IRSA access control identifier: mission ID';
+COMMENT ON COLUMN spherex.artifact.ipac_pub_date IS 'public release date (UTC)';
+COMMENT ON COLUMN spherex.artifact.lastmodified IS 'timestamp of last modification of this row';
+
+-- [SPHEREx: tablas TAP de IRSA] spherex.obscore — acceso: TAP IRSA (ADQL)
+CREATE TABLE IF NOT EXISTS spherex.obscore (
+    obs_id text,
+    obs_collection text,
+    s_ra double precision,
+    s_dec double precision,
+    energy_bandpassname text,
+    em_min double precision,
+    em_max double precision,
+    t_min double precision,
+    t_max double precision,
+    t_exptime double precision,
+    access_url text,
+    access_format text,
+    dataproduct_type text,
+    calib_level smallint,
+    target_name text,
+    obs_title text,
+    facility_name text,
+    instrument_name text,
+    obs_creation_date text,
+    obs_creator_name text,
+    obs_release_date text,
+    obs_publisher_did text,
+    publisher_id text,
+    bib_reference text,
+    data_rights text,
+    s_fov double precision,
+    s_region text,
+    s_resolution double precision,
+    s_xel1 bigint,
+    s_xel2 bigint,
+    s_ucd text,
+    s_unit text,
+    s_resolution_min double precision,
+    s_resolution_max double precision,
+    s_calib_status text,
+    s_pixel_scale double precision,
+    t_xel bigint,
+    t_resolution double precision,
+    em_xel bigint,
+    em_calib_status text,
+    em_res_power double precision,
+    pol_xel bigint,
+    proposal_id text,
+    energy_emband text,
+    position_timedependent boolean,
+    obs_intent text,
+    algorithm_name text,
+    facility_keywords text,
+    instrument_keywords text,
+    environment_photometric boolean,
+    proposal_project text,
+    target_type text,
+    target_standard boolean,
+    target_moving boolean,
+    target_keywords text,
+    proposal_pi text,
+    access_estsize bigint,
+    o_ucd text,
+    ipac_gid integer,
+    ipac_pub_date text,
+    pt text,
+    poly text
+);
+COMMENT ON TABLE spherex.obscore IS 'IRSA ObsCore table of SPHEREx products';
+COMMENT ON COLUMN spherex.obscore.obs_id IS 'Observation ID';
+COMMENT ON COLUMN spherex.obscore.obs_collection IS 'Data collection';
+COMMENT ON COLUMN spherex.obscore.s_ra IS 'Central right ascension, ICRS [deg]';
+COMMENT ON COLUMN spherex.obscore.s_dec IS 'Central declination, ICRS [deg]';
+COMMENT ON COLUMN spherex.obscore.energy_bandpassname IS 'Band name';
+COMMENT ON COLUMN spherex.obscore.em_min IS 'Minimum wavelength (in meters) [m]';
+COMMENT ON COLUMN spherex.obscore.em_max IS 'Maximum wavelength (in meters) [m]';
+COMMENT ON COLUMN spherex.obscore.t_min IS 'Observation start time (in MJD) [d]';
+COMMENT ON COLUMN spherex.obscore.t_max IS 'Observation end time (in MJD) [d]';
+COMMENT ON COLUMN spherex.obscore.t_exptime IS 'Exposure time [s]';
+COMMENT ON COLUMN spherex.obscore.access_url IS 'Data access URL';
+COMMENT ON COLUMN spherex.obscore.access_format IS 'MIME type of access_url';
+COMMENT ON COLUMN spherex.obscore.dataproduct_type IS 'Data product type (e.g. image, spectrum, cube, measurements)';
+COMMENT ON COLUMN spherex.obscore.calib_level IS 'Calibration level (0, 1, 2, 3, 4)';
+COMMENT ON COLUMN spherex.obscore.target_name IS 'SPHEREx target field';
+COMMENT ON COLUMN spherex.obscore.obs_title IS 'Description of observation';
+COMMENT ON COLUMN spherex.obscore.facility_name IS 'Telescope name';
+COMMENT ON COLUMN spherex.obscore.instrument_name IS 'Instrument name';
+COMMENT ON COLUMN spherex.obscore.obs_creation_date IS 'Data product creation date';
+COMMENT ON COLUMN spherex.obscore.obs_creator_name IS 'Data product creator';
+COMMENT ON COLUMN spherex.obscore.obs_release_date IS 'Public release date';
+COMMENT ON COLUMN spherex.obscore.obs_publisher_did IS 'IVOA ID for the dataset, assigned by the publisher (IRSA)';
+COMMENT ON COLUMN spherex.obscore.publisher_id IS 'IVOA ID for the publisher (IRSA)';
+COMMENT ON COLUMN spherex.obscore.bib_reference IS 'IRSA documentation landing page';
+COMMENT ON COLUMN spherex.obscore.data_rights IS 'Data rights (Public, Secure, Proprietary)';
+COMMENT ON COLUMN spherex.obscore.s_fov IS 'Field of view [deg]';
+COMMENT ON COLUMN spherex.obscore.s_region IS 'Sky region covered by the data product (ICRS)';
+COMMENT ON COLUMN spherex.obscore.s_resolution IS 'Spatial resolution [arcsec]';
+COMMENT ON COLUMN spherex.obscore.s_xel1 IS 'Number of pixels along x-axis (NAXIS1)';
+COMMENT ON COLUMN spherex.obscore.s_xel2 IS 'Number of pixels along y-axis (NAXIS2)';
+COMMENT ON COLUMN spherex.obscore.s_ucd IS 'UCD for s_xel1/s_xel2 (pos or u,v data)';
+COMMENT ON COLUMN spherex.obscore.s_unit IS 'Units used for s_ra, s_dec';
+COMMENT ON COLUMN spherex.obscore.s_resolution_min IS 'Minimum spatial resolution [arcsec]';
+COMMENT ON COLUMN spherex.obscore.s_resolution_max IS 'Maximum spatial resolution [arcsec]';
+COMMENT ON COLUMN spherex.obscore.s_calib_status IS 'Astrometric calibration status';
+COMMENT ON COLUMN spherex.obscore.s_pixel_scale IS 'Pixel size [arcsec]';
+COMMENT ON COLUMN spherex.obscore.t_xel IS 'Number of pixels along the time axis';
+COMMENT ON COLUMN spherex.obscore.t_resolution IS 'Resolution on the time axis [s]';
+COMMENT ON COLUMN spherex.obscore.em_xel IS 'Number of pixels along the energy axis';
+COMMENT ON COLUMN spherex.obscore.em_calib_status IS 'Type of spectral coord calibration';
+COMMENT ON COLUMN spherex.obscore.em_res_power IS 'Spectral resolving power (R)';
+COMMENT ON COLUMN spherex.obscore.pol_xel IS 'Number of pixels along the polarization axis';
+COMMENT ON COLUMN spherex.obscore.proposal_id IS 'Proposal identifier';
+COMMENT ON COLUMN spherex.obscore.energy_emband IS 'Energy band (Radio,Millimeter,Infrared,Optical,...)';
+COMMENT ON COLUMN spherex.obscore.position_timedependent IS 'Position is time-dependent (0=false, 1=true)';
+COMMENT ON COLUMN spherex.obscore.obs_intent IS 'Intended purpose of data (science, calibration)';
+COMMENT ON COLUMN spherex.obscore.algorithm_name IS 'Algorithm (e.g. mosaic, exposure)';
+COMMENT ON COLUMN spherex.obscore.facility_keywords IS 'Telescope keywords formatted as a JSON string';
+COMMENT ON COLUMN spherex.obscore.instrument_keywords IS 'Instrument keywords formatted as a JSON string';
+COMMENT ON COLUMN spherex.obscore.environment_photometric IS 'Conditions were photometric (0=false, 1=true)';
+COMMENT ON COLUMN spherex.obscore.proposal_project IS 'Project that created/acquired the observation';
+COMMENT ON COLUMN spherex.obscore.target_type IS 'Classification of intended target (object, field)';
+COMMENT ON COLUMN spherex.obscore.target_standard IS 'Intended target is a standard (0=false, 1=true)';
+COMMENT ON COLUMN spherex.obscore.target_moving IS 'Intended target is moving (0=false, 1=true)';
+COMMENT ON COLUMN spherex.obscore.target_keywords IS 'Target keywords formatted as a JSON string';
+COMMENT ON COLUMN spherex.obscore.proposal_pi IS 'Proposal principal investigator';
+COMMENT ON COLUMN spherex.obscore.access_estsize IS 'Estimated size of the download at access_url [kbyte]';
+COMMENT ON COLUMN spherex.obscore.o_ucd IS 'UCD of the observable (e.g. phot.flux.density, phot.count)';
+COMMENT ON COLUMN spherex.obscore.ipac_gid IS 'Internal IRSA column: group ID';
+COMMENT ON COLUMN spherex.obscore.ipac_pub_date IS 'Internal IRSA column: public release date';
+COMMENT ON COLUMN spherex.obscore.pt IS 'Internal IRSA column: Spatial index [deg]';
+COMMENT ON COLUMN spherex.obscore.poly IS 'Internal IRSA column: Spatial index [deg]';
+CREATE INDEX IF NOT EXISTS spherex_obscore_obs_publisher_did_idx ON spherex.obscore (obs_publisher_did);
+
+-- [SPHEREx: tablas TAP de IRSA] spherex.observation — acceso: TAP IRSA (ADQL)
+CREATE TABLE IF NOT EXISTS spherex.observation (
+    obsid text,
+    collection text,
+    observationid text,
+    metarelease text,
+    sequencenumber integer,
+    type text,
+    intent text,
+    algorithm_name text,
+    telescope_name text,
+    telescope_geolocationx double precision,
+    telescope_geolocationy double precision,
+    telescope_geolocationz double precision,
+    telescope_keywords text,
+    instrument_name text,
+    instrument_keywords text,
+    environment_seeing double precision,
+    environment_humidity double precision,
+    environment_elevation double precision,
+    environment_tau double precision,
+    environment_wavelengthtau double precision,
+    environment_ambienttemp double precision,
+    environment_photometric boolean,
+    proposal_id text,
+    proposal_pi text,
+    proposal_project text,
+    proposal_title text,
+    proposal_keywords text,
+    target_name text,
+    target_type text,
+    target_redshift double precision,
+    target_standard boolean,
+    target_moving boolean,
+    target_keywords text,
+    targetposition_coordinates text,
+    targetposition_coordsys text,
+    targetposition_equinox double precision,
+    requirements_flag text,
+    ipac_gid integer,
+    mission_id integer,
+    ipac_pub_date text,
+    lastmodified text
+);
+COMMENT ON TABLE spherex.observation IS 'SPHEREx CAOM Observation Table';
+COMMENT ON COLUMN spherex.observation.obsid IS 'unique observation identifier: 32-bit UUID';
+COMMENT ON COLUMN spherex.observation.collection IS 'data collection this observation belongs to';
+COMMENT ON COLUMN spherex.observation.observationid IS 'unique observation identifier (human readable)';
+COMMENT ON COLUMN spherex.observation.metarelease IS 'metadata public release date';
+COMMENT ON COLUMN spherex.observation.sequencenumber IS 'sequence number of the observation';
+COMMENT ON COLUMN spherex.observation.type IS 'type of data, often from FITS OBSTYPE keyword, e.g. exposure, spectrum, object, dark';
+COMMENT ON COLUMN spherex.observation.intent IS 'intended purpose of data (one of: science, calibration)';
+COMMENT ON COLUMN spherex.observation.algorithm_name IS 'algorithm that defines the observation (e.g. exposure, coadd, cube)';
+COMMENT ON COLUMN spherex.observation.telescope_name IS 'name of telescope used to acquire observation';
+COMMENT ON COLUMN spherex.observation.telescope_geolocationx IS 'x component of geocentric location of telescope';
+COMMENT ON COLUMN spherex.observation.telescope_geolocationy IS 'y component of geocentric location of telescope';
+COMMENT ON COLUMN spherex.observation.telescope_geolocationz IS 'z component of geocentric location of telescope';
+COMMENT ON COLUMN spherex.observation.telescope_keywords IS 'telescope keywords (JSON of key/value pairs)';
+COMMENT ON COLUMN spherex.observation.instrument_name IS 'name of instrument used to acquire observation';
+COMMENT ON COLUMN spherex.observation.instrument_keywords IS 'instrument keywords (JSON of key/value pairs)';
+COMMENT ON COLUMN spherex.observation.environment_seeing IS 'atmospheric seeing (FWHM) [arcsec]';
+COMMENT ON COLUMN spherex.observation.environment_humidity IS 'humidity at telescope during observation';
+COMMENT ON COLUMN spherex.observation.environment_elevation IS 'elevation above horizon (0 to 90) [deg]';
+COMMENT ON COLUMN spherex.observation.environment_tau IS 'zenith optical depth';
+COMMENT ON COLUMN spherex.observation.environment_wavelengthtau IS 'wavelength at which Tau has been measured [m]';
+COMMENT ON COLUMN spherex.observation.environment_ambienttemp IS 'ambient temperature telescope during observation [C]';
+COMMENT ON COLUMN spherex.observation.environment_photometric IS 'conditions were photometric (0=false, 1=true)';
+COMMENT ON COLUMN spherex.observation.proposal_id IS 'collection-specific unique proposal identifier';
+COMMENT ON COLUMN spherex.observation.proposal_pi IS 'proposal principal investigator';
+COMMENT ON COLUMN spherex.observation.proposal_project IS 'project that created/acquired the observation';
+COMMENT ON COLUMN spherex.observation.proposal_title IS 'proposal title';
+COMMENT ON COLUMN spherex.observation.proposal_keywords IS 'proposal keywords (JSON of key/value pairs)';
+COMMENT ON COLUMN spherex.observation.target_name IS 'name of intended target';
+COMMENT ON COLUMN spherex.observation.target_type IS 'classification of intended target';
+COMMENT ON COLUMN spherex.observation.target_redshift IS 'redshift of intended target';
+COMMENT ON COLUMN spherex.observation.target_standard IS 'intended target is a standard (0=false, 1=true)';
+COMMENT ON COLUMN spherex.observation.target_moving IS 'flag for moving target';
+COMMENT ON COLUMN spherex.observation.target_keywords IS 'target keywords (JSON of key/value pairs)';
+COMMENT ON COLUMN spherex.observation.targetposition_coordinates IS 'coordiantes of the target position [deg]';
+COMMENT ON COLUMN spherex.observation.targetposition_coordsys IS 'coordinate system for target position';
+COMMENT ON COLUMN spherex.observation.targetposition_equinox IS 'equinox of target position coordinate system';
+COMMENT ON COLUMN spherex.observation.requirements_flag IS 'flag describing satisfied proposal requirements (possible values: fail,null)';
+COMMENT ON COLUMN spherex.observation.ipac_gid IS 'IRSA access control identifier: group ID';
+COMMENT ON COLUMN spherex.observation.mission_id IS 'IRSA access control identifier: mission ID';
+COMMENT ON COLUMN spherex.observation.ipac_pub_date IS 'public release date (UTC)';
+COMMENT ON COLUMN spherex.observation.lastmodified IS 'timestamp of last modification of this row';
+
+-- [SPHEREx: tablas TAP de IRSA] spherex.plane — acceso: TAP IRSA (ADQL)
+CREATE TABLE IF NOT EXISTS spherex.plane (
+    obsid text,
+    planeid text,
+    productid text,
+    creatorid text,
+    metarelease text,
+    datarelease text,
+    calibrationlevel smallint,
+    dataproducttype text,
+    quality_flag text,
+    metrics_sourcenumberdensity double precision,
+    metrics_background double precision,
+    metrics_backgroundstddev double precision,
+    metrics_fluxdensitylimit double precision,
+    metrics_maglimit double precision,
+    position_dimension_naxis1 bigint,
+    position_dimension_naxis2 bigint,
+    position_resolution double precision,
+    position_samplesize double precision,
+    position_timedependent boolean,
+    energy_bounds_lower double precision,
+    energy_bounds_upper double precision,
+    energy_bounds_samples double precision,
+    energy_emband text,
+    energy_dimension bigint,
+    energy_resolvingpower double precision,
+    energy_samplesize double precision,
+    energy_bandpassname text,
+    energy_transition_species text,
+    energy_transition_transition text,
+    energy_restwav double precision,
+    time_bounds_lower double precision,
+    time_bounds_upper double precision,
+    time_bounds_samples double precision,
+    time_dimension bigint,
+    time_resolution double precision,
+    time_samplesize double precision,
+    time_exposure double precision,
+    polarization_states text,
+    polarization_dimension bigint,
+    provenance_name text,
+    provenance_reference text,
+    provenance_version text,
+    provenance_project text,
+    provenance_producer text,
+    provenance_runid text,
+    provenance_lastexecuted text,
+    provenance_keywords text,
+    ipac_gid integer,
+    mission_id integer,
+    poly text,
+    pt text,
+    ipac_pub_date text,
+    lastmodified text,
+    obs_publisher_did text
+);
+COMMENT ON TABLE spherex.plane IS 'SPHEREx CAOM Plane Table';
+COMMENT ON COLUMN spherex.plane.obsid IS 'foreign key: caom.observation.obsid';
+COMMENT ON COLUMN spherex.plane.planeid IS 'unique plane identifier: 32-bit UUID';
+COMMENT ON COLUMN spherex.plane.productid IS 'name of this product';
+COMMENT ON COLUMN spherex.plane.creatorid IS 'unique creator identifier for this product';
+COMMENT ON COLUMN spherex.plane.metarelease IS 'date the metadata for a plane is public (UTC)';
+COMMENT ON COLUMN spherex.plane.datarelease IS 'public release date';
+COMMENT ON COLUMN spherex.plane.calibrationlevel IS 'IVOA ObsCore calibration level (-1,0,1,2,3,4)';
+COMMENT ON COLUMN spherex.plane.dataproducttype IS 'IVOA ObsCore data product type + extensions';
+COMMENT ON COLUMN spherex.plane.quality_flag IS 'flag describing the data quality';
+COMMENT ON COLUMN spherex.plane.metrics_sourcenumberdensity IS 'number density of sources [deg-2]';
+COMMENT ON COLUMN spherex.plane.metrics_background IS 'background intensity [Jy/pix]';
+COMMENT ON COLUMN spherex.plane.metrics_backgroundstddev IS 'standard deviation in background [Jy/pix]';
+COMMENT ON COLUMN spherex.plane.metrics_fluxdensitylimit IS 'flux density limit where S:N=5 for point source [Jy]';
+COMMENT ON COLUMN spherex.plane.metrics_maglimit IS 'AB magnitude limit where S:N=5 for point source';
+COMMENT ON COLUMN spherex.plane.position_dimension_naxis1 IS 'dimensions (number of pixels) along one spatial axis';
+COMMENT ON COLUMN spherex.plane.position_dimension_naxis2 IS 'dimensions (number of pixels) along other spatial axis';
+COMMENT ON COLUMN spherex.plane.position_resolution IS 'median spatial resolution (FWHM) [arcsec]';
+COMMENT ON COLUMN spherex.plane.position_samplesize IS 'median sample (pixel) size on spatial axes [arcsec]';
+COMMENT ON COLUMN spherex.plane.position_timedependent IS 'flag indicating that the position is time-dependent (0=false, 1=true)';
+COMMENT ON COLUMN spherex.plane.energy_bounds_lower IS 'lower bound on energy axis (barycentric wavelength) [m]';
+COMMENT ON COLUMN spherex.plane.energy_bounds_upper IS 'upper bound on energy axis (barycentric wavelength) [m]';
+COMMENT ON COLUMN spherex.plane.energy_bounds_samples IS 'detailed energy coverage (barycentric wavelength) [m]';
+COMMENT ON COLUMN spherex.plane.energy_emband IS 'comma-separated energy band names (e.g. Infrared, Optical)';
+COMMENT ON COLUMN spherex.plane.energy_dimension IS 'dimension (number of pixels) along energy axis';
+COMMENT ON COLUMN spherex.plane.energy_resolvingpower IS 'median spectral resolving power (R)';
+COMMENT ON COLUMN spherex.plane.energy_samplesize IS 'median sample (pixel) size on energy axis [m]';
+COMMENT ON COLUMN spherex.plane.energy_bandpassname IS 'collection-specific name for energy band (e.g. filter name)';
+COMMENT ON COLUMN spherex.plane.energy_transition_species IS 'atom or molecule';
+COMMENT ON COLUMN spherex.plane.energy_transition_transition IS 'specific energy transition of species';
+COMMENT ON COLUMN spherex.plane.energy_restwav IS 'rest wavelength of target spectral feature (barycentric) [m]';
+COMMENT ON COLUMN spherex.plane.time_bounds_lower IS 'lower bound on time axis (Modified Julian Day) [d]';
+COMMENT ON COLUMN spherex.plane.time_bounds_upper IS 'upper bound on time axis (Modified Julian Day) [d]';
+COMMENT ON COLUMN spherex.plane.time_bounds_samples IS 'detailed time coverage (Modified Julian Day) [d]';
+COMMENT ON COLUMN spherex.plane.time_dimension IS 'dimension (number of pixels) along time axis';
+COMMENT ON COLUMN spherex.plane.time_resolution IS 'median resolution on the time axis [d]';
+COMMENT ON COLUMN spherex.plane.time_samplesize IS 'median sample (pixel) size on time axis [d]';
+COMMENT ON COLUMN spherex.plane.time_exposure IS 'median exposure time per pixel [s]';
+COMMENT ON COLUMN spherex.plane.polarization_states IS 'polarization letter codes - not populated at IRSA';
+COMMENT ON COLUMN spherex.plane.polarization_dimension IS 'number of samples (pixels) along polarization axis';
+COMMENT ON COLUMN spherex.plane.provenance_name IS 'name of the process that created this plane';
+COMMENT ON COLUMN spherex.plane.provenance_reference IS 'external reference (URL)';
+COMMENT ON COLUMN spherex.plane.provenance_version IS 'version of the process/software';
+COMMENT ON COLUMN spherex.plane.provenance_project IS 'responsible entity (e.g. person)';
+COMMENT ON COLUMN spherex.plane.provenance_producer IS 'responsible entity (e.g. person)';
+COMMENT ON COLUMN spherex.plane.provenance_runid IS 'responsible entity (e.g. person)';
+COMMENT ON COLUMN spherex.plane.provenance_lastexecuted IS 'date this process was last executed';
+COMMENT ON COLUMN spherex.plane.provenance_keywords IS 'provenance keywords (JSON of key/value pairs)';
+COMMENT ON COLUMN spherex.plane.ipac_gid IS 'IRSA access control identifier: group ID';
+COMMENT ON COLUMN spherex.plane.mission_id IS 'IRSA access control identifier: mission ID';
+COMMENT ON COLUMN spherex.plane.poly IS 'IRSA internal spatial index descriptor [deg]';
+COMMENT ON COLUMN spherex.plane.pt IS 'IRSA internal spatial index descriptor [deg]';
+COMMENT ON COLUMN spherex.plane.ipac_pub_date IS 'public release date (UTC)';
+COMMENT ON COLUMN spherex.plane.lastmodified IS 'timestamp of last modification of this row';
+COMMENT ON COLUMN spherex.plane.obs_publisher_did IS 'IVOA ID for the dataset, assigned by the publisher (IRSA)';
+CREATE INDEX IF NOT EXISTS spherex_plane_obs_publisher_did_idx ON spherex.plane (obs_publisher_did);
+
+-- [SPHEREx: tablas TAP de IRSA] spherex.provenance_input — acceso: TAP IRSA (ADQL)
+CREATE TABLE IF NOT EXISTS spherex.provenance_input (
+    inputid text,
+    outputid text
+);
+COMMENT ON TABLE spherex.provenance_input IS 'Join tables for SPHEREx calibration files';
+COMMENT ON COLUMN spherex.provenance_input.inputid IS 'calibration input plane identifier (plane.planeid)';
+COMMENT ON COLUMN spherex.provenance_input.outputid IS 'science output plane identifier (plane.planeid)';
+
+-- [SPHEREx: tablas TAP de IRSA] spherex.splices — acceso: TAP IRSA (ADQL)
+CREATE TABLE IF NOT EXISTS spherex.splices (
+    source_id bigint,
+    designation text,
+    ra double precision,
+    dec double precision,
+    gal_long double precision,
+    gal_lat double precision,
+    tmassdesignation text,
+    tmassra double precision,
+    tmassdec double precision,
+    j real,
+    jerr real,
+    h real,
+    herr real,
+    k real,
+    kerr real,
+    ph_qual text,
+    rd_flg bigint,
+    prox double precision,
+    w1 real,
+    w1err real,
+    w2 real,
+    w2err real,
+    w3 real,
+    w3err real,
+    w4 real,
+    w4err real,
+    cc_flags text,
+    ext_flg bigint,
+    var_flg text,
+    irac_designation text,
+    ra_irac double precision,
+    dec_irac double precision,
+    mag3_6 real,
+    d3_6m real,
+    mag4_5 real,
+    d4_5m real,
+    mag5_8 real,
+    d5_8m real,
+    mag8_0 real,
+    d8_0m real,
+    sel_type text,
+    class_1 text,
+    yso_pub bigint,
+    stype_ml text,
+    stype_ml_prob1 double precision,
+    stype_ml_prob2 double precision,
+    name text,
+    gaia_dr3 bigint,
+    gaiadr3_g real,
+    gaiadr3_gerr double precision,
+    gaiadr3_b real,
+    gaiadr3_berr double precision,
+    gaiadr3_r real,
+    gaiadr3_rerr double precision,
+    plx double precision,
+    e_plx real,
+    pmra double precision,
+    pmra_err real,
+    pmdec double precision,
+    pmdec_err real,
+    gaiadist real,
+    e_dist_upper real,
+    e_dist_lower real,
+    classvar text,
+    w1var bigint,
+    w1var_class text,
+    w2var bigint,
+    w2var_class text,
+    w1varavg double precision,
+    w2varavg double precision,
+    w1varamp double precision,
+    w2varamp double precision,
+    av double precision,
+    mc text,
+    mc_lon double precision,
+    mc_lat double precision,
+    mc_dist double precision,
+    mc_avf double precision,
+    mc_los text,
+    numgaianb bigint,
+    maxrmag real,
+    sumrflux double precision,
+    mainrflux double precision,
+    fluxratiogaia double precision,
+    mingaiadist real,
+    mindistgaiaflux double precision,
+    noc bigint,
+    noc_gl double precision,
+    noc_gb double precision,
+    numiracnbors bigint,
+    mindistirac real,
+    i1mag real,
+    maxi1mag real,
+    sumi1flux double precision,
+    maini1flux double precision,
+    mindisti1flux double precision,
+    i2mag real,
+    maxi2mag real,
+    sumi2flux double precision,
+    maini2flux double precision,
+    mindisti2flux double precision,
+    fluxratioi1 double precision,
+    fluxratioi2 double precision,
+    numvvvneighbors bigint,
+    mindistvvv real,
+    vvvjmag real,
+    maxvvvjmag real,
+    sumvvvjflux double precision,
+    mainvvvjflux double precision,
+    mindistvvvjflux double precision,
+    vvvhmag real,
+    maxvvvhmag real,
+    sumvvvhflux double precision,
+    mainvvvhflux double precision,
+    mindistvvvhflux double precision,
+    vvvkmag real,
+    maxvvvkmag real,
+    sumvvvkflux double precision,
+    mainvvvkflux double precision,
+    mindistvvvkflux double precision,
+    fluxratiovvvj double precision,
+    fluxratiovvvh double precision,
+    fluxratiovvvk double precision,
+    numuksnbors bigint,
+    mindistuks real,
+    uksjmag real,
+    maxuksjmag real,
+    sumuksjflux double precision,
+    mainuksjflux double precision,
+    mindistuksjflux double precision,
+    ukshmag real,
+    maxukshmag real,
+    sumukshflux double precision,
+    mainukshflux double precision,
+    mindistukshflux double precision,
+    ukskmag real,
+    maxukskmag real,
+    sumukskflux double precision,
+    mainukskflux double precision,
+    mindistukskflux double precision,
+    fluxratiouksj double precision,
+    fluxratiouksh double precision,
+    fluxratiouksk double precision,
+    varclassgaia text,
+    varclassgaiasc double precision,
+    sv_w1 text,
+    sv_w1_v double precision,
+    sv_w1_t double precision,
+    sv_w2 text,
+    sv_w2_v double precision,
+    sv_w2_t double precision,
+    x double precision,
+    y double precision,
+    z double precision,
+    spt_ind bigint,
+    htm20 bigint,
+    cntr bigint
+);
+COMMENT ON TABLE spherex.splices IS 'The SPHEREx Target List of Ice Sources (SPLICES)';
+COMMENT ON COLUMN spherex.splices.source_id IS 'SPLICES source ID';
+COMMENT ON COLUMN spherex.splices.designation IS 'Source Designation';
+COMMENT ON COLUMN spherex.splices.ra IS 'Right Ascension (J2000) [deg]';
+COMMENT ON COLUMN spherex.splices.dec IS 'Declination (J2000) [deg]';
+COMMENT ON COLUMN spherex.splices.gal_long IS 'Galactic Longitude [deg]';
+COMMENT ON COLUMN spherex.splices.gal_lat IS 'Galactic Latitude [deg]';
+COMMENT ON COLUMN spherex.splices.tmassdesignation IS '2MASS source designation';
+COMMENT ON COLUMN spherex.splices.tmassra IS '2MASS right ascension [deg]';
+COMMENT ON COLUMN spherex.splices.tmassdec IS '2MASS declination [deg]';
+COMMENT ON COLUMN spherex.splices.j IS '2MASS J magnitude [mag]';
+COMMENT ON COLUMN spherex.splices.jerr IS '2MASS J magnitude uncertainty [mag]';
+COMMENT ON COLUMN spherex.splices.h IS '2MASS H magnitude [mag]';
+COMMENT ON COLUMN spherex.splices.herr IS '2MASS H magnitude uncertainty [mag]';
+COMMENT ON COLUMN spherex.splices.k IS '2MASS K magnitude [mag]';
+COMMENT ON COLUMN spherex.splices.kerr IS '2MASS K magnitude uncertainty [mag]';
+COMMENT ON COLUMN spherex.splices.ph_qual IS '2MASS photometric quality flag';
+COMMENT ON COLUMN spherex.splices.rd_flg IS '2MASS rd_flg';
+COMMENT ON COLUMN spherex.splices.prox IS '2MASS prox value [arcsec]';
+COMMENT ON COLUMN spherex.splices.w1 IS 'WISE band 1 magnitude [mag]';
+COMMENT ON COLUMN spherex.splices.w1err IS 'WISE band 1 magnitude uncertainty [mag]';
+COMMENT ON COLUMN spherex.splices.w2 IS 'WISE band 2 magnitude [mag]';
+COMMENT ON COLUMN spherex.splices.w2err IS 'WISE band 2 magnitude uncertainty [mag]';
+COMMENT ON COLUMN spherex.splices.w3 IS 'WISE band 3 magnitude [mag]';
+COMMENT ON COLUMN spherex.splices.w3err IS 'WISE band 3 magnitude uncertainty [mag]';
+COMMENT ON COLUMN spherex.splices.w4 IS 'WISE band 4 magnitude [mag]';
+COMMENT ON COLUMN spherex.splices.w4err IS 'WISE band 4 magnitude uncertainty [mag]';
+COMMENT ON COLUMN spherex.splices.cc_flags IS 'WISE cc_flags';
+COMMENT ON COLUMN spherex.splices.ext_flg IS 'WISE ext_flg';
+COMMENT ON COLUMN spherex.splices.var_flg IS 'WISE var_flg';
+COMMENT ON COLUMN spherex.splices.irac_designation IS 'IRAC source designation';
+COMMENT ON COLUMN spherex.splices.ra_irac IS 'IRAC right ascension [deg]';
+COMMENT ON COLUMN spherex.splices.dec_irac IS 'IRAC declination [deg]';
+COMMENT ON COLUMN spherex.splices.mag3_6 IS 'IRAC 3.6 micron magnitude [mag]';
+COMMENT ON COLUMN spherex.splices.d3_6m IS 'IRAC 3.6 micron magnitude uncertainty [mag]';
+COMMENT ON COLUMN spherex.splices.mag4_5 IS 'IRAC 4.5 micron magnitude [mag]';
+COMMENT ON COLUMN spherex.splices.d4_5m IS 'IRAC 4.5 micron magnitude uncertainty [mag]';
+COMMENT ON COLUMN spherex.splices.mag5_8 IS 'IRAC 5.8 micron magnitude [mag]';
+COMMENT ON COLUMN spherex.splices.d5_8m IS 'IRAC 5.8 micron magnitude uncertainty [mag]';
+COMMENT ON COLUMN spherex.splices.mag8_0 IS 'IRAC 8.0 micron magnitude [mag]';
+COMMENT ON COLUMN spherex.splices.d8_0m IS 'IRAC 8.0 micron magnitude uncertainty [mag]';
+COMMENT ON COLUMN spherex.splices.sel_type IS 'Source selection method';
+COMMENT ON COLUMN spherex.splices.class_1 IS 'Source Class';
+COMMENT ON COLUMN spherex.splices.yso_pub IS 'Publication source of YSO classification';
+COMMENT ON COLUMN spherex.splices.stype_ml IS 'Machine Learning Source Class';
+COMMENT ON COLUMN spherex.splices.stype_ml_prob1 IS 'Machine Learning Source Type Probability Stage 1';
+COMMENT ON COLUMN spherex.splices.stype_ml_prob2 IS 'Machine Learning Source Type Probability Stage 2';
+COMMENT ON COLUMN spherex.splices.name IS 'Proper Name';
+COMMENT ON COLUMN spherex.splices.gaia_dr3 IS 'Gaia DR3 source designation';
+COMMENT ON COLUMN spherex.splices.gaiadr3_g IS 'Gaia G band magnitude [mag]';
+COMMENT ON COLUMN spherex.splices.gaiadr3_gerr IS 'Gaia G band magnitude uncertainty [mag]';
+COMMENT ON COLUMN spherex.splices.gaiadr3_b IS 'Gaia B band magnitude [mag]';
+COMMENT ON COLUMN spherex.splices.gaiadr3_berr IS 'Gaia B band magnitude [mag]';
+COMMENT ON COLUMN spherex.splices.gaiadr3_r IS 'Gaia R band magnitude [mag]';
+COMMENT ON COLUMN spherex.splices.gaiadr3_rerr IS 'Gaia R band magnitude [mag]';
+COMMENT ON COLUMN spherex.splices.plx IS 'Gaia parallax [mas]';
+COMMENT ON COLUMN spherex.splices.e_plx IS 'Gaia parallax uncertainty [mas]';
+COMMENT ON COLUMN spherex.splices.pmra IS 'Right ascension proper motion [mas.yr**-1]';
+COMMENT ON COLUMN spherex.splices.pmra_err IS 'Right ascension proper motion uncertainty [mas.yr**-1]';
+COMMENT ON COLUMN spherex.splices.pmdec IS 'Declination proper motion [mas.yr**-1]';
+COMMENT ON COLUMN spherex.splices.pmdec_err IS 'Declination proper motion uncertainty [mas.yr**-1]';
+COMMENT ON COLUMN spherex.splices.gaiadist IS 'Distance derived by Gaia [pc]';
+COMMENT ON COLUMN spherex.splices.e_dist_upper IS 'Upper limit of distance 68% confidence range [pc]';
+COMMENT ON COLUMN spherex.splices.e_dist_lower IS 'Lower limit of distance 68% confidence range [pc]';
+COMMENT ON COLUMN spherex.splices.classvar IS 'Source Class from variability analysis';
+COMMENT ON COLUMN spherex.splices.w1var IS 'W1 variability flag';
+COMMENT ON COLUMN spherex.splices.w1var_class IS 'W1 variability class';
+COMMENT ON COLUMN spherex.splices.w2var IS 'W2 variability flag';
+COMMENT ON COLUMN spherex.splices.w2var_class IS 'W2 variability class';
+COMMENT ON COLUMN spherex.splices.w1varavg IS 'NEOWISE W1 mean mag [mag]';
+COMMENT ON COLUMN spherex.splices.w2varavg IS 'NEOWISE W2 mean mag [mag]';
+COMMENT ON COLUMN spherex.splices.w1varamp IS 'NEOWISE W1 variability amplitude [mag]';
+COMMENT ON COLUMN spherex.splices.w2varamp IS 'NEOWISE W2 variability amplitude [mag]';
+COMMENT ON COLUMN spherex.splices.av IS 'Estimate of Av from H-W2 or K-W2 [mag]';
+COMMENT ON COLUMN spherex.splices.mc IS 'Molecular Cloud name';
+COMMENT ON COLUMN spherex.splices.mc_lon IS 'Galactic longitude of cloud sightline [deg]';
+COMMENT ON COLUMN spherex.splices.mc_lat IS 'Galactic latitude of cloud sightline [deg]';
+COMMENT ON COLUMN spherex.splices.mc_dist IS 'Distance of cloud [pc]';
+COMMENT ON COLUMN spherex.splices.mc_avf IS 'Foreground Av to cloud [mag]';
+COMMENT ON COLUMN spherex.splices.mc_los IS 'Position class';
+COMMENT ON COLUMN spherex.splices.numgaianb IS 'Number of Gaia sources &lt;7.6 arcsec from target';
+COMMENT ON COLUMN spherex.splices.maxrmag IS 'Maximum Gaia R mag of neighbors [mag]';
+COMMENT ON COLUMN spherex.splices.sumrflux IS 'Sum of Gaia R band fluxes of neighbors [uJy]';
+COMMENT ON COLUMN spherex.splices.mainrflux IS 'SPLICES target Gaia R flux [uJy]';
+COMMENT ON COLUMN spherex.splices.fluxratiogaia IS 'Ratio of bkgnd Gaia flux to SPLICES source flux [%]';
+COMMENT ON COLUMN spherex.splices.mingaiadist IS 'Distance to nearest Gaia neighbor [arcsec]';
+COMMENT ON COLUMN spherex.splices.mindistgaiaflux IS 'Flux of nearest Gaia neighbor [uJy]';
+COMMENT ON COLUMN spherex.splices.noc IS 'Number of clouds along the line of sight (Dame et al.)';
+COMMENT ON COLUMN spherex.splices.noc_gl IS 'Galactic longitude of Dame et al. pixel [deg]';
+COMMENT ON COLUMN spherex.splices.noc_gb IS 'Galactic latitude of Dame et al. pixel [deg]';
+COMMENT ON COLUMN spherex.splices.numiracnbors IS 'Number of IRAC sources &lt;7.6 arcsec from target';
+COMMENT ON COLUMN spherex.splices.mindistirac IS 'Distance of closest neighbor [arcsec]';
+COMMENT ON COLUMN spherex.splices.i1mag IS 'I1 mag of SPLICES target [mag]';
+COMMENT ON COLUMN spherex.splices.maxi1mag IS 'I1 mag of brightest neighbor [mag]';
+COMMENT ON COLUMN spherex.splices.sumi1flux IS 'Sum of I1 neighbor fluxes [uJy]';
+COMMENT ON COLUMN spherex.splices.maini1flux IS 'I1 Flux of SPLICES target [uJy]';
+COMMENT ON COLUMN spherex.splices.mindisti1flux IS 'I1 Flux of closest neighbor [uJy]';
+COMMENT ON COLUMN spherex.splices.i2mag IS 'I2 mag of SPLICES target [mag]';
+COMMENT ON COLUMN spherex.splices.maxi2mag IS 'I2 mag of brightest neighbor [mag]';
+COMMENT ON COLUMN spherex.splices.sumi2flux IS 'Sum of I2 neighbor fluxes [uJy]';
+COMMENT ON COLUMN spherex.splices.maini2flux IS 'I2 Flux of SPLICES target [uJy]';
+COMMENT ON COLUMN spherex.splices.mindisti2flux IS 'I2 Flux of closest neighbor [uJy]';
+COMMENT ON COLUMN spherex.splices.fluxratioi1 IS 'Ratio of bkgnd I1 flux to SPLICES source flux [%]';
+COMMENT ON COLUMN spherex.splices.fluxratioi2 IS 'Ratio of bkgnd I2 flux to SPLICES source flux [%]';
+COMMENT ON COLUMN spherex.splices.numvvvneighbors IS 'Number of VVV sources &lt;7.6 arcsec from target';
+COMMENT ON COLUMN spherex.splices.mindistvvv IS 'Distance to nearest VVV neighbor [arcsec]';
+COMMENT ON COLUMN spherex.splices.vvvjmag IS 'VVVJ mag of SPLICES target [mag]';
+COMMENT ON COLUMN spherex.splices.maxvvvjmag IS 'VVVJ mag of brightest nearby source [mag]';
+COMMENT ON COLUMN spherex.splices.sumvvvjflux IS 'Sum of VVVJ fluxes of background sources [uJy]';
+COMMENT ON COLUMN spherex.splices.mainvvvjflux IS 'J band Flux of SPLICES source [uJy]';
+COMMENT ON COLUMN spherex.splices.mindistvvvjflux IS 'Flux of nearest VVVJ background source [uJy]';
+COMMENT ON COLUMN spherex.splices.vvvhmag IS 'VVVH mag of SPLICES target [mag]';
+COMMENT ON COLUMN spherex.splices.maxvvvhmag IS 'VVVH mag of brightest nearby source [mag]';
+COMMENT ON COLUMN spherex.splices.sumvvvhflux IS 'Sum of VVVH fluxes of background sources [uJy]';
+COMMENT ON COLUMN spherex.splices.mainvvvhflux IS 'H band Flux of SPLICES source [uJy]';
+COMMENT ON COLUMN spherex.splices.mindistvvvhflux IS 'Flux of nearest VVVH background source [uJy]';
+COMMENT ON COLUMN spherex.splices.vvvkmag IS 'VVVK band mag of SPLICES source [mag]';
+COMMENT ON COLUMN spherex.splices.maxvvvkmag IS 'VVVK mag of brightest nearby source [mag]';
+COMMENT ON COLUMN spherex.splices.sumvvvkflux IS 'Sum of VVVK fluxes of background sources [uJy]';
+COMMENT ON COLUMN spherex.splices.mainvvvkflux IS 'K band Flux of SPLICES source [uJy]';
+COMMENT ON COLUMN spherex.splices.mindistvvvkflux IS 'Flux of nearest VVVK background source [uJy]';
+COMMENT ON COLUMN spherex.splices.fluxratiovvvj IS 'Ratio of bkgnd VVVJ flux to SPLICES source flux [%]';
+COMMENT ON COLUMN spherex.splices.fluxratiovvvh IS 'Ratio of bkgnd VVVH flux to SPLICES source flux [%]';
+COMMENT ON COLUMN spherex.splices.fluxratiovvvk IS 'Ratio of bkgnd VVVK flux to SPLICES source flux [%]';
+COMMENT ON COLUMN spherex.splices.numuksnbors IS 'Number of UKIDSS sources &lt;7.6 arcsec from target';
+COMMENT ON COLUMN spherex.splices.mindistuks IS 'Distance to closest UKIDSS neighbor [arcsec]';
+COMMENT ON COLUMN spherex.splices.uksjmag IS 'UKSJ band mag of SPLICES source [mag]';
+COMMENT ON COLUMN spherex.splices.maxuksjmag IS 'UKSJ mag of brightest nearby source [mag]';
+COMMENT ON COLUMN spherex.splices.sumuksjflux IS 'Sum of UKSJ fluxes of background sources [uJy]';
+COMMENT ON COLUMN spherex.splices.mainuksjflux IS 'J band Flux of SPLICES source [uJy]';
+COMMENT ON COLUMN spherex.splices.mindistuksjflux IS 'Flux of nearest UKSJ background source [uJy]';
+COMMENT ON COLUMN spherex.splices.ukshmag IS 'UKSH band mag of SPLICES source [mag]';
+COMMENT ON COLUMN spherex.splices.maxukshmag IS 'UKSH mag of brightest nearby source [mag]';
+COMMENT ON COLUMN spherex.splices.sumukshflux IS 'Sum of UKSH fluxes of background sources [uJy]';
+COMMENT ON COLUMN spherex.splices.mainukshflux IS 'H band Flux of SPLICES source [uJy]';
+COMMENT ON COLUMN spherex.splices.mindistukshflux IS 'Flux of nearest UKSH background source [uJy]';
+COMMENT ON COLUMN spherex.splices.ukskmag IS 'UKSK band mag of SPLICES source [mag]';
+COMMENT ON COLUMN spherex.splices.maxukskmag IS 'UKSK mag of brightest nearby source [mag]';
+COMMENT ON COLUMN spherex.splices.sumukskflux IS 'Sum of UKSK fluxes of background sources [uJy]';
+COMMENT ON COLUMN spherex.splices.mainukskflux IS 'K band Flux of SPLICES source [uJy]';
+COMMENT ON COLUMN spherex.splices.mindistukskflux IS 'Flux of nearest UKSK background source [uJy]';
+COMMENT ON COLUMN spherex.splices.fluxratiouksj IS 'Ratio of bkgnd UKSJ flux to SPLICES source flux [%]';
+COMMENT ON COLUMN spherex.splices.fluxratiouksh IS 'Ratio of bkgnd UKSH flux to SPLICES source flux [%]';
+COMMENT ON COLUMN spherex.splices.fluxratiouksk IS 'Ratio of bkgnd UKSK flux to SPLICES source flux [%]';
+COMMENT ON COLUMN spherex.splices.varclassgaia IS 'Gaia Variability best class';
+COMMENT ON COLUMN spherex.splices.varclassgaiasc IS 'Score of the best Gaia class';
+COMMENT ON COLUMN spherex.splices.sv_w1 IS 'NEOWISE W1 short-term variability flag';
+COMMENT ON COLUMN spherex.splices.sv_w1_v IS 'Number of W1 variable short-term epoch';
+COMMENT ON COLUMN spherex.splices.sv_w1_t IS 'Number of W1 total short-term epochs';
+COMMENT ON COLUMN spherex.splices.sv_w2 IS 'NEOWISE W2 short-term variability flag';
+COMMENT ON COLUMN spherex.splices.sv_w2_v IS 'Number of W2 variable short-term epochs';
+COMMENT ON COLUMN spherex.splices.sv_w2_t IS 'Number of W2 total short-term epochs';
+COMMENT ON COLUMN spherex.splices.x IS 'unit sphere (x,y,z) position x value';
+COMMENT ON COLUMN spherex.splices.y IS 'unit sphere (x,y,z) position y value';
+COMMENT ON COLUMN spherex.splices.z IS 'unit sphere (x,y,z) position z value';
+COMMENT ON COLUMN spherex.splices.spt_ind IS 'Spatial (x,y,z) index key';
+COMMENT ON COLUMN spherex.splices.htm20 IS 'HTM20 spatial index key';
+COMMENT ON COLUMN spherex.splices.cntr IS 'entry counter (key) number (unique within table)';
+CREATE INDEX IF NOT EXISTS spherex_splices_source_id_idx ON spherex.splices (source_id);
+
+-- [SPHEREx: resultados de API guardados localmente] spherex.imagenes — acceso: SIA2 IRSA (spherex_api.py imagenes)
+CREATE TABLE IF NOT EXISTS spherex.imagenes (
+    obs_publisher_did text,
+    obs_id text,
+    obs_collection text,
+    energy_bandpassname text,
+    dataproduct_type text,
+    calib_level smallint,
+    s_ra double precision,
+    s_dec double precision,
+    s_fov double precision,
+    s_region text,
+    s_pixel_scale double precision,
+    em_min double precision,
+    em_max double precision,
+    em_res_power double precision,
+    t_min double precision,
+    t_max double precision,
+    t_exptime double precision,
+    target_name text,
+    obs_release_date text,
+    access_url text,
+    access_estsize bigint,
+    cloud_access text
+);
+COMMENT ON TABLE spherex.imagenes IS 'Imágenes espectrales SPHEREx encontradas con SIA2 (una fila por imagen/detector). No guarda los píxeles, solo metadatos y las URLs para descargarlas o recortarlas.';
+COMMENT ON COLUMN spherex.imagenes.obs_publisher_did IS 'Identificador IVOA único de la imagen (ivo://irsa.ipac/<colección>?<obs_id>/D<detector>)';
+COMMENT ON COLUMN spherex.imagenes.obs_id IS 'Observation ID: periodo de planeación + contador de giro grande + giro pequeño';
+COMMENT ON COLUMN spherex.imagenes.obs_collection IS 'Colección SIA2: spherex_dr1, spherex_dr1_deep, spherex_qr3, spherex_qr3_deep, spherex_dr1_cube';
+COMMENT ON COLUMN spherex.imagenes.energy_bandpassname IS 'Detector/banda (SPHEREx-D1 ... SPHEREx-D6)';
+COMMENT ON COLUMN spherex.imagenes.dataproduct_type IS 'Tipo de producto (image, cube)';
+COMMENT ON COLUMN spherex.imagenes.calib_level IS 'Nivel de calibración ObsCore (2 = imagen calibrada, 3 = cubo)';
+COMMENT ON COLUMN spherex.imagenes.s_ra IS 'AR del centro de la imagen (ICRS) [deg]';
+COMMENT ON COLUMN spherex.imagenes.s_dec IS 'Dec del centro de la imagen (ICRS) [deg]';
+COMMENT ON COLUMN spherex.imagenes.s_fov IS 'Campo de visión [deg]';
+COMMENT ON COLUMN spherex.imagenes.s_region IS 'Polígono que cubre la imagen en el cielo (ICRS) [deg]';
+COMMENT ON COLUMN spherex.imagenes.s_pixel_scale IS 'Tamaño de píxel [arcsec]';
+COMMENT ON COLUMN spherex.imagenes.em_min IS 'Longitud de onda mínima cubierta por la imagen [m]';
+COMMENT ON COLUMN spherex.imagenes.em_max IS 'Longitud de onda máxima cubierta por la imagen [m]';
+COMMENT ON COLUMN spherex.imagenes.em_res_power IS 'Poder de resolución espectral R';
+COMMENT ON COLUMN spherex.imagenes.t_min IS 'Inicio de la exposición (MJD) [d]';
+COMMENT ON COLUMN spherex.imagenes.t_max IS 'Fin de la exposición (MJD) [d]';
+COMMENT ON COLUMN spherex.imagenes.t_exptime IS 'Tiempo de exposición [s]';
+COMMENT ON COLUMN spherex.imagenes.target_name IS 'Campo SPHEREx';
+COMMENT ON COLUMN spherex.imagenes.obs_release_date IS 'Fecha de publicación';
+COMMENT ON COLUMN spherex.imagenes.access_url IS 'URL HTTPS de la imagen completa en IRSA (acepta ?center=ra,dec&size=grados para recortes)';
+COMMENT ON COLUMN spherex.imagenes.access_estsize IS 'Tamaño estimado de la descarga [kbyte]';
+COMMENT ON COLUMN spherex.imagenes.cloud_access IS 'JSON con bucket y key de la copia en AWS S3';
+CREATE INDEX IF NOT EXISTS spherex_imagenes_obs_publisher_did_idx ON spherex.imagenes (obs_publisher_did);
+
+-- [SPHEREx: resultados de API guardados localmente] spherex.recortes — acceso: IBE Cutouts IRSA (spherex_api.py recorte)
+CREATE TABLE IF NOT EXISTS spherex.recortes (
+    obs_publisher_did text,
+    obs_id text,
+    energy_bandpassname text,
+    ra double precision,
+    dec double precision,
+    tamano_deg double precision,
+    url_recorte text,
+    archivo text,
+    bytes bigint
+);
+COMMENT ON TABLE spherex.recortes IS 'Recortes FITS (MEF con IMAGE, FLAGS, VARIANCE, ZODI, EPSF, WCS-WAVE) descargados localmente.';
+COMMENT ON COLUMN spherex.recortes.obs_publisher_did IS 'Imagen de origen (spherex.imagenes.obs_publisher_did)';
+COMMENT ON COLUMN spherex.recortes.obs_id IS 'Observation ID';
+COMMENT ON COLUMN spherex.recortes.energy_bandpassname IS 'Detector/banda';
+COMMENT ON COLUMN spherex.recortes.ra IS 'AR del centro del recorte [deg]';
+COMMENT ON COLUMN spherex.recortes.dec IS 'Dec del centro del recorte [deg]';
+COMMENT ON COLUMN spherex.recortes.tamano_deg IS 'Lado del recorte [deg]';
+COMMENT ON COLUMN spherex.recortes.url_recorte IS 'URL usada para pedir el recorte';
+COMMENT ON COLUMN spherex.recortes.archivo IS 'Ruta local del FITS';
+COMMENT ON COLUMN spherex.recortes.bytes IS 'Tamaño del archivo [byte]';
+CREATE INDEX IF NOT EXISTS spherex_recortes_obs_publisher_did_idx ON spherex.recortes (obs_publisher_did);
+
+-- [Integración Gaia DR3 + SPHEREx] proyecto.espectro_spherex — acceso: Calculado (spherex_api.py espectro)
+CREATE TABLE IF NOT EXISTS proyecto.espectro_spherex (
+    source_id bigint,
+    obs_publisher_did text,
+    obs_collection text,
+    detector smallint,
+    mjd double precision,
+    ra_epoca double precision,
+    dec_epoca double precision,
+    x_pix double precision,
+    y_pix double precision,
+    longitud_onda_um double precision,
+    ancho_banda_um double precision,
+    flujo_ujy double precision,
+    error_flujo_ujy double precision,
+    brillo_pico_mjy_sr double precision,
+    fondo_mjy_sr double precision,
+    zodi_mjy_sr double precision,
+    radio_apertura_pix double precision,
+    flags bigint,
+    flag_malo boolean
+);
+COMMENT ON TABLE proyecto.espectro_spherex IS 'Espectro infrarrojo SPHEREx (0.75-5 µm) de fuentes Gaia: una fila por fuente y por imagen donde aparece. Fotometría de apertura sobre los píxeles leídos directamente de S3. Enlaza con gaiadr3.* por source_id.';
+COMMENT ON COLUMN proyecto.espectro_spherex.source_id IS 'Identificador Gaia DR3 (NULL si se dio una posición manual)';
+COMMENT ON COLUMN proyecto.espectro_spherex.obs_publisher_did IS 'Imagen SPHEREx usada (spherex.imagenes)';
+COMMENT ON COLUMN proyecto.espectro_spherex.obs_collection IS 'Colección SPHEREx';
+COMMENT ON COLUMN proyecto.espectro_spherex.detector IS 'Detector 1-6 (1-3 SWIR, 4-6 MWIR)';
+COMMENT ON COLUMN proyecto.espectro_spherex.mjd IS 'Fecha media de la exposición (MJD-AVG) [d]';
+COMMENT ON COLUMN proyecto.espectro_spherex.ra_epoca IS 'AR de la fuente propagada a la fecha de la imagen con el movimiento propio de Gaia [deg]';
+COMMENT ON COLUMN proyecto.espectro_spherex.dec_epoca IS 'Dec de la fuente propagada a la fecha de la imagen [deg]';
+COMMENT ON COLUMN proyecto.espectro_spherex.x_pix IS 'Posición X en la imagen (0-based) [pix]';
+COMMENT ON COLUMN proyecto.espectro_spherex.y_pix IS 'Posición Y en la imagen (0-based) [pix]';
+COMMENT ON COLUMN proyecto.espectro_spherex.longitud_onda_um IS 'Longitud de onda central en la posición de la fuente (WCS-WAVE) [um]';
+COMMENT ON COLUMN proyecto.espectro_spherex.ancho_banda_um IS 'Ancho de banda en la posición de la fuente [um]';
+COMMENT ON COLUMN proyecto.espectro_spherex.flujo_ujy IS 'Flujo en apertura menos fondo local (incluye corrección de zodiacal vía anillo) [uJy]';
+COMMENT ON COLUMN proyecto.espectro_spherex.error_flujo_ujy IS 'Error del flujo a partir de la extensión VARIANCE [uJy]';
+COMMENT ON COLUMN proyecto.espectro_spherex.brillo_pico_mjy_sr IS 'Brillo superficial del píxel central [MJy/sr]';
+COMMENT ON COLUMN proyecto.espectro_spherex.fondo_mjy_sr IS 'Mediana del anillo de fondo [MJy/sr]';
+COMMENT ON COLUMN proyecto.espectro_spherex.zodi_mjy_sr IS 'Modelo de luz zodiacal en el píxel central [MJy/sr]';
+COMMENT ON COLUMN proyecto.espectro_spherex.radio_apertura_pix IS 'Radio de la apertura [pix]';
+COMMENT ON COLUMN proyecto.espectro_spherex.flags IS 'OR de los bits FLAGS dentro de la apertura (definición en la cabecera FLAGS: MSKN/MSKM)';
+COMMENT ON COLUMN proyecto.espectro_spherex.flag_malo IS 'True si algún píxel de la apertura tiene un bit grave (transitorio, saturación, no funcional, caliente/frío, no lineal, persistencia, outlier, faltante)';
+CREATE INDEX IF NOT EXISTS proyecto_espectro_spherex_source_id_idx ON proyecto.espectro_spherex (source_id);
 
