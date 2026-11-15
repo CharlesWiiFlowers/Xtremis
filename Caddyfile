@@ -1,0 +1,5 @@
+# DOMAIN viene del .env (por ejemplo astro.midominio.com). Con "localhost" usa un certificado local.
+{$DOMAIN:localhost} {
+	encode gzip
+	reverse_proxy node:3010
+}

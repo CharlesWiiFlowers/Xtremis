@@ -1,0 +1,98 @@
+[
+  {
+    "slug": "spherex-sia2",
+    "mission": "spherex",
+    "provider": "IRSA",
+    "protocol": "SIA2",
+    "category": "images",
+    "upstream_url": "https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_dr1,spherex_dr1_deep,spherex_qr3,spherex_qr3_deep",
+    "internal_route": "/api/v1/spherex/images",
+    "description": "Metadatos de imágenes espectrales SPHEREx por posición. Colecciones DR1 y QR3, wide y deep. La disponibilidad en SIA2 puede retrasarse alrededor de un día respecto a la ingesta.",
+    "verified": true,
+    "source_doc": "https://caltech-ipac.github.io/spherex-archive-documentation/spherex-data-access/"
+  },
+  {
+    "slug": "spherex-tap-metadata",
+    "mission": "spherex",
+    "provider": "IRSA",
+    "protocol": "TAP/ADQL",
+    "category": "metadata",
+    "upstream_url": "https://irsa.ipac.caltech.edu/TAP",
+    "internal_route": "/api/v1/spherex/images",
+    "description": "Consulta de metadatos de artefactos SPHEREx con spherex.artifact y spherex.plane. Ruta TAP documentada para acceso a ingestas recientes.",
+    "verified": true,
+    "source_doc": "https://caltech-ipac.github.io/irsa-tutorials/spherex-cutouts/"
+  },
+  {
+    "slug": "spherex-cutout",
+    "mission": "spherex",
+    "provider": "IRSA",
+    "protocol": "HTTP FITS",
+    "category": "cutouts",
+    "upstream_url": "{access_url}?center={ra},{dec}&size={size_deg}",
+    "internal_route": "/api/v1/spherex/cutout-url",
+    "description": "Recorte espacial de una imagen SPHEREx identificada por SIA2/TAP. La URL de acceso apunta al archivo FITS oficial de IRSA.",
+    "verified": true,
+    "source_doc": "https://caltech-ipac.github.io/irsa-tutorials/spherex/"
+  },
+  {
+    "slug": "spherex-archive",
+    "mission": "spherex",
+    "provider": "IRSA",
+    "protocol": "WEB",
+    "category": "archive",
+    "upstream_url": "https://irsa.ipac.caltech.edu/Missions/spherex.html",
+    "internal_route": null,
+    "description": "Portal oficial de misión, productos, releases, herramientas y documentación SPHEREx.",
+    "verified": true,
+    "source_doc": "https://irsa.ipac.caltech.edu/Missions/spherex.html"
+  },
+  {
+    "slug": "wise-allwise-scs",
+    "mission": "wise",
+    "provider": "IRSA",
+    "protocol": "SCS",
+    "category": "catalog",
+    "upstream_url": "https://irsa.ipac.caltech.edu/SCS?table=allwise_p3as_psd",
+    "internal_route": "/api/v1/wise/sources",
+    "description": "Consulta de cono del catálogo AllWISE Source Catalog (allwise_p3as_psd). El servicio devuelve posiciones y fotometría infrarroja W1–W4.",
+    "verified": true,
+    "source_doc": "https://irsa.ipac.caltech.edu/docs/program_interface/Simple_Cone_Search.html"
+  },
+  {
+    "slug": "wiseview",
+    "mission": "wise",
+    "provider": "Backyard Worlds / WiseView",
+    "protocol": "WEB",
+    "category": "visualizer",
+    "upstream_url": "http://byw.tools/wiseview",
+    "internal_route": "/api/v1/wise/wiseview-link",
+    "description": "Visor de imágenes/blinks unWISE. Se abre como herramienta externa; no se trata como un endpoint de catálogo de fuentes.",
+    "verified": true,
+    "source_doc": "http://byw.tools/wiseview"
+  },
+  {
+    "slug": "gaia-mast-dr3",
+    "mission": "gaia",
+    "provider": "MAST / STScI",
+    "protocol": "TAP/ADQL",
+    "category": "catalog",
+    "upstream_url": "https://mast.stsci.edu/vo-tap/api/v0.1/gaiadr3/",
+    "internal_route": "/api/v1/gaia/stars?provider=mast",
+    "description": "Copia alojada en MAST del catálogo Gaia Data Release 3. Consulta de estrellas por región, paralaje, movimiento propio y fotometría.",
+    "verified": true,
+    "source_doc": "https://archive.stsci.edu/missions-and-data/gaia"
+  },
+  {
+    "slug": "gaia-mast-archive",
+    "mission": "gaia",
+    "provider": "MAST / STScI",
+    "protocol": "WEB",
+    "category": "archive",
+    "upstream_url": "https://archive.stsci.edu/missions-and-data/gaia",
+    "internal_route": null,
+    "description": "Página de acceso y documentación del archivo Gaia en MAST/STScI.",
+    "verified": true,
+    "source_doc": "https://archive.stsci.edu/missions-and-data/gaia"
+  }
+]
