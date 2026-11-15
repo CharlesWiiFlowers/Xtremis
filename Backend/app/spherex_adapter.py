@@ -62,6 +62,7 @@ class _DropSipNotice(logging.Filter):
         return "Inconsistent SIP distortion" not in record.getMessage()
 
 
+astropy_log.addFilter(_DropSipNotice())   # also covers records forwarded to root-logger handlers
 for _handler in astropy_log.handlers:
     _handler.addFilter(_DropSipNotice())
 
@@ -79,11 +80,14 @@ open_fits = _spherex.abrir_fits                 # (image_row) -> HDUList read la
 photometry = _spherex.fotometria                # (image_row, sources, r_ap, r_in, r_out) -> list[dict]
 _download = _spherex.descargar                  # (url, intentos=5) -> bytes
 _search_images = _spherex.buscar_imagenes       # (ra, dec, radio, colecciones, banda, tiempo, maxrec) -> Table
+_retry = _spherex.reintentar                    # (fn, intentos, espera): retries IRSA 502/503 proxy errors
+gaia_adql = _gaia.ejecutar_adql                 # (adql) -> Table from the ESA Gaia archive
 
 
 def search_images(ra: float, dec: float, radius_deg: float, collections=None, band=None, time=None, maxrec=None):
     """SIA2 search for SPHEREx spectral images covering a position. Returns an astropy Table."""
-    return _search_images(ra, dec, radius_deg, collections or DEFAULT_COLLECTIONS, band, time, maxrec)
+    return _retry(lambda: _search_images(ra, dec, radius_deg, collections or DEFAULT_COLLECTIONS, band, time, maxrec),
+                  4, 5)
 
 
 def download(url: str, attempts: int = 5) -> bytes:
