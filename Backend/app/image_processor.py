@@ -73,7 +73,7 @@ def _detector_label(band_name: str) -> str:
     return str(band_name).rsplit("-", 1)[-1]
 
 
-def _mjd_to_iso(mjd: float) -> str:
+def mjd_to_iso(mjd: float) -> str:
     return Time(mjd, format="mjd").isot[:19] + "Z"
 
 
@@ -133,20 +133,38 @@ def select_frames(frames: list[dict], per_group: int) -> list[dict]:
 
 
 # ---------------------------------------------------------------- cutouts (disk cache)
+def _frame_cutout_dir(frame: dict) -> Path:
+    return CUTOUT_DIR / hashlib.sha1(frame["obs_publisher_did"].encode()).hexdigest()[:16]
+
+
 def fetch_cutout(frame: dict, ra: float, dec: float, size_deg: float) -> Path:
-    """Download an IRSA cutout once and keep a slim copy (no EPSF table) in ``cache/cutouts``."""
-    CUTOUT_DIR.mkdir(parents=True, exist_ok=True)
-    key = hashlib.sha1(f"{frame['obs_publisher_did']}|{ra:.6f}|{dec:.6f}|{size_deg:.6f}".encode()).hexdigest()
-    path = CUTOUT_DIR / f"{key}.fits"
+    """Download an IRSA cutout once and keep a slim copy (no EPSF table) in ``cache/cutouts/<frame>/``."""
+    folder = _frame_cutout_dir(frame)
+    folder.mkdir(parents=True, exist_ok=True)
+    key = hashlib.sha1(f"{ra:.6f}|{dec:.6f}|{size_deg:.6f}".encode()).hexdigest()[:16]
+    path = folder / f"{key}.fits"
     if path.exists():
         return path
     raw = spherex.download(spherex.cutout_url(frame["access_url"], ra, dec, size_deg))
     with fits.open(io.BytesIO(raw)) as hdul:
         slim = fits.HDUList([fits.PrimaryHDU()] + [hdul[name].copy() for name in CUTOUT_EXTENSIONS if name in hdul])
-        tmp = path.with_suffix(".tmp")
+        tmp = path.with_suffix(f".{threading.get_ident()}.tmp")
         slim.writeto(tmp, overwrite=True)
     tmp.replace(path)
     return path
+
+
+def find_cached_cutout(frame: dict, ra: float, dec: float, margin_px: int) -> Path | None:
+    """Any cached cutout of this frame that contains (ra, dec) at least ``margin_px`` pixels from its edges."""
+    folder = _frame_cutout_dir(frame)
+    if not folder.is_dir():
+        return None
+    for path in sorted(folder.glob("*.fits")):
+        header = fits.getheader(path, "IMAGE")
+        x, y = (float(v) for v in WCS(header).world_to_pixel_values(ra, dec))
+        if margin_px <= x <= header["NAXIS1"] - 1 - margin_px and margin_px <= y <= header["NAXIS2"] - 1 - margin_px:
+            return path
+    return None
 
 
 def target_wcs(ra: float, dec: float, fov_deg: float) -> tuple[WCS, tuple[int, int]]:
@@ -239,6 +257,18 @@ def normalize(data: np.ndarray) -> np.ndarray:
     return np.nan_to_num(np.clip((data - vmin) / (vmax - vmin), 0, 1))
 
 
+def png_pixel_to_world(ra: float, dec: float, fov_deg: float, x: float, y: float) -> tuple[float, float] | None:
+    """Sky position of pixel (x, y) (origin top-left) in a PNG rendered for a view centred on (ra, dec)."""
+    wcs, (ny, nx) = target_wcs(ra, dec, fov_deg)
+    factor = max(1, int(np.ceil(MIN_PNG_SIZE_PX / max(nx, ny))))
+    col = (x + 0.5) / factor - 0.5
+    row = ny - 1 - ((y + 0.5) / factor - 0.5)
+    if not (-0.5 <= col < nx - 0.5 and -0.5 <= row < ny - 0.5):
+        return None
+    lon, lat = (float(v) for v in wcs.pixel_to_world_values(col, row))
+    return lon % 360.0, lat
+
+
 def _save_png(rgb: np.ndarray, path: Path) -> None:
     """Write an (H, W, 3) float [0, 1] array, flipped to north-up and upscaled with nearest neighbour."""
     img = Image.fromarray((np.flipud(rgb) * 255).round().astype(np.uint8), mode="RGB")
@@ -258,7 +288,7 @@ def render_rgb(red: np.ndarray, green: np.ndarray, blue: np.ndarray, path: Path)
 
 
 # ---------------------------------------------------------------- pipeline
-def _lock_for(key: str) -> threading.Lock:
+def lock_for(key: str) -> threading.Lock:
     with _request_locks_guard:
         return _request_locks.setdefault(key, threading.Lock())
 
@@ -268,7 +298,7 @@ def build_sky_images(req: ImageRequest) -> dict:
     key = req.key()
     out_dir = RENDER_DIR / key
     result_path = out_dir / "result.json"
-    with _lock_for(key):
+    with lock_for(key):
         if result_path.exists():
             return {**json.loads(result_path.read_text()), "cached": True}
         started = time.time()
@@ -307,7 +337,7 @@ def _run_pipeline(req: ImageRequest, key: str, out_dir: Path) -> dict:
         frame_items.append({
             "index": len(frame_items), "obs_id": frame["obs_id"], "obs_publisher_did": frame["obs_publisher_did"],
             "collection": frame["collection"], "detector": frame["detector"], "epoch": frame["epoch"],
-            "mjd": mjd, "date_utc": _mjd_to_iso(mjd),
+            "mjd": mjd, "date_utc": mjd_to_iso(mjd),
             "wavelength_min_um": round(frame["wavelength_min_um"], 4),
             "wavelength_max_um": round(frame["wavelength_max_um"], 4),
             "png": rel, "_slot": i,
@@ -341,7 +371,7 @@ def _run_pipeline(req: ImageRequest, key: str, out_dir: Path) -> dict:
                 render_gray(coadd(stack), RENDER_DIR / pngs[det], req.cmap)
         epoch_items.append({
             "index": epoch["index"], "mjd_start": epoch["mjd_start"], "mjd_end": epoch["mjd_end"],
-            "date_start_utc": _mjd_to_iso(epoch["mjd_start"]), "date_end_utc": _mjd_to_iso(epoch["mjd_end"]),
+            "date_start_utc": mjd_to_iso(epoch["mjd_start"]), "date_end_utc": mjd_to_iso(epoch["mjd_end"]),
             "frames": len(members), "detector_pngs": pngs,
         })
 

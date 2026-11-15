@@ -54,6 +54,17 @@ def _load_legacy_modules():
 _common, _gaia, _spherex = _load_legacy_modules()
 logger = logging.getLogger(__name__)
 
+
+class _DropSipNotice(logging.Filter):
+    """SPHEREx headers carry SIP terms without a -SIP CTYPE; astropy logs a long INFO notice on every WCS."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return "Inconsistent SIP distortion" not in record.getMessage()
+
+
+for _handler in astropy_log.handlers:
+    _handler.addFilter(_DropSipNotice())
+
 # Constants
 COLLECTIONS = list(_common.COLECCIONES_SPHEREX)
 DEFAULT_COLLECTIONS = ["spherex_dr1", "spherex_qr3"]

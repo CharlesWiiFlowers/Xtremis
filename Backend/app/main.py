@@ -11,12 +11,13 @@ from fastapi.staticfiles import StaticFiles
 from matplotlib import colormaps
 
 from . import image_processor as images
+from . import spectrum_processor as spectra
 from . import spherex_adapter as spherex
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
 app = FastAPI(title="Xtremis SPHEREx API", version="0.1.0",
-              description="SPHEREx infrared images (IRSA/AWS) for the NASA Space Apps 2026 Xtremis project.")
+              description="SPHEREx infrared images and 102-channel spectra (IRSA/AWS) for the NASA Space Apps 2026 Xtremis project.")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 images.RENDER_DIR.mkdir(parents=True, exist_ok=True)
@@ -60,16 +61,60 @@ def sky_images(
         raise HTTPException(422, "rgb must be three detectors from D1..D6, e.g. 'D5,D3,D1'")
     if cmap not in colormaps:
         raise HTTPException(422, f"unknown colormap '{cmap}'")
-    collections = collections or list(spherex.DEFAULT_COLLECTIONS)
-    unknown = sorted(set(collections) - set(spherex.COLLECTIONS))
-    if unknown:
-        raise HTTPException(422, f"unknown collections {unknown}; valid: {spherex.COLLECTIONS}")
-
+    collections = _validated_collections(collections)
     req = images.ImageRequest(ra=ra, dec=dec, fov_arcmin=fov, frames_per_group=frames_per_group,
-                              rgb=channels, cmap=cmap, collections=list(collections))
+                              rgb=channels, cmap=cmap, collections=collections)
     try:
         result = images.build_sky_images(req)
     except Exception as exc:
         logging.getLogger(__name__).exception("sky images failed")
         raise HTTPException(502, f"SPHEREx upstream error: {exc}") from exc
     return _absolute_urls(result, request)
+
+
+def _validated_collections(collections: list[str] | None) -> list[str]:
+    collections = collections or list(spherex.DEFAULT_COLLECTIONS)
+    unknown = sorted(set(collections) - set(spherex.COLLECTIONS))
+    if unknown:
+        raise HTTPException(422, f"unknown collections {unknown}; valid: {spherex.COLLECTIONS}")
+    return list(collections)
+
+
+@app.get("/api/sky/spectrum")
+def sky_spectrum(
+    ra: Annotated[float, Query(ge=0, lt=360, description="Right ascension (deg, ICRS); view centre if x/y are given")],
+    dec: Annotated[float, Query(ge=-90, le=90, description="Declination (deg, ICRS); view centre if x/y are given")],
+    x: Annotated[float | None, Query(ge=0, description="Pixel column in a /api/sky/images PNG (origin top-left)")] = None,
+    y: Annotated[float | None, Query(ge=0, description="Pixel row in a /api/sky/images PNG (origin top-left)")] = None,
+    fov: Annotated[float, Query(ge=1, le=60, description="Field of view (arcmin) of the PNG that x/y refer to")] = 10.0,
+    r_ap: Annotated[float, Query(ge=1, le=6, description="Aperture radius (SPHEREx pixels of 6.15 arcsec)")]
+    = spectra.DEFAULT_R_AP_PIX,
+    pmra: Annotated[float, Query(description="Proper motion in RA*cos(dec) (mas/yr)")] = 0.0,
+    pmdec: Annotated[float, Query(description="Proper motion in Dec (mas/yr)")] = 0.0,
+    ref_epoch: Annotated[float, Query(ge=1900, le=2100, description="Epoch of ra/dec (Julian year)")]
+    = spectra.GAIA_EPOCH,
+    collections: Annotated[list[str] | None, Query(description="SPHEREx SIA2 collections")] = None,
+):
+    collections = _validated_collections(collections)
+    pixel = None
+    if (x is None) != (y is None):
+        raise HTTPException(422, "x and y must be given together")
+    if x is not None:
+        point = images.png_pixel_to_world(ra, dec, fov / 60.0, x, y)
+        if point is None:
+            raise HTTPException(422, "x/y fall outside the image view")
+        pixel = {"x": x, "y": y, "view_ra": ra, "view_dec": dec, "view_fov_arcmin": fov}
+        ra, dec = point
+
+    r_in = max(spectra.DEFAULT_ANNULUS_PIX[0], r_ap + 2.0)
+    r_out = max(spectra.DEFAULT_ANNULUS_PIX[1], r_in + 3.0)
+    req = spectra.SpectrumRequest(ra=ra, dec=dec, r_ap=r_ap, r_in=r_in, r_out=r_out, pmra=pmra, pmdec=pmdec,
+                                  ref_epoch=ref_epoch, collections=collections)
+    try:
+        result = spectra.build_spectrum(req)
+    except Exception as exc:
+        logging.getLogger(__name__).exception("sky spectrum failed")
+        raise HTTPException(502, f"SPHEREx upstream error: {exc}") from exc
+    if pixel:
+        result["target"]["pixel"] = pixel
+    return result
