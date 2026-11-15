@@ -14,6 +14,8 @@ from pathlib import Path
 
 from astropy import log as astropy_log
 
+from . import offline
+
 SCRIPTS_DIR = Path(__file__).resolve().parents[2] / "Database" / "scripts"
 _NAMESPACE = "xtremis_db"
 _FLAT_NAMES = ("comun", "gaia_api")
@@ -86,12 +88,14 @@ gaia_adql = _gaia.ejecutar_adql                 # (adql) -> Table from the ESA G
 
 def search_images(ra: float, dec: float, radius_deg: float, collections=None, band=None, time=None, maxrec=None):
     """SIA2 search for SPHEREx spectral images covering a position. Returns an astropy Table."""
+    offline.guard("SPHEREx image search (IRSA SIA2)")
     return retry(lambda: _search_images(ra, dec, radius_deg, collections or DEFAULT_COLLECTIONS, band, time, maxrec),
                   4, 5)
 
 
 def download(url: str, attempts: int = 5) -> bytes:
     """HTTP GET with retries on IRSA's intermittent 429/5xx responses."""
+    offline.guard("SPHEREx cutout download (IRSA)")
     return _download(url, attempts)
 
 

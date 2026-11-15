@@ -1,15 +1,17 @@
 """Pre-compute images and spectra for the challenge benchmark targets so live demo requests hit the cache.
 
 Run from the Backend/ folder:
-    python warm_cache.py                          # all 5 presets, fov 10', images + spectra + React viewer PNGs
+    python warm_cache.py                          # all 5 presets, fov 10': images, spectra, React viewer PNGs
     python warm_cache.py --targets barnard rdra --fov 10 20 --no-spectrum
+    python warm_cache.py --export offline/demo_cache.tar.gz   # then pack the cache as the offline dataset
 """
 import argparse
 import logging
 import sys
 import time
+from pathlib import Path
 
-from app import frontend_adapter, targets
+from app import frontend_adapter, offline, targets
 from app import image_processor as images
 from app import spectrum_processor as spectra
 
@@ -27,15 +29,12 @@ def warm(preset: str, fovs: list[float], with_spectrum: bool, with_viewer: bool)
         print(f"   images  fov={fov:g}'  {summary['frames_rendered']}/{summary['frames_selected']} frames, "
               f"{summary['epochs']} epochs, cached={result['cached']}, {time.time() - started:.1f}s", flush=True)
     if with_viewer:
-        # The React viewer opens benchmark targets on their approximate J2000 position (frontend/src/lib/targets.ts):
-        # exact values from the Home cards, 5-decimal values when the view is reloaded from its URL.
-        exact = targets.BENCHMARKS[preset]["frontend_center"]
-        for fra, fdec in dict.fromkeys([exact, tuple(round(v, 5) for v in exact)]):
-            for fov in fovs:
-                started = time.time()
-                pngs = frontend_adapter.warm_view(fra, fdec, fov)
-                print(f"   viewer  fov={fov:g}' centre {fra} {fdec:+}: {pngs} PNGs, {time.time() - started:.1f}s",
-                      flush=True)
+        # The React viewer opens benchmark targets on their approximate J2000 position (frontend/src/lib/targets.ts)
+        fra, fdec = targets.BENCHMARKS[preset]["frontend_center"]
+        for fov in fovs:
+            started = time.time()
+            pngs = frontend_adapter.warm_view(fra, fdec, fov, frontend_adapter.DETECTOR_OPTIONS)
+            print(f"   viewer  fov={fov:g}' centre {fra} {fdec:+}: {pngs} PNGs, {time.time() - started:.1f}s", flush=True)
     if with_spectrum:
         started = time.time()
         result = spectra.build_spectrum(spectra.SpectrumRequest(
@@ -54,6 +53,8 @@ def main() -> int:
     parser.add_argument("--fov", nargs="+", type=float, default=[10.0], help="image fields of view (arcmin)")
     parser.add_argument("--no-spectrum", action="store_true", help="skip the spectra")
     parser.add_argument("--no-viewer", action="store_true", help="skip the React viewer (/api/frame) PNGs")
+    parser.add_argument("--export", type=Path, help="afterwards, pack the cache into this .tar.gz (offline dataset)")
+    parser.add_argument("--full", action="store_true", help="with --export: also include renders/ and FITS cutouts")
     args = parser.parse_args()
     logging.basicConfig(level=logging.WARNING)
     failed = []
@@ -64,6 +65,9 @@ def main() -> int:
         except Exception as exc:  # noqa: BLE001 - keep warming the other targets
             print(f"   FAILED: {exc}", flush=True)
             failed.append(preset)
+    if args.export:
+        n = offline.export_bundle(images.CACHE_DIR, args.export, args.full)
+        print(f"exported {n} files -> {args.export} ({args.export.stat().st_size / 1e6:.1f} MB)")
     print("done" if not failed else f"failed: {failed}")
     return 1 if failed else 0
 

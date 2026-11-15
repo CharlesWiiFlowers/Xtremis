@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from matplotlib import colormaps
 
-from . import frontend_adapter, targets
+from . import frontend_adapter, offline, targets
 from . import image_processor as images
 from . import spectrum_processor as spectra
 from . import spherex_adapter as spherex
@@ -21,6 +21,7 @@ app = FastAPI(title="Xtremis SPHEREx API", version="0.1.0",
               description="SPHEREx infrared images and 102-channel spectra (IRSA/AWS) for the NASA Space Apps 2026 Xtremis project.")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 app.include_router(frontend_adapter.router)
+offline.seed_cache(images.CACHE_DIR)
 
 images.RENDER_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory=images.RENDER_DIR), name="static")
@@ -51,7 +52,7 @@ def _resolve_target(ra, dec, gaia_source_id, target_name) -> targets.Target:
         raise HTTPException(422, str(exc)) from exc
     except Exception as exc:
         logging.getLogger(__name__).exception("Gaia lookup failed")
-        raise HTTPException(502, f"Gaia archive error: {exc}") from exc
+        raise offline.upstream_error(exc, "Gaia archive") from exc
 
 
 GaiaSourceId = Annotated[int | None, Query(ge=1, description="Gaia DR3 source_id (overrides ra/dec)")]
@@ -65,7 +66,7 @@ def benchmark_targets():
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok", "offline": offline.ENABLED, "demo_bundle": offline.DEMO_BUNDLE.exists()}
 
 
 @app.get("/api/sky/images")
@@ -95,7 +96,7 @@ def sky_images(
         result = images.build_sky_images(req)
     except Exception as exc:
         logging.getLogger(__name__).exception("sky images failed")
-        raise HTTPException(502, f"SPHEREx upstream error: {exc}") from exc
+        raise offline.upstream_error(exc, "SPHEREx") from exc
     return {**_absolute_urls(result, request), "resolved_target": target.metadata()}
 
 
@@ -147,7 +148,7 @@ def sky_spectrum(
         result = spectra.build_spectrum(req)
     except Exception as exc:
         logging.getLogger(__name__).exception("sky spectrum failed")
-        raise HTTPException(502, f"SPHEREx upstream error: {exc}") from exc
+        raise offline.upstream_error(exc, "SPHEREx") from exc
     if pixel:
         result["target"]["pixel"] = pixel
     return {**result, "resolved_target": target.metadata()}

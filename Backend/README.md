@@ -15,10 +15,37 @@ source .venv/bin/activate            # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-## Pre-warm the cache (recommended before a demo)
+> **Two separate apps live in this repo.** The root `docker-compose.yml` (node gateway + `python/app` + MySQL,
+> http://localhost:3010) runs **ORBITAL**, the 2D orbital simulator. It does not start this SPHEREx backend or the
+> React viewer in `../frontend`; those run as described below.
+
+## Offline / API outages
+
+IRSA (502 Proxy Error on `/SIA/capabilities`) and the ESA Gaia archive (`ConnectTimeout` on `/tap-server/tap/sync`)
+fail intermittently. The backend handles this with:
+
+- **Bundled demo dataset** `offline/demo_cache.tar.gz`, copied into `Backend/cache/` on every start (missing files
+  only). It holds everything the React viewer requests for the 5 benchmark targets at their Home-card position,
+  10′ field: epochs, frames for all detectors in animate/diff/sum, flag overlays, Gaia + WISE overlays, spectra and
+  light curves.
+- **Bundled Gaia DR3 rows** for the presets (`app/data/gaia/`): resolving a benchmark target never needs Gaia.
+- **Gaia fallback chain** for other lookups: ESA async (`gaia_api.ejecutar_adql`) → MAST mirror → ESA sync, each
+  with a 45 s deadline. IRSA searches are retried.
+- **Offline mode** `XTREMIS_OFFLINE=1`: no network calls at all. Cached requests are served as usual; anything else
+  returns HTTP 503 immediately instead of waiting for timeouts.
 
 ```bash
-python warm_cache.py                          # 5 benchmark targets: images, spectra and the viewer's first frames
+XTREMIS_OFFLINE=1 uvicorn app.main:app --port 8000     # Windows PowerShell: $env:XTREMIS_OFFLINE=1; uvicorn ...
+curl http://localhost:8000/api/health                  # {"status":"ok","offline":true,"demo_bundle":true}
+```
+
+To refresh or share your own cache: `python warm_cache.py --export offline/demo_cache.tar.gz` (add `--full` to
+include the large FITS cutouts and `/api/sky/images` renders), and `python -m app.offline import <bundle>` to load one.
+
+## Pre-warm the cache (online, optional)
+
+```bash
+python warm_cache.py                          # 5 benchmark targets: images, spectra and all viewer frames
 python warm_cache.py --targets barnard rdra   # a subset (barnard, epsindib, wise0855, rwaur, rdra)
 python warm_cache.py --fov 10 20              # several fields of view (arcmin)
 ```
@@ -62,5 +89,4 @@ preset the position is propagated with its proper motion.
 - Benchmark stars that are very bright (Barnard's Star, R Draconis, most of RW Aurigae) saturate SPHEREx; their
   measurements are returned but flagged (`flagged` / `bad_flag`).
 - WISE 0855−0714 has no Gaia DR3 entry; its preset uses literature coordinates and proper motion (unverified).
-- IRSA and the ESA Gaia archive fail intermittently; searches are retried and Gaia lookups fall back to a
-  synchronous TAP query. A spectrum for a new (uncached) position takes about 1–2 minutes.
+- A spectrum for a new (uncached) position takes about 1–2 minutes and needs IRSA; see "Offline / API outages".

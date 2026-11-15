@@ -28,9 +28,9 @@ from PIL import Image
 from reproject import reproject_interp
 
 from . import image_processor as images
+from . import offline, targets
 from . import spectrum_processor as spectra
 from . import spherex_adapter as spherex
-from . import targets
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["frontend"])
@@ -38,6 +38,7 @@ router = APIRouter(prefix="/api", tags=["frontend"])
 FRONTEND_DIR = images.CACHE_DIR / "frontend"
 ADAPTER_VERSION = 1
 FIELD_CACHE_SIZE = 6            # aligned frame stacks kept in memory
+SNAP_ARCSEC = 0.5               # viewer centres this close to a preset Home-card position share its cache
 CLICK_MATCH_ARCSEC = 12.0       # clicks within ~2 SPHEREx pixels of a benchmark target reuse its proper-motion spectrum
 FOUND_SNR = 3.0                 # median channel S/N above which a source counts as found
 FLAG_MAJORITY = 0.5             # a pixel is drawn as flagged when flagged in at least this fraction of frames
@@ -48,6 +49,7 @@ DIFF_OLD_RGB = np.array([0xF2, 0xB4, 0x5F]) / 255   # gold: earlier position / f
 CATWISE_SCS = "https://irsa.ipac.caltech.edu/SCS?table=catwise_2020"
 PRESET_RETRY_S = 600.0
 FLUX_UNIT = "µJy"
+DETECTOR_OPTIONS = ("all", "1", "2", "3", "4", "5", "6")
 PNG_HEADERS = {"Cache-Control": "public, max-age=86400"}
 
 Ra = Annotated[float, Query(ge=0, lt=360, description="Right ascension (deg, ICRS)")]
@@ -70,6 +72,15 @@ def _offset_arcsec(ra0: float, dec0: float, ra: float, dec: float) -> tuple[floa
 
 def _sep_arcsec(ra1: float, dec1: float, ra2: float, dec2: float) -> float:
     return math.hypot(*_offset_arcsec(ra1, dec1, ra2, dec2))
+
+
+def snap_centre(ra: float, dec: float) -> tuple[float, float]:
+    """The exact Home-card position of a benchmark preset when (ra, dec) is that position as written in the
+    viewer URL (5 decimals, < 0.04″ off), so opening a card and reloading its URL share one cache entry."""
+    for info in targets.BENCHMARKS.values():
+        if _sep_arcsec(ra, dec, *info["frontend_center"]) < SNAP_ARCSEC:
+            return info["frontend_center"]
+    return ra, dec
 
 
 def _number(value) -> float | None:
@@ -169,6 +180,7 @@ def _field_key(ra: float, dec: float, fov: float) -> str:
 
 def field_meta(ra: float, dec: float, fov: float) -> dict:
     """Survey epochs of a view (``key``, ``epochs``, ``epoch_index``), cached on disk."""
+    ra, dec = snap_centre(ra, dec)
     key = _field_key(ra, dec, fov)
     path = FRONTEND_DIR / "fields" / f"{key}.json"
     with images.lock_for(f"meta-{key}"):
@@ -179,7 +191,7 @@ def field_meta(ra: float, dec: float, fov: float) -> dict:
             found = images.search_frames(ra, dec, list(spherex.DEFAULT_COLLECTIONS))
         except Exception as exc:
             logger.exception("field metadata failed")
-            raise HTTPException(502, f"SPHEREx upstream error: {exc}") from exc
+            raise offline.upstream_error(exc, "SPHEREx") from exc
         images.assign_epochs(found, images.ImageRequest.epoch_gap_days)
         exposures: dict[int, set[str]] = {}
         for f in found:
@@ -208,7 +220,7 @@ def _build_field(ra: float, dec: float, fov: float, meta: dict) -> Field:
     fov_deg = fov / 60.0
     wcs, shape = images.target_wcs(ra, dec, fov_deg)
 
-    frames, layers = [], []
+    frames, layers, failures = [], [], 0
     for item in meta["frames"]:
         frame = by_did.get(item["obs_publisher_did"])
         if frame is None:
@@ -217,7 +229,9 @@ def _build_field(ra: float, dec: float, fov: float, meta: dict) -> Field:
             layers.append(_load_layers(images.fetch_cutout(frame, ra, dec, fov_deg), wcs, shape))
             frames.append({"detector": item["detector"], "epoch": item["epoch"]})
         except Exception as exc:  # noqa: BLE001 - one bad frame must not break the view
+            failures += 1
             logger.warning("frame %s skipped: %s", item["obs_publisher_did"], exc)
+    offline.check_complete(failures, len(meta["frames"]), "view")
 
     field = Field(meta["key"], ra, dec, fov, shape, frames, layers, meta["epochs"], meta["epoch_index"], {})
     every = set(field.epoch_index.values())
@@ -230,6 +244,7 @@ def _build_field(ra: float, dec: float, fov: float, meta: dict) -> Field:
 
 
 def get_field(ra: float, dec: float, fov: float) -> Field:
+    ra, dec = snap_centre(ra, dec)
     meta = field_meta(ra, dec, fov)
     key = meta["key"]
     with images.lock_for(f"field-{key}"):
@@ -241,7 +256,7 @@ def get_field(ra: float, dec: float, fov: float) -> Field:
             field = _build_field(ra, dec, fov, meta)
         except Exception as exc:
             logger.exception("field build failed")
-            raise HTTPException(502, f"SPHEREx upstream error: {exc}") from exc
+            raise offline.upstream_error(exc, "SPHEREx") from exc
         with _fields_lock:
             _fields[key] = field
             while len(_fields) > FIELD_CACHE_SIZE:
@@ -328,25 +343,28 @@ def year_groups(epochs: list[dict]) -> list[str]:
     return [",".join(ids) for _, ids in sorted(by_year.items())]
 
 
-def warm_view(ra: float, dec: float, fov: float) -> int:
-    """Pre-render the PNGs the viewer requests first (all detectors; by year and by survey) and cache the
-    Gaia/WISE overlays. Returns the number of PNGs."""
+def warm_view(ra: float, dec: float, fov: float, detectors: tuple[str, ...] = ("all",)) -> int:
+    """Pre-render what the viewer requests for ``detectors`` (by-year and by-survey timelines in animate/diff,
+    sum, flag overlays) and cache the Gaia/WISE overlays. Returns the number of PNGs."""
     meta = field_meta(ra, dec, fov)
+    timelines = [t for t in (year_groups(meta["epochs"]), [e["id"] for e in meta["epochs"]]) if t]
     count = 0
-    for groups in (year_groups(meta["epochs"]), [e["id"] for e in meta["epochs"]]):
-        if not groups:
-            continue
-        for epoch in groups:
-            for mode in ("animate", "diff"):
-                frame_png(ra, dec, fov, "all", epoch, mode, groups[0] if mode == "diff" else None)
-                count += 1
-    frame_png(ra, dec, fov, "all", "all", "sum", None)
+    for det in detectors:
+        for groups in timelines:
+            for epoch in groups:
+                frame_png(ra, dec, fov, det, epoch, "animate", None)
+                frame_png(ra, dec, fov, det, epoch, "diff", groups[0])
+                frame_png(ra, dec, fov, det, epoch, "animate", None, kind="flags")
+                count += 3
+        frame_png(ra, dec, fov, det, "all", "sum", None)
+        frame_png(ra, dec, fov, det, "all", "sum", None, kind="flags")
+        count += 2
     for cat in ("gaia", "wise"):
         try:
             catalog(ra, dec, fov, cat)
         except HTTPException as exc:
             logger.warning("%s catalog not cached: %s", cat, exc.detail)
-    return count + 1
+    return count
 
 
 # ---------------------------------------------------------------- spectra and light curves
@@ -369,7 +387,7 @@ def point_spectrum(ra: float, dec: float) -> tuple[dict, str | None]:
         return spectra.build_spectrum(req), preset
     except Exception as exc:
         logger.exception("spectrum failed")
-        raise HTTPException(502, f"SPHEREx upstream error: {exc}") from exc
+        raise offline.upstream_error(exc, "SPHEREx") from exc
 
 
 def _channels(result: dict, det: str) -> list[dict]:
@@ -400,12 +418,14 @@ def resolve(name: Annotated[str, Query(min_length=1, description="Object name or
     except LookupError as exc:
         raise HTTPException(404, str(exc.args[0])) from exc
     except Exception as exc:
-        raise HTTPException(502, f"Gaia archive error: {exc}") from exc
+        raise offline.upstream_error(exc, "Gaia archive") from exc
     if target is not None:
         ra, dec = target.view_center()
         return {"name": target.name, "ra": round(ra, 7), "dec": round(dec, 7), "source": target.source,
                 "position_epoch": targets.VIEW_EPOCH, "pmra_mas_yr": target.pmra, "pmdec_mas_yr": target.pmdec,
                 "gaia_source_id": str(target.gaia["source_id"]) if target.gaia else None}
+    if offline.ENABLED:
+        raise HTTPException(503, f"offline mode: cannot resolve '{name}' (benchmark presets and cached Gaia IDs only)")
     try:
         coord = SkyCoord.from_name(name)
     except Exception as exc:
@@ -467,6 +487,7 @@ def _gaia_rows(ra: float, dec: float, radius: float) -> list[dict]:
 
 
 def _wise_rows(ra: float, dec: float, radius: float) -> list[dict]:
+    offline.guard("CatWISE catalog query (IRSA)")
     table = spherex.retry(lambda: pyvo.dal.SCSService(CATWISE_SCS).search(pos=(ra, dec), radius=radius).to_table(),
                           4, 5)
     return [{"ra": float(r["ra"]), "dec": float(r["dec"]), "id": f"CatWISE {r['source_name']}",
@@ -477,6 +498,7 @@ def _wise_rows(ra: float, dec: float, radius: float) -> list[dict]:
 def catalog(ra: Ra, dec: Dec, fov: Fov = 10.0,
             cat: Annotated[Literal["gaia", "wise"], Query(description="gaia (DR3, epoch 2016) | wise (CatWISE2020)")]
             = "gaia"):
+    ra, dec = snap_centre(ra, dec)
     radius = fov / 60.0 / 2.0 * math.sqrt(2.0)
     key = hashlib.sha1(json.dumps([cat, round(ra, 6), round(dec, 6), round(fov, 3)]).encode()).hexdigest()[:16]
     path = FRONTEND_DIR / "catalog" / f"{key}.json"
@@ -488,7 +510,7 @@ def catalog(ra: Ra, dec: Dec, fov: Fov = 10.0,
                 rows = _gaia_rows(ra, dec, radius) if cat == "gaia" else _wise_rows(ra, dec, radius)
             except Exception as exc:
                 logger.exception("catalog query failed")
-                raise HTTPException(502, f"{cat} catalog error: {exc}") from exc
+                raise offline.upstream_error(exc, f"{cat} catalog") from exc
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(json.dumps(rows))
     half = fov * 30.0
