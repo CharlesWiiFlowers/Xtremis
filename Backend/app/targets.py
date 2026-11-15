@@ -12,10 +12,12 @@ import numpy as np
 import pyvo
 
 from . import image_processor as images
+from . import offline
 from . import spherex_adapter as spherex
 
 GAIA_DIR = images.CACHE_DIR / "gaia"
 GAIA_TAP_URL = "https://gea.esac.esa.int/tap-server/tap"
+MAST_GAIA_TAP_URL = "https://mast.stsci.edu/vo-tap/api/v0.1/gaiadr3/"   # same columns, table dbo.gaia_source
 _GAIA_POOL = ThreadPoolExecutor(max_workers=4, thread_name_prefix="gaia")
 logger = logging.getLogger(__name__)
 VIEW_EPOCH = 2026.0   # mid-survey epoch: image views of moving targets are centred on this position
@@ -115,20 +117,28 @@ def _plain(value):
     return value
 
 
-def gaia_query(adql: str, attempts: int = 2, timeout_s: float = 60.0):
-    """Run ADQL with the legacy ``gaia_api.ejecutar_adql``; fall back to a synchronous TAP query.
+def gaia_query(adql: str, timeout_s: float = 45.0):
+    """Run ADQL against Gaia DR3: the legacy ``gaia_api.ejecutar_adql`` (ESA async) first, then synchronous TAP on
+    the MAST mirror and on ESA.
 
-    The ESA archive intermittently answers async jobs with HTTP 500 or stops answering job-phase polls
-    (astroquery sets no socket timeout), so each attempt runs in a worker thread with a deadline.
+    ESA intermittently answers async jobs with HTTP 500, hangs on job-phase polls (astroquery sets no socket
+    timeout) or refuses connections, so every attempt runs in a worker thread with a deadline.
     """
-    for _ in range(attempts):
-        future = _GAIA_POOL.submit(spherex.gaia_adql, adql)
+    offline.guard("Gaia DR3 query")
+    attempts = [
+        ("ESA async", lambda: spherex.gaia_adql(adql)),
+        ("MAST sync", lambda: pyvo.dal.TAPService(MAST_GAIA_TAP_URL).run_sync(
+            adql.replace("gaiadr3.gaia_source", "dbo.gaia_source")).to_table()),
+        ("ESA sync", lambda: pyvo.dal.TAPService(GAIA_TAP_URL).run_sync(adql).to_table()),
+    ]
+    error: Exception | None = None
+    for name, attempt in attempts:
         try:
-            return future.result(timeout=timeout_s)
-        except Exception as exc:  # noqa: BLE001 - includes TimeoutError
-            logger.warning("Gaia async query failed (%s); retrying", type(exc).__name__)
-    logger.warning("Falling back to a synchronous Gaia TAP query")
-    return pyvo.dal.TAPService(GAIA_TAP_URL).run_sync(adql).to_table()
+            return _GAIA_POOL.submit(attempt).result(timeout=timeout_s)
+        except Exception as exc:  # noqa: BLE001 - includes TimeoutError; try the next service
+            logger.warning("Gaia %s query failed (%s: %s)", name, type(exc).__name__, str(exc)[:120])
+            error = exc
+    raise error
 
 
 def gaia_source(source_id: int) -> dict:
@@ -137,10 +147,14 @@ def gaia_source(source_id: int) -> dict:
     with images.lock_for(f"gaia-{int(source_id)}"):
         if path.exists():
             return json.loads(path.read_text())
-        table = gaia_query(f"SELECT {GAIA_COLUMNS} FROM gaiadr3.gaia_source WHERE source_id = {int(source_id)}")
-        if not len(table):
-            raise LookupError(f"Gaia DR3 source_id {source_id} not found")
-        row = {name: _plain(table[name][0]) for name in table.colnames}
+        seed = offline.SEED_GAIA_DIR / path.name   # benchmark presets ship with the repo: no network needed
+        if seed.exists():
+            row = json.loads(seed.read_text())
+        else:
+            table = gaia_query(f"SELECT {GAIA_COLUMNS} FROM gaiadr3.gaia_source WHERE source_id = {int(source_id)}")
+            if not len(table):
+                raise LookupError(f"Gaia DR3 source_id {source_id} not found")
+            row = {name: _plain(table[name][0]) for name in table.colnames}
         GAIA_DIR.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(row))
         return row

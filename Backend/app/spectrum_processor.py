@@ -19,6 +19,7 @@ from pathlib import Path
 import numpy as np
 
 from . import image_processor as images
+from . import offline
 from . import spherex_adapter as spherex
 
 logger = logging.getLogger(__name__)
@@ -199,6 +200,7 @@ def build_spectrum(req: SpectrumRequest) -> dict:
             return {**json.loads(path.read_text()), "cached": True}
         started = time.time()
         result = _compute(req)
+        offline.check_complete(len(result["errors"]), result["summary"]["frames_found"], "spectrum")
         result["elapsed_s"] = round(time.time() - started, 2)
         SPECTRUM_DIR.mkdir(parents=True, exist_ok=True)
         tmp = path.with_suffix(".tmp")

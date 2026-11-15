@@ -25,6 +25,7 @@ from PIL import Image
 from reproject import reproject_interp
 from scipy import ndimage
 
+from . import offline
 from . import spherex_adapter as spherex
 
 logger = logging.getLogger(__name__)
@@ -303,6 +304,7 @@ def build_sky_images(req: ImageRequest) -> dict:
             return {**json.loads(result_path.read_text()), "cached": True}
         started = time.time()
         result = _run_pipeline(req, key, out_dir)
+        offline.check_complete(len(result["errors"]), result["summary"]["frames_selected"], "view")
         result["elapsed_s"] = round(time.time() - started, 2)
         out_dir.mkdir(parents=True, exist_ok=True)
         result_path.write_text(json.dumps(result))
