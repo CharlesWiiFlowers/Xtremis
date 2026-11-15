@@ -6,14 +6,17 @@ the React viewer in `../frontend`. It reuses the IRSA/S3/Gaia query code in `../
 
 ## Setup
 
-Python 3.11+ (tested with 3.12). No accounts or API keys are needed.
+Python 3.12+ and no accounts or API keys. With [uv](https://docs.astral.sh/uv/) (recommended; it also installs
+Python 3.12 if missing):
 
 ```bash
 cd Backend
-python -m venv .venv
+uv venv --python 3.12
 source .venv/bin/activate            # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
+
+Without uv: `python3.12 -m venv .venv`, activate it, then `pip install -r requirements.txt`.
 
 > **Two separate apps live in this repo.** The root `docker-compose.yml` (node gateway + `python/app` + MySQL,
 > http://localhost:3010) runs **ORBITAL**, the 2D orbital simulator. It does not start this SPHEREx backend or the
