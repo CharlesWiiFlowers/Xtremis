@@ -1,0 +1,1025 @@
+{
+ "source": "s3://nasa-irsa-spherex/qr3/spectral_channels/cal-sch-v2-2026-229/spectral_channels_spx_cal-sch-v2-2026-229.fits (SPECTRAL_CHANNELS table)",
+ "channels": [
+  {
+   "channel": 1,
+   "detector": "D1",
+   "subchannel": 1,
+   "wavelength_um": 0.753,
+   "wavelength_min_um": 0.743,
+   "wavelength_max_um": 0.762,
+   "resolving_power": 42.0,
+   "bandwidth_um": 0.018
+  },
+  {
+   "channel": 2,
+   "detector": "D1",
+   "subchannel": 2,
+   "wavelength_um": 0.771,
+   "wavelength_min_um": 0.761,
+   "wavelength_max_um": 0.781,
+   "resolving_power": 42.0,
+   "bandwidth_um": 0.019
+  },
+  {
+   "channel": 3,
+   "detector": "D1",
+   "subchannel": 3,
+   "wavelength_um": 0.79,
+   "wavelength_min_um": 0.78,
+   "wavelength_max_um": 0.8,
+   "resolving_power": 41.0,
+   "bandwidth_um": 0.019
+  },
+  {
+   "channel": 4,
+   "detector": "D1",
+   "subchannel": 4,
+   "wavelength_um": 0.809,
+   "wavelength_min_um": 0.798,
+   "wavelength_max_um": 0.819,
+   "resolving_power": 40.0,
+   "bandwidth_um": 0.02
+  },
+  {
+   "channel": 5,
+   "detector": "D1",
+   "subchannel": 5,
+   "wavelength_um": 0.828,
+   "wavelength_min_um": 0.817,
+   "wavelength_max_um": 0.839,
+   "resolving_power": 40.0,
+   "bandwidth_um": 0.02
+  },
+  {
+   "channel": 6,
+   "detector": "D1",
+   "subchannel": 6,
+   "wavelength_um": 0.848,
+   "wavelength_min_um": 0.837,
+   "wavelength_max_um": 0.859,
+   "resolving_power": 40.0,
+   "bandwidth_um": 0.021
+  },
+  {
+   "channel": 7,
+   "detector": "D1",
+   "subchannel": 7,
+   "wavelength_um": 0.868,
+   "wavelength_min_um": 0.857,
+   "wavelength_max_um": 0.879,
+   "resolving_power": 40.0,
+   "bandwidth_um": 0.022
+  },
+  {
+   "channel": 8,
+   "detector": "D1",
+   "subchannel": 8,
+   "wavelength_um": 0.889,
+   "wavelength_min_um": 0.877,
+   "wavelength_max_um": 0.9,
+   "resolving_power": 39.0,
+   "bandwidth_um": 0.023
+  },
+  {
+   "channel": 9,
+   "detector": "D1",
+   "subchannel": 9,
+   "wavelength_um": 0.91,
+   "wavelength_min_um": 0.898,
+   "wavelength_max_um": 0.922,
+   "resolving_power": 39.0,
+   "bandwidth_um": 0.023
+  },
+  {
+   "channel": 10,
+   "detector": "D1",
+   "subchannel": 10,
+   "wavelength_um": 0.932,
+   "wavelength_min_um": 0.92,
+   "wavelength_max_um": 0.944,
+   "resolving_power": 39.0,
+   "bandwidth_um": 0.024
+  },
+  {
+   "channel": 11,
+   "detector": "D1",
+   "subchannel": 11,
+   "wavelength_um": 0.955,
+   "wavelength_min_um": 0.942,
+   "wavelength_max_um": 0.967,
+   "resolving_power": 39.0,
+   "bandwidth_um": 0.025
+  },
+  {
+   "channel": 12,
+   "detector": "D1",
+   "subchannel": 12,
+   "wavelength_um": 0.978,
+   "wavelength_min_um": 0.964,
+   "wavelength_max_um": 0.99,
+   "resolving_power": 38.0,
+   "bandwidth_um": 0.026
+  },
+  {
+   "channel": 13,
+   "detector": "D1",
+   "subchannel": 13,
+   "wavelength_um": 1.001,
+   "wavelength_min_um": 0.988,
+   "wavelength_max_um": 1.014,
+   "resolving_power": 38.0,
+   "bandwidth_um": 0.026
+  },
+  {
+   "channel": 14,
+   "detector": "D1",
+   "subchannel": 14,
+   "wavelength_um": 1.025,
+   "wavelength_min_um": 1.012,
+   "wavelength_max_um": 1.039,
+   "resolving_power": 38.0,
+   "bandwidth_um": 0.027
+  },
+  {
+   "channel": 15,
+   "detector": "D1",
+   "subchannel": 15,
+   "wavelength_um": 1.05,
+   "wavelength_min_um": 1.036,
+   "wavelength_max_um": 1.064,
+   "resolving_power": 38.0,
+   "bandwidth_um": 0.028
+  },
+  {
+   "channel": 16,
+   "detector": "D1",
+   "subchannel": 16,
+   "wavelength_um": 1.075,
+   "wavelength_min_um": 1.061,
+   "wavelength_max_um": 1.09,
+   "resolving_power": 37.0,
+   "bandwidth_um": 0.029
+  },
+  {
+   "channel": 17,
+   "detector": "D1",
+   "subchannel": 17,
+   "wavelength_um": 1.102,
+   "wavelength_min_um": 1.086,
+   "wavelength_max_um": 1.116,
+   "resolving_power": 37.0,
+   "bandwidth_um": 0.03
+  },
+  {
+   "channel": 18,
+   "detector": "D2",
+   "subchannel": 1,
+   "wavelength_um": 1.113,
+   "wavelength_min_um": 1.099,
+   "wavelength_max_um": 1.126,
+   "resolving_power": 43.0,
+   "bandwidth_um": 0.026
+  },
+  {
+   "channel": 19,
+   "detector": "D2",
+   "subchannel": 2,
+   "wavelength_um": 1.139,
+   "wavelength_min_um": 1.125,
+   "wavelength_max_um": 1.153,
+   "resolving_power": 42.0,
+   "bandwidth_um": 0.027
+  },
+  {
+   "channel": 20,
+   "detector": "D2",
+   "subchannel": 3,
+   "wavelength_um": 1.167,
+   "wavelength_min_um": 1.152,
+   "wavelength_max_um": 1.182,
+   "resolving_power": 42.0,
+   "bandwidth_um": 0.028
+  },
+  {
+   "channel": 21,
+   "detector": "D2",
+   "subchannel": 4,
+   "wavelength_um": 1.195,
+   "wavelength_min_um": 1.18,
+   "wavelength_max_um": 1.21,
+   "resolving_power": 41.0,
+   "bandwidth_um": 0.029
+  },
+  {
+   "channel": 22,
+   "detector": "D2",
+   "subchannel": 5,
+   "wavelength_um": 1.224,
+   "wavelength_min_um": 1.209,
+   "wavelength_max_um": 1.24,
+   "resolving_power": 41.0,
+   "bandwidth_um": 0.03
+  },
+  {
+   "channel": 23,
+   "detector": "D2",
+   "subchannel": 6,
+   "wavelength_um": 1.254,
+   "wavelength_min_um": 1.238,
+   "wavelength_max_um": 1.269,
+   "resolving_power": 41.0,
+   "bandwidth_um": 0.03
+  },
+  {
+   "channel": 24,
+   "detector": "D2",
+   "subchannel": 7,
+   "wavelength_um": 1.284,
+   "wavelength_min_um": 1.267,
+   "wavelength_max_um": 1.3,
+   "resolving_power": 42.0,
+   "bandwidth_um": 0.031
+  },
+  {
+   "channel": 25,
+   "detector": "D2",
+   "subchannel": 8,
+   "wavelength_um": 1.315,
+   "wavelength_min_um": 1.298,
+   "wavelength_max_um": 1.331,
+   "resolving_power": 42.0,
+   "bandwidth_um": 0.032
+  },
+  {
+   "channel": 26,
+   "detector": "D2",
+   "subchannel": 9,
+   "wavelength_um": 1.346,
+   "wavelength_min_um": 1.329,
+   "wavelength_max_um": 1.363,
+   "resolving_power": 42.0,
+   "bandwidth_um": 0.032
+  },
+  {
+   "channel": 27,
+   "detector": "D2",
+   "subchannel": 10,
+   "wavelength_um": 1.378,
+   "wavelength_min_um": 1.36,
+   "wavelength_max_um": 1.396,
+   "resolving_power": 42.0,
+   "bandwidth_um": 0.033
+  },
+  {
+   "channel": 28,
+   "detector": "D2",
+   "subchannel": 11,
+   "wavelength_um": 1.412,
+   "wavelength_min_um": 1.393,
+   "wavelength_max_um": 1.43,
+   "resolving_power": 41.0,
+   "bandwidth_um": 0.034
+  },
+  {
+   "channel": 29,
+   "detector": "D2",
+   "subchannel": 12,
+   "wavelength_um": 1.446,
+   "wavelength_min_um": 1.426,
+   "wavelength_max_um": 1.464,
+   "resolving_power": 41.0,
+   "bandwidth_um": 0.035
+  },
+  {
+   "channel": 30,
+   "detector": "D2",
+   "subchannel": 13,
+   "wavelength_um": 1.481,
+   "wavelength_min_um": 1.461,
+   "wavelength_max_um": 1.5,
+   "resolving_power": 41.0,
+   "bandwidth_um": 0.036
+  },
+  {
+   "channel": 31,
+   "detector": "D2",
+   "subchannel": 14,
+   "wavelength_um": 1.517,
+   "wavelength_min_um": 1.496,
+   "wavelength_max_um": 1.537,
+   "resolving_power": 41.0,
+   "bandwidth_um": 0.037
+  },
+  {
+   "channel": 32,
+   "detector": "D2",
+   "subchannel": 15,
+   "wavelength_um": 1.554,
+   "wavelength_min_um": 1.533,
+   "wavelength_max_um": 1.575,
+   "resolving_power": 41.0,
+   "bandwidth_um": 0.038
+  },
+  {
+   "channel": 33,
+   "detector": "D2",
+   "subchannel": 16,
+   "wavelength_um": 1.592,
+   "wavelength_min_um": 1.57,
+   "wavelength_max_um": 1.613,
+   "resolving_power": 41.0,
+   "bandwidth_um": 0.039
+  },
+  {
+   "channel": 34,
+   "detector": "D2",
+   "subchannel": 17,
+   "wavelength_um": 1.631,
+   "wavelength_min_um": 1.608,
+   "wavelength_max_um": 1.651,
+   "resolving_power": 41.0,
+   "bandwidth_um": 0.039
+  },
+  {
+   "channel": 35,
+   "detector": "D3",
+   "subchannel": 1,
+   "wavelength_um": 1.656,
+   "wavelength_min_um": 1.636,
+   "wavelength_max_um": 1.676,
+   "resolving_power": 42.0,
+   "bandwidth_um": 0.039
+  },
+  {
+   "channel": 36,
+   "detector": "D3",
+   "subchannel": 2,
+   "wavelength_um": 1.695,
+   "wavelength_min_um": 1.675,
+   "wavelength_max_um": 1.715,
+   "resolving_power": 42.0,
+   "bandwidth_um": 0.041
+  },
+  {
+   "channel": 37,
+   "detector": "D3",
+   "subchannel": 3,
+   "wavelength_um": 1.735,
+   "wavelength_min_um": 1.714,
+   "wavelength_max_um": 1.756,
+   "resolving_power": 41.0,
+   "bandwidth_um": 0.042
+  },
+  {
+   "channel": 38,
+   "detector": "D3",
+   "subchannel": 4,
+   "wavelength_um": 1.775,
+   "wavelength_min_um": 1.754,
+   "wavelength_max_um": 1.797,
+   "resolving_power": 41.0,
+   "bandwidth_um": 0.043
+  },
+  {
+   "channel": 39,
+   "detector": "D3",
+   "subchannel": 5,
+   "wavelength_um": 1.818,
+   "wavelength_min_um": 1.795,
+   "wavelength_max_um": 1.84,
+   "resolving_power": 41.0,
+   "bandwidth_um": 0.045
+  },
+  {
+   "channel": 40,
+   "detector": "D3",
+   "subchannel": 6,
+   "wavelength_um": 1.861,
+   "wavelength_min_um": 1.838,
+   "wavelength_max_um": 1.884,
+   "resolving_power": 41.0,
+   "bandwidth_um": 0.046
+  },
+  {
+   "channel": 41,
+   "detector": "D3",
+   "subchannel": 7,
+   "wavelength_um": 1.905,
+   "wavelength_min_um": 1.881,
+   "wavelength_max_um": 1.928,
+   "resolving_power": 41.0,
+   "bandwidth_um": 0.047
+  },
+  {
+   "channel": 42,
+   "detector": "D3",
+   "subchannel": 8,
+   "wavelength_um": 1.949,
+   "wavelength_min_um": 1.925,
+   "wavelength_max_um": 1.973,
+   "resolving_power": 41.0,
+   "bandwidth_um": 0.048
+  },
+  {
+   "channel": 43,
+   "detector": "D3",
+   "subchannel": 9,
+   "wavelength_um": 1.995,
+   "wavelength_min_um": 1.97,
+   "wavelength_max_um": 2.019,
+   "resolving_power": 41.0,
+   "bandwidth_um": 0.049
+  },
+  {
+   "channel": 44,
+   "detector": "D3",
+   "subchannel": 10,
+   "wavelength_um": 2.041,
+   "wavelength_min_um": 2.015,
+   "wavelength_max_um": 2.067,
+   "resolving_power": 40.0,
+   "bandwidth_um": 0.051
+  },
+  {
+   "channel": 45,
+   "detector": "D3",
+   "subchannel": 11,
+   "wavelength_um": 2.089,
+   "wavelength_min_um": 2.062,
+   "wavelength_max_um": 2.115,
+   "resolving_power": 40.0,
+   "bandwidth_um": 0.052
+  },
+  {
+   "channel": 46,
+   "detector": "D3",
+   "subchannel": 12,
+   "wavelength_um": 2.139,
+   "wavelength_min_um": 2.111,
+   "wavelength_max_um": 2.166,
+   "resolving_power": 40.0,
+   "bandwidth_um": 0.054
+  },
+  {
+   "channel": 47,
+   "detector": "D3",
+   "subchannel": 13,
+   "wavelength_um": 2.189,
+   "wavelength_min_um": 2.16,
+   "wavelength_max_um": 2.216,
+   "resolving_power": 40.0,
+   "bandwidth_um": 0.055
+  },
+  {
+   "channel": 48,
+   "detector": "D3",
+   "subchannel": 14,
+   "wavelength_um": 2.24,
+   "wavelength_min_um": 2.211,
+   "wavelength_max_um": 2.268,
+   "resolving_power": 40.0,
+   "bandwidth_um": 0.056
+  },
+  {
+   "channel": 49,
+   "detector": "D3",
+   "subchannel": 15,
+   "wavelength_um": 2.292,
+   "wavelength_min_um": 2.262,
+   "wavelength_max_um": 2.321,
+   "resolving_power": 40.0,
+   "bandwidth_um": 0.057
+  },
+  {
+   "channel": 50,
+   "detector": "D3",
+   "subchannel": 16,
+   "wavelength_um": 2.345,
+   "wavelength_min_um": 2.314,
+   "wavelength_max_um": 2.375,
+   "resolving_power": 40.0,
+   "bandwidth_um": 0.058
+  },
+  {
+   "channel": 51,
+   "detector": "D3",
+   "subchannel": 17,
+   "wavelength_um": 2.399,
+   "wavelength_min_um": 2.367,
+   "wavelength_max_um": 2.44,
+   "resolving_power": 41.0,
+   "bandwidth_um": 0.059
+  },
+  {
+   "channel": 52,
+   "detector": "D4",
+   "subchannel": 1,
+   "wavelength_um": 2.445,
+   "wavelength_min_um": 2.422,
+   "wavelength_max_um": 2.474,
+   "resolving_power": 42.0,
+   "bandwidth_um": 0.058
+  },
+  {
+   "channel": 53,
+   "detector": "D4",
+   "subchannel": 2,
+   "wavelength_um": 2.506,
+   "wavelength_min_um": 2.47,
+   "wavelength_max_um": 2.542,
+   "resolving_power": 34.0,
+   "bandwidth_um": 0.073
+  },
+  {
+   "channel": 54,
+   "detector": "D4",
+   "subchannel": 3,
+   "wavelength_um": 2.575,
+   "wavelength_min_um": 2.538,
+   "wavelength_max_um": 2.612,
+   "resolving_power": 35.0,
+   "bandwidth_um": 0.074
+  },
+  {
+   "channel": 55,
+   "detector": "D4",
+   "subchannel": 4,
+   "wavelength_um": 2.646,
+   "wavelength_min_um": 2.607,
+   "wavelength_max_um": 2.684,
+   "resolving_power": 35.0,
+   "bandwidth_um": 0.076
+  },
+  {
+   "channel": 56,
+   "detector": "D4",
+   "subchannel": 5,
+   "wavelength_um": 2.719,
+   "wavelength_min_um": 2.678,
+   "wavelength_max_um": 2.758,
+   "resolving_power": 35.0,
+   "bandwidth_um": 0.078
+  },
+  {
+   "channel": 57,
+   "detector": "D4",
+   "subchannel": 6,
+   "wavelength_um": 2.794,
+   "wavelength_min_um": 2.752,
+   "wavelength_max_um": 2.835,
+   "resolving_power": 35.0,
+   "bandwidth_um": 0.079
+  },
+  {
+   "channel": 58,
+   "detector": "D4",
+   "subchannel": 7,
+   "wavelength_um": 2.871,
+   "wavelength_min_um": 2.828,
+   "wavelength_max_um": 2.914,
+   "resolving_power": 34.0,
+   "bandwidth_um": 0.084
+  },
+  {
+   "channel": 59,
+   "detector": "D4",
+   "subchannel": 8,
+   "wavelength_um": 2.951,
+   "wavelength_min_um": 2.906,
+   "wavelength_max_um": 2.995,
+   "resolving_power": 34.0,
+   "bandwidth_um": 0.086
+  },
+  {
+   "channel": 60,
+   "detector": "D4",
+   "subchannel": 9,
+   "wavelength_um": 3.033,
+   "wavelength_min_um": 2.985,
+   "wavelength_max_um": 3.079,
+   "resolving_power": 34.0,
+   "bandwidth_um": 0.089
+  },
+  {
+   "channel": 61,
+   "detector": "D4",
+   "subchannel": 10,
+   "wavelength_um": 3.118,
+   "wavelength_min_um": 3.069,
+   "wavelength_max_um": 3.164,
+   "resolving_power": 34.0,
+   "bandwidth_um": 0.091
+  },
+  {
+   "channel": 62,
+   "detector": "D4",
+   "subchannel": 11,
+   "wavelength_um": 3.204,
+   "wavelength_min_um": 3.155,
+   "wavelength_max_um": 3.252,
+   "resolving_power": 35.0,
+   "bandwidth_um": 0.093
+  },
+  {
+   "channel": 63,
+   "detector": "D4",
+   "subchannel": 12,
+   "wavelength_um": 3.293,
+   "wavelength_min_um": 3.242,
+   "wavelength_max_um": 3.342,
+   "resolving_power": 35.0,
+   "bandwidth_um": 0.094
+  },
+  {
+   "channel": 64,
+   "detector": "D4",
+   "subchannel": 13,
+   "wavelength_um": 3.383,
+   "wavelength_min_um": 3.33,
+   "wavelength_max_um": 3.434,
+   "resolving_power": 35.0,
+   "bandwidth_um": 0.096
+  },
+  {
+   "channel": 65,
+   "detector": "D4",
+   "subchannel": 14,
+   "wavelength_um": 3.476,
+   "wavelength_min_um": 3.422,
+   "wavelength_max_um": 3.528,
+   "resolving_power": 36.0,
+   "bandwidth_um": 0.098
+  },
+  {
+   "channel": 66,
+   "detector": "D4",
+   "subchannel": 15,
+   "wavelength_um": 3.57,
+   "wavelength_min_um": 3.514,
+   "wavelength_max_um": 3.624,
+   "resolving_power": 36.0,
+   "bandwidth_um": 0.099
+  },
+  {
+   "channel": 67,
+   "detector": "D4",
+   "subchannel": 16,
+   "wavelength_um": 3.667,
+   "wavelength_min_um": 3.61,
+   "wavelength_max_um": 3.723,
+   "resolving_power": 36.0,
+   "bandwidth_um": 0.102
+  },
+  {
+   "channel": 68,
+   "detector": "D4",
+   "subchannel": 17,
+   "wavelength_um": 3.768,
+   "wavelength_min_um": 3.707,
+   "wavelength_max_um": 3.827,
+   "resolving_power": 36.0,
+   "bandwidth_um": 0.103
+  },
+  {
+   "channel": 69,
+   "detector": "D5",
+   "subchannel": 1,
+   "wavelength_um": 3.833,
+   "wavelength_min_um": 3.8144,
+   "wavelength_max_um": 3.8514,
+   "resolving_power": 109.0,
+   "bandwidth_um": 0.035
+  },
+  {
+   "channel": 70,
+   "detector": "D5",
+   "subchannel": 2,
+   "wavelength_um": 3.867,
+   "wavelength_min_um": 3.8494,
+   "wavelength_max_um": 3.8854,
+   "resolving_power": 109.0,
+   "bandwidth_um": 0.036
+  },
+  {
+   "channel": 71,
+   "detector": "D5",
+   "subchannel": 3,
+   "wavelength_um": 3.901,
+   "wavelength_min_um": 3.8824,
+   "wavelength_max_um": 3.9194,
+   "resolving_power": 109.0,
+   "bandwidth_um": 0.036
+  },
+  {
+   "channel": 72,
+   "detector": "D5",
+   "subchannel": 4,
+   "wavelength_um": 3.935,
+   "wavelength_min_um": 3.9164,
+   "wavelength_max_um": 3.9534,
+   "resolving_power": 108.0,
+   "bandwidth_um": 0.036
+  },
+  {
+   "channel": 73,
+   "detector": "D5",
+   "subchannel": 5,
+   "wavelength_um": 3.97,
+   "wavelength_min_um": 3.9504,
+   "wavelength_max_um": 3.9884,
+   "resolving_power": 109.0,
+   "bandwidth_um": 0.036
+  },
+  {
+   "channel": 74,
+   "detector": "D5",
+   "subchannel": 6,
+   "wavelength_um": 4.005,
+   "wavelength_min_um": 3.9854,
+   "wavelength_max_um": 4.0244,
+   "resolving_power": 110.0,
+   "bandwidth_um": 0.036
+  },
+  {
+   "channel": 75,
+   "detector": "D5",
+   "subchannel": 7,
+   "wavelength_um": 4.04,
+   "wavelength_min_um": 4.0204,
+   "wavelength_max_um": 4.0594,
+   "resolving_power": 110.0,
+   "bandwidth_um": 0.037
+  },
+  {
+   "channel": 76,
+   "detector": "D5",
+   "subchannel": 8,
+   "wavelength_um": 4.076,
+   "wavelength_min_um": 4.0554,
+   "wavelength_max_um": 4.0954,
+   "resolving_power": 111.0,
+   "bandwidth_um": 0.037
+  },
+  {
+   "channel": 77,
+   "detector": "D5",
+   "subchannel": 9,
+   "wavelength_um": 4.112,
+   "wavelength_min_um": 4.0914,
+   "wavelength_max_um": 4.1314,
+   "resolving_power": 112.0,
+   "bandwidth_um": 0.037
+  },
+  {
+   "channel": 78,
+   "detector": "D5",
+   "subchannel": 10,
+   "wavelength_um": 4.148,
+   "wavelength_min_um": 4.1264,
+   "wavelength_max_um": 4.1674,
+   "resolving_power": 113.0,
+   "bandwidth_um": 0.037
+  },
+  {
+   "channel": 79,
+   "detector": "D5",
+   "subchannel": 11,
+   "wavelength_um": 4.184,
+   "wavelength_min_um": 4.1624,
+   "wavelength_max_um": 4.2034,
+   "resolving_power": 113.0,
+   "bandwidth_um": 0.037
+  },
+  {
+   "channel": 80,
+   "detector": "D5",
+   "subchannel": 12,
+   "wavelength_um": 4.22,
+   "wavelength_min_um": 4.1994,
+   "wavelength_max_um": 4.2404,
+   "resolving_power": 115.0,
+   "bandwidth_um": 0.037
+  },
+  {
+   "channel": 81,
+   "detector": "D5",
+   "subchannel": 13,
+   "wavelength_um": 4.257,
+   "wavelength_min_um": 4.2354,
+   "wavelength_max_um": 4.2774,
+   "resolving_power": 114.0,
+   "bandwidth_um": 0.037
+  },
+  {
+   "channel": 82,
+   "detector": "D5",
+   "subchannel": 14,
+   "wavelength_um": 4.294,
+   "wavelength_min_um": 4.2714,
+   "wavelength_max_um": 4.3134,
+   "resolving_power": 115.0,
+   "bandwidth_um": 0.037
+  },
+  {
+   "channel": 83,
+   "detector": "D5",
+   "subchannel": 15,
+   "wavelength_um": 4.331,
+   "wavelength_min_um": 4.3084,
+   "wavelength_max_um": 4.3514,
+   "resolving_power": 116.0,
+   "bandwidth_um": 0.037
+  },
+  {
+   "channel": 84,
+   "detector": "D5",
+   "subchannel": 16,
+   "wavelength_um": 4.368,
+   "wavelength_min_um": 4.3454,
+   "wavelength_max_um": 4.3884,
+   "resolving_power": 116.0,
+   "bandwidth_um": 0.038
+  },
+  {
+   "channel": 85,
+   "detector": "D5",
+   "subchannel": 17,
+   "wavelength_um": 4.405,
+   "wavelength_min_um": 4.3824,
+   "wavelength_max_um": 4.4264,
+   "resolving_power": 117.0,
+   "bandwidth_um": 0.038
+  },
+  {
+   "channel": 86,
+   "detector": "D6",
+   "subchannel": 1,
+   "wavelength_um": 4.435,
+   "wavelength_min_um": 4.4184,
+   "wavelength_max_um": 4.4524,
+   "resolving_power": 128.0,
+   "bandwidth_um": 0.035
+  },
+  {
+   "channel": 87,
+   "detector": "D6",
+   "subchannel": 2,
+   "wavelength_um": 4.467,
+   "wavelength_min_um": 4.4504,
+   "wavelength_max_um": 4.4844,
+   "resolving_power": 125.0,
+   "bandwidth_um": 0.036
+  },
+  {
+   "channel": 88,
+   "detector": "D6",
+   "subchannel": 3,
+   "wavelength_um": 4.5,
+   "wavelength_min_um": 4.4824,
+   "wavelength_max_um": 4.5174,
+   "resolving_power": 127.0,
+   "bandwidth_um": 0.035
+  },
+  {
+   "channel": 89,
+   "detector": "D6",
+   "subchannel": 4,
+   "wavelength_um": 4.533,
+   "wavelength_min_um": 4.5154,
+   "wavelength_max_um": 4.5504,
+   "resolving_power": 126.0,
+   "bandwidth_um": 0.036
+  },
+  {
+   "channel": 90,
+   "detector": "D6",
+   "subchannel": 5,
+   "wavelength_um": 4.566,
+   "wavelength_min_um": 4.5484,
+   "wavelength_max_um": 4.5844,
+   "resolving_power": 127.0,
+   "bandwidth_um": 0.036
+  },
+  {
+   "channel": 91,
+   "detector": "D6",
+   "subchannel": 6,
+   "wavelength_um": 4.6,
+   "wavelength_min_um": 4.5824,
+   "wavelength_max_um": 4.6184,
+   "resolving_power": 125.0,
+   "bandwidth_um": 0.037
+  },
+  {
+   "channel": 92,
+   "detector": "D6",
+   "subchannel": 7,
+   "wavelength_um": 4.635,
+   "wavelength_min_um": 4.6154,
+   "wavelength_max_um": 4.6534,
+   "resolving_power": 127.0,
+   "bandwidth_um": 0.036
+  },
+  {
+   "channel": 93,
+   "detector": "D6",
+   "subchannel": 8,
+   "wavelength_um": 4.669,
+   "wavelength_min_um": 4.6494,
+   "wavelength_max_um": 4.6884,
+   "resolving_power": 126.0,
+   "bandwidth_um": 0.037
+  },
+  {
+   "channel": 94,
+   "detector": "D6",
+   "subchannel": 9,
+   "wavelength_um": 4.704,
+   "wavelength_min_um": 4.6844,
+   "wavelength_max_um": 4.7234,
+   "resolving_power": 128.0,
+   "bandwidth_um": 0.037
+  },
+  {
+   "channel": 95,
+   "detector": "D6",
+   "subchannel": 10,
+   "wavelength_um": 4.739,
+   "wavelength_min_um": 4.7194,
+   "wavelength_max_um": 4.7584,
+   "resolving_power": 130.0,
+   "bandwidth_um": 0.037
+  },
+  {
+   "channel": 96,
+   "detector": "D6",
+   "subchannel": 11,
+   "wavelength_um": 4.773,
+   "wavelength_min_um": 4.7534,
+   "wavelength_max_um": 4.7924,
+   "resolving_power": 131.0,
+   "bandwidth_um": 0.036
+  },
+  {
+   "channel": 97,
+   "detector": "D6",
+   "subchannel": 12,
+   "wavelength_um": 4.808,
+   "wavelength_min_um": 4.7884,
+   "wavelength_max_um": 4.8274,
+   "resolving_power": 132.0,
+   "bandwidth_um": 0.036
+  },
+  {
+   "channel": 98,
+   "detector": "D6",
+   "subchannel": 13,
+   "wavelength_um": 4.843,
+   "wavelength_min_um": 4.8224,
+   "wavelength_max_um": 4.8624,
+   "resolving_power": 131.0,
+   "bandwidth_um": 0.037
+  },
+  {
+   "channel": 99,
+   "detector": "D6",
+   "subchannel": 14,
+   "wavelength_um": 4.879,
+   "wavelength_min_um": 4.8574,
+   "wavelength_max_um": 4.8994,
+   "resolving_power": 130.0,
+   "bandwidth_um": 0.038
+  },
+  {
+   "channel": 100,
+   "detector": "D6",
+   "subchannel": 15,
+   "wavelength_um": 4.915,
+   "wavelength_min_um": 4.8934,
+   "wavelength_max_um": 4.9364,
+   "resolving_power": 130.0,
+   "bandwidth_um": 0.038
+  },
+  {
+   "channel": 101,
+   "detector": "D6",
+   "subchannel": 16,
+   "wavelength_um": 4.951,
+   "wavelength_min_um": 4.9304,
+   "wavelength_max_um": 4.9724,
+   "resolving_power": 132.0,
+   "bandwidth_um": 0.037
+  },
+  {
+   "channel": 102,
+   "detector": "D6",
+   "subchannel": 17,
+   "wavelength_um": 4.988,
+   "wavelength_min_um": 4.9664,
+   "wavelength_max_um": 5.0094,
+   "resolving_power": 135.0,
+   "bandwidth_um": 0.037
+  }
+ ]
+}
