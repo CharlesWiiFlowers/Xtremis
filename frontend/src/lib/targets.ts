@@ -117,3 +117,10 @@ export function findTargetByName(name: string): Target | undefined {
   const n = normalizeName(name);
   return TARGETS.find((t) => normalizeName(t.name) === n || t.aliases.includes(n));
 }
+
+/** Objetos de prueba cuyo nombre o alias contiene el texto escrito (para autocompletar). */
+export function matchTargets(query: string): Target[] {
+  const q = normalizeName(query);
+  if (!q) return [];
+  return TARGETS.filter((t) => normalizeName(t.name).includes(q) || t.aliases.some((a) => a.includes(q)));
+}

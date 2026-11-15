@@ -97,7 +97,12 @@ const es = {
   date: 'Fecha',
   spectrumHelp: 'Cuánta luz emite el objeto en cada color infrarrojo. Las caídas revelan moléculas como agua o metano.',
   lightcurveHelp: 'Brillo del objeto en cada observación. Si sube y baja, es una estrella variable.',
-  shortcuts: 'Atajos: Espacio = reproducir · ← → = avanzar o retroceder · Esc = salir de pantalla completa',
+  shortcuts: 'Atajos: Espacio = reproducir · ← → = avanzar o retroceder · Rueda o + − = zoom · Arrastrar = mover · Esc = salir de pantalla completa',
+  quickTargets: 'Objetos de prueba',
+  zoom: 'Zoom',
+  zoomIn: 'Acercar',
+  zoomOut: 'Alejar',
+  zoomReset: 'Restablecer zoom',
   loadingChart: 'Calculando…',
 } as const;
 
@@ -198,7 +203,12 @@ const en: Record<I18nKey, string> = {
   date: 'Date',
   spectrumHelp: 'How much light the object emits in each infrared color. Dips reveal molecules like water or methane.',
   lightcurveHelp: "The object's brightness in each observation. If it rises and falls, it's a variable star.",
-  shortcuts: 'Shortcuts: Space = play · ← → = step · Esc = exit full screen',
+  shortcuts: 'Shortcuts: Space = play · ← → = step · Wheel or + − = zoom · Drag = pan · Esc = exit full screen',
+  quickTargets: 'Test objects',
+  zoom: 'Zoom',
+  zoomIn: 'Zoom in',
+  zoomOut: 'Zoom out',
+  zoomReset: 'Reset zoom',
   loadingChart: 'Computing…',
 };
 
