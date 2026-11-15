@@ -27,12 +27,15 @@ def warm(preset: str, fovs: list[float], with_spectrum: bool, with_viewer: bool)
         print(f"   images  fov={fov:g}'  {summary['frames_rendered']}/{summary['frames_selected']} frames, "
               f"{summary['epochs']} epochs, cached={result['cached']}, {time.time() - started:.1f}s", flush=True)
     if with_viewer:
-        # The React viewer opens benchmark targets on their approximate J2000 position (frontend/src/lib/targets.ts)
-        fra, fdec = (round(v, 5) for v in targets.BENCHMARKS[preset]["frontend_center"])
-        for fov in fovs:
-            started = time.time()
-            pngs = frontend_adapter.warm_view(fra, fdec, fov)
-            print(f"   viewer  fov={fov:g}' centre {fra} {fdec:+}: {pngs} PNGs, {time.time() - started:.1f}s", flush=True)
+        # The React viewer opens benchmark targets on their approximate J2000 position (frontend/src/lib/targets.ts):
+        # exact values from the Home cards, 5-decimal values when the view is reloaded from its URL.
+        exact = targets.BENCHMARKS[preset]["frontend_center"]
+        for fra, fdec in dict.fromkeys([exact, tuple(round(v, 5) for v in exact)]):
+            for fov in fovs:
+                started = time.time()
+                pngs = frontend_adapter.warm_view(fra, fdec, fov)
+                print(f"   viewer  fov={fov:g}' centre {fra} {fdec:+}: {pngs} PNGs, {time.time() - started:.1f}s",
+                      flush=True)
     if with_spectrum:
         started = time.time()
         result = spectra.build_spectrum(spectra.SpectrumRequest(

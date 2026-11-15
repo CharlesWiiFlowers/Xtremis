@@ -329,7 +329,8 @@ def year_groups(epochs: list[dict]) -> list[str]:
 
 
 def warm_view(ra: float, dec: float, fov: float) -> int:
-    """Pre-render the PNGs the viewer requests first (all detectors; by year and by survey). Returns the count."""
+    """Pre-render the PNGs the viewer requests first (all detectors; by year and by survey) and cache the
+    Gaia/WISE overlays. Returns the number of PNGs."""
     meta = field_meta(ra, dec, fov)
     count = 0
     for groups in (year_groups(meta["epochs"]), [e["id"] for e in meta["epochs"]]):
@@ -340,6 +341,11 @@ def warm_view(ra: float, dec: float, fov: float) -> int:
                 frame_png(ra, dec, fov, "all", epoch, mode, groups[0] if mode == "diff" else None)
                 count += 1
     frame_png(ra, dec, fov, "all", "all", "sum", None)
+    for cat in ("gaia", "wise"):
+        try:
+            catalog(ra, dec, fov, cat)
+        except HTTPException as exc:
+            logger.warning("%s catalog not cached: %s", cat, exc.detail)
     return count + 1
 
 
