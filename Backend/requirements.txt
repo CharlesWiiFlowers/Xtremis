@@ -1,0 +1,20 @@
+# Backend API
+fastapi
+uvicorn[standard]
+pillow
+matplotlib
+reproject
+scipy
+
+# Shared with Database/requirements.txt (reused through app/spherex_adapter.py)
+astroquery
+pyvo
+astropy
+numpy
+pandas
+pyarrow
+s3fs
+openpyxl
+PyYAML
+psycopg2-binary
+markdown
