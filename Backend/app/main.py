@@ -10,16 +10,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from matplotlib import colormaps
 
+from . import frontend_adapter, targets
 from . import image_processor as images
 from . import spectrum_processor as spectra
 from . import spherex_adapter as spherex
-from . import targets
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
 app = FastAPI(title="Xtremis SPHEREx API", version="0.1.0",
               description="SPHEREx infrared images and 102-channel spectra (IRSA/AWS) for the NASA Space Apps 2026 Xtremis project.")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.include_router(frontend_adapter.router)
 
 images.RENDER_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory=images.RENDER_DIR), name="static")

@@ -1,7 +1,7 @@
 """Pre-compute images and spectra for the challenge benchmark targets so live demo requests hit the cache.
 
 Run from the Backend/ folder:
-    python warm_cache.py                          # all 5 presets, fov 10', images + spectra
+    python warm_cache.py                          # all 5 presets, fov 10', images + spectra + React viewer PNGs
     python warm_cache.py --targets barnard rdra --fov 10 20 --no-spectrum
 """
 import argparse
@@ -9,12 +9,12 @@ import logging
 import sys
 import time
 
+from app import frontend_adapter, targets
 from app import image_processor as images
 from app import spectrum_processor as spectra
-from app import targets
 
 
-def warm(preset: str, fovs: list[float], with_spectrum: bool) -> bool:
+def warm(preset: str, fovs: list[float], with_spectrum: bool, with_viewer: bool) -> bool:
     target = targets.resolve(target_name=preset)
     ra, dec = target.view_center()
     print(f"== {target.name} ({target.source}) view centre {ra:.5f} {dec:+.5f}", flush=True)
@@ -26,6 +26,13 @@ def warm(preset: str, fovs: list[float], with_spectrum: bool) -> bool:
         ok &= summary["frames_rendered"] > 0
         print(f"   images  fov={fov:g}'  {summary['frames_rendered']}/{summary['frames_selected']} frames, "
               f"{summary['epochs']} epochs, cached={result['cached']}, {time.time() - started:.1f}s", flush=True)
+    if with_viewer:
+        # The React viewer opens benchmark targets on their approximate J2000 position (frontend/src/lib/targets.ts)
+        fra, fdec = (round(v, 5) for v in targets.BENCHMARKS[preset]["frontend_center"])
+        for fov in fovs:
+            started = time.time()
+            pngs = frontend_adapter.warm_view(fra, fdec, fov)
+            print(f"   viewer  fov={fov:g}' centre {fra} {fdec:+}: {pngs} PNGs, {time.time() - started:.1f}s", flush=True)
     if with_spectrum:
         started = time.time()
         result = spectra.build_spectrum(spectra.SpectrumRequest(
@@ -42,13 +49,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--targets", nargs="+", default=list(targets.BENCHMARKS), choices=list(targets.BENCHMARKS))
     parser.add_argument("--fov", nargs="+", type=float, default=[10.0], help="image fields of view (arcmin)")
-    parser.add_argument("--no-spectrum", action="store_true", help="only warm the image cache")
+    parser.add_argument("--no-spectrum", action="store_true", help="skip the spectra")
+    parser.add_argument("--no-viewer", action="store_true", help="skip the React viewer (/api/frame) PNGs")
     args = parser.parse_args()
     logging.basicConfig(level=logging.WARNING)
     failed = []
     for preset in args.targets:
         try:
-            if not warm(preset, args.fov, not args.no_spectrum):
+            if not warm(preset, args.fov, not args.no_spectrum, not args.no_viewer):
                 failed.append(preset)
         except Exception as exc:  # noqa: BLE001 - keep warming the other targets
             print(f"   FAILED: {exc}", flush=True)

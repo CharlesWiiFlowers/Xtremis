@@ -22,20 +22,24 @@ VIEW_EPOCH = 2026.0   # mid-survey epoch: image views of moving targets are cent
 GAIA_COLUMNS = ("source_id, designation, ra, dec, ra_error, dec_error, pmra, pmdec, parallax, ref_epoch, "
                 "phot_g_mean_mag, phot_bp_mean_mag, phot_rp_mean_mag, ruwe")
 
+# ``frontend_center``: approximate J2000 position the React app (frontend/src/lib/targets.ts) opens the view on.
 BENCHMARKS: dict[str, dict] = {
     "barnard": {
         "name": "Barnard's Star",
         "aliases": ["barnard", "barnardsstar", "gj699"],
+        "frontend_center": (269.452075, 4.693391),
         "gaia_source_id": 4472832130942575872,
     },
     "epsindib": {
         "name": "Epsilon Indi B",
         "aliases": ["epsilonindib", "epsindib", "epsindiba", "epsilonindiba"],
+        "frontend_center": (331.043833, -56.782694),
         "gaia_source_id": 6412596012146801152,
     },
     "wise0855": {
         "name": "WISE 0855-0714",
         "aliases": ["wise0855", "wise08550714", "wisej085510830714442"],
+        "frontend_center": (133.795129, -7.245147),
         "gaia_source_id": None,   # too cold/faint for Gaia
         # Challenge coordinates (08h55m10.831s -07d14m42.53s), taken as epoch J2000, with the
         # Luhman & Esplin (2016) proper motion. Not cross-checked against CatWISE yet.
@@ -45,11 +49,13 @@ BENCHMARKS: dict[str, dict] = {
     "rwaur": {
         "name": "RW Aurigae",
         "aliases": ["rwaurigae", "rwaur", "rwaura"],
+        "frontend_center": (76.956417, 30.401417),
         "gaia_source_id": 156430817820015232,
     },
     "rdra": {
         "name": "R Draconis",
         "aliases": ["rdraconis", "rdra"],
+        "frontend_center": (248.167417, 66.754972),
         "gaia_source_id": 1648328016354496384,
     },
 }
@@ -109,7 +115,7 @@ def _plain(value):
     return value
 
 
-def _gaia_query(adql: str, attempts: int = 2, timeout_s: float = 60.0):
+def gaia_query(adql: str, attempts: int = 2, timeout_s: float = 60.0):
     """Run ADQL with the legacy ``gaia_api.ejecutar_adql``; fall back to a synchronous TAP query.
 
     The ESA archive intermittently answers async jobs with HTTP 500 or stops answering job-phase polls
@@ -131,7 +137,7 @@ def gaia_source(source_id: int) -> dict:
     with images.lock_for(f"gaia-{int(source_id)}"):
         if path.exists():
             return json.loads(path.read_text())
-        table = _gaia_query(f"SELECT {GAIA_COLUMNS} FROM gaiadr3.gaia_source WHERE source_id = {int(source_id)}")
+        table = gaia_query(f"SELECT {GAIA_COLUMNS} FROM gaiadr3.gaia_source WHERE source_id = {int(source_id)}")
         if not len(table):
             raise LookupError(f"Gaia DR3 source_id {source_id} not found")
         row = {name: _plain(table[name][0]) for name in table.colnames}

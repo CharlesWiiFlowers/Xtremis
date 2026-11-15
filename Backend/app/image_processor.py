@@ -269,7 +269,7 @@ def png_pixel_to_world(ra: float, dec: float, fov_deg: float, x: float, y: float
     return lon % 360.0, lat
 
 
-def _save_png(rgb: np.ndarray, path: Path) -> None:
+def save_png(rgb: np.ndarray, path: Path) -> None:
     """Write an (H, W, 3) float [0, 1] array, flipped to north-up and upscaled with nearest neighbour."""
     img = Image.fromarray((np.flipud(rgb) * 255).round().astype(np.uint8), mode="RGB")
     factor = max(1, int(np.ceil(MIN_PNG_SIZE_PX / max(img.size))))
@@ -280,11 +280,11 @@ def _save_png(rgb: np.ndarray, path: Path) -> None:
 
 
 def render_gray(data: np.ndarray, path: Path, cmap: str = "gray") -> None:
-    _save_png(colormaps[cmap](normalize(data))[..., :3], path)
+    save_png(colormaps[cmap](normalize(data))[..., :3], path)
 
 
 def render_rgb(red: np.ndarray, green: np.ndarray, blue: np.ndarray, path: Path) -> None:
-    _save_png(np.dstack([normalize(red), normalize(green), normalize(blue)]), path)
+    save_png(np.dstack([normalize(red), normalize(green), normalize(blue)]), path)
 
 
 # ---------------------------------------------------------------- pipeline
