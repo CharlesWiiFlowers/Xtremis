@@ -1,88 +1,65 @@
-# ORBITAL · Mecánica orbital integrada 2D
+# Xtremis — Space Apps Challenge 2026
 
-ORBITAL ahora es una sola simulación 2D: **el Sol, los planetas y los orbes del Laboratorio local aparecen juntos en el mismo lienzo**, con un reloj, zoom, desplazamiento y selección compartidos. Se retiró la vista de Campo astronómico de la interfaz.
+Proyecto del reto **Planet X and SPHEREx**. El visor web está desarrollado con React, TypeScript y Vite.
 
-## Una sola experiencia
+## Ejecutar con Docker desde la carpeta principal
 
-- **Sistema orbital:** Sol seleccionable y seis planetas de referencia con órbitas keplerianas, trayectorias elípticas, pausa, paso de tiempo, velocidad y control temporal.
-- **Laboratorio local integrado:** 180 orbes sintéticos en un anillo experimental exterior dentro del mismo plano visual. Incluye filtro por clase espectral, búsqueda por ID, regeneración reproducible y opción para ocultar/mostrar los objetos. Los valores se identifican expresamente como sintéticos y no como observaciones reales.
-- **Ficha completa al seleccionar:** clic en el Sol, cualquier planeta o cualquier orbe local para desplegar sus datos. Los planetas muestran todos los campos orbitales disponibles, propiedades físicas de referencia y magnitudes dinámicas calculadas; los orbes locales muestran todos sus valores sintéticos.
-- **Un solo renderizador:** Canvas 2D, sin Three.js ni WebGL.
+Requisitos: Docker Desktop instalado y en ejecución (incluye Docker Compose).
 
-Los objetos locales del laboratorio se ubican en un anillo visual exterior para distinguirlos de los planetas y permitir la interacción conjunta. No son distancias heliocéntricas medidas ni órbitas reales. La distancia en parsecs y los datos fotométricos de esos objetos son valores sintéticos independientes.
-
-Los parámetros físicos de los planetas proceden de JPL Solar System Dynamics, *Planetary Physical Parameters*, y los del Sol de NASA NSSDC, *Sun Fact Sheet*. Los valores orbitales de la simulación siguen siendo elementos de referencia aproximados J2000 y el movimiento es un modelo kepleriano de dos cuerpos.
-
-## Inicio rápido con Docker
-
-Requiere Docker Desktop (o Docker Engine) con Docker Compose.
+En una terminal, entra a la carpeta principal del proyecto —la que contiene este `docker-compose.yml`— y ejecuta:
 
 ```bash
-docker compose up -d --build
+docker compose up --build
 ```
 
-Abrir **http://localhost:3010**.
+Cuando termine la compilación, abre:
 
-Para comprobar los servicios:
+**http://localhost:8080**
 
-```bash
-docker compose ps
-curl http://localhost:3010/api/v1/status
-curl http://localhost:3010/health
-```
+El frontend corre dentro del contenedor `xtremis-frontend`; Docker publica el puerto `8080` de tu computadora hacia el puerto `80` del contenedor. El proyecto queda en modo demo (`VITE_USE_MOCK=true`), por lo que no necesita levantar un backend ni una base de datos. Las nuevas zonas se muestran con estrellas simuladas hasta conectar el backend SPHEREx/IRSA.
 
-La interfaz, las fichas y la matemática del simulador se sirven localmente. El frontend no necesita CDN, Three.js, WebGL ni conexión a internet para la simulación integrada.
-
-## Datos de referencia y origen
-
-Las fichas del Sol y los planetas presentan valores físicos de referencia, no telemetría en vivo. Las propiedades planetarias se basan en JPL Solar System Dynamics, *Planetary Physical Parameters*, y los datos del Sol en NASA NSSDC, *Sun Fact Sheet*. Los parámetros orbitales de la escena son elementos aproximados J2000 y la dinámica es un modelo kepleriano de dos cuerpos.
-
-Los objetos del Laboratorio local se generan en el navegador con una semilla reproducible. Su temperatura, magnitud, distancia y coordenadas se etiquetan como sintéticas; no son observaciones ni cuerpos reales del sistema solar.
-
-La vista de catálogos externos ya no forma parte de la interfaz visual. Se conservan los servicios Node/Python/MySQL y las rutas anteriores de API como compatibilidad del despliegue, pero el simulador integrado actual no las invoca.
-
-## Docker y persistencia
-
-Servicios: `node` (web/API gateway), `python` (rutas de consulta heredadas) y `mysql` (persistencia opcional). La interfaz de simulación local funciona aunque MySQL o internet no estén disponibles. Las rutas heredadas de consulta requieren internet; no se activan desde el visor integrado. MySQL permanece para compatibilidad con el despliegue previo.
+Para detenerlo, presiona `Ctrl + C`. Si lo levantaste en segundo plano, usa:
 
 ```bash
-# Ver registros
-docker compose logs -f node
-docker compose logs -f python
-docker compose logs -f mysql
-
-# Detener sin borrar los datos
 docker compose down
-
-# Reiniciar desde cero (BORRA MySQL)
-docker compose down -v
-docker compose up -d --build
 ```
 
-El puerto de la aplicación es **3010**. MySQL se expone solo en `127.0.0.1:3307` para herramientas locales.
-
-## Compatibilidad y conectividad
-
-La simulación local funciona sin internet y sin MySQL. Los servicios del backend anterior se mantienen en Docker para preservar compatibilidad con el despliegue existente; no son necesarios para mover el Sol, los planetas ni los orbes sintéticos locales.
-
-## Pruebas del código
-
-Pruebas de las órbitas keplerianas, fichas completas del Sol/planetas, orbes locales sintéticos y selección 2D:
+Para volver a levantarlo en segundo plano:
 
 ```bash
-node --test tests/*.test.mjs
+docker compose up --build -d
 ```
 
-Pruebas del constructor ADQL de MAST, tabla Gaia, límites y captura de error HTTP 400:
+Para ver los registros:
 
 ```bash
-PYTHONPATH=python python -m unittest discover -s python/tests -v
+docker compose logs -f
 ```
 
-Prueba de navegador real (requiere Playwright y Chromium instalados):
+## Estructura principal
+
+- `docker-compose.yml`: orquesta el contenedor desde la raíz.
+- `frontend-prototipo3/`: aplicación React + Vite.
+- `frontend-prototipo3/Dockerfile`: compila la aplicación y crea la imagen de producción.
+- `frontend-prototipo3/nginx.conf`: configura Nginx para servir el frontend.
+- `Frontend/`: prototipo separado que se conserva en el repositorio; el Compose raíz levanta el visor de `frontend-prototipo3/`.
+
+## Controles del visor
+
+- Flechas: mover la cruz dorada (mira de exploración) por el campo.
+- Al acercarse a un borde: el visor recentra la coordenada apuntada y carga otra zona del cielo, con solapamiento.
+- `Shift` + flechas: movimiento rápido.
+- `Enter`: seleccionar el punto actual.
+- `Espacio`: reproducir o pausar.
+- `[` y `]`: cambiar de año.
+- `Esc`: salir de pantalla completa.
+
+## Ejecutar sin Docker (opcional)
 
 ```bash
-python -m pip install playwright
-playwright install chromium
-python tests/browser-smoke.py
+cd frontend-prototipo3
+npm install
+npm run dev
 ```
+
+Vite muestra la dirección local en la terminal, normalmente `http://localhost:5173`.
