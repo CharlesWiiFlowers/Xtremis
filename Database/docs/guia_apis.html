@@ -1,0 +1,1054 @@
+<!doctype html><html lang='es'><head><meta charset='utf-8'><title>Guía de APIs</title><style>body{font-family:'DejaVu Sans',Arial,sans-serif;font-size:10.5pt;line-height:1.45;margin:0 8mm;color:#1b1b1b}
+h1{color:#0b3d91;border-bottom:3px solid #0b3d91;padding-bottom:4px}h2{color:#0b3d91;border-bottom:1px solid #ccd;margin-top:28px}
+h3{color:#24497a}table{border-collapse:collapse;width:100%;margin:8px 0;font-size:9pt;page-break-inside:auto}
+th,td{border:1px solid #c8cdd6;padding:4px 6px;vertical-align:top}th{background:#e8eef8}tr:nth-child(even) td{background:#f7f9fc}
+code{background:#f1f3f6;padding:1px 3px;border-radius:3px;font-size:8.8pt;word-break:break-all}
+pre{background:#f1f3f6;padding:8px;border-radius:4px;white-space:pre-wrap;word-break:break-all;font-size:8.5pt}
+pre code{background:none;padding:0}blockquote{border-left:4px solid #e0a800;background:#fff8e1;margin:8px 0;padding:6px 10px}
+a{color:#0b5bd3}</style></head><body><h1 id="guia-de-apis-gaia-dr3-spherex">Guía de APIs: Gaia DR3 + SPHEREx</h1>
+<p>Versión 2 del proyecto. Explica <strong>todas las APIs</strong> que usa el proyecto: qué datos tiene cada una, sus endpoints, el método HTTP, los parámetros y ejemplos con <code>curl</code> y Python. Todas son <strong>gratuitas, públicas y no piden cuenta</strong>. Una cuenta del Archivo Gaia es opcional y da límites más altos.</p>
+<p>Fecha de verificación: 14 de noviembre de 2026. Cada endpoint de esta guía se probó con una petición real; los resultados de esas pruebas están en el apartado 9.</p>
+<hr />
+<h2 id="1-resumen">1. Resumen</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>API</th>
+<th>Organismo</th>
+<th>Qué da</th>
+<th>Endpoint base</th>
+<th>Método</th>
+<th>Protocolo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Gaia TAP</td>
+<td>ESA</td>
+<td>Tablas Gaia DR3 (91 en <code>gaiadr3</code>) con SQL/ADQL</td>
+<td><code>https://gea.esac.esa.int/tap-server/tap</code></td>
+<td>GET / POST</td>
+<td>IVOA TAP 1.1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Gaia DataLink</td>
+<td>ESA</td>
+<td>Espectros XP/RVS, curvas de luz y MCMC por <code>source_id</code></td>
+<td><code>https://gea.esac.esa.int/data-server/data</code></td>
+<td>GET / POST</td>
+<td>DataLink (ESA)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Gaia CDN (bulk)</td>
+<td>ESA</td>
+<td>Archivos <code>.csv.gz</code> completos (~9.75 TB)</td>
+<td><code>https://cdn.gea.esac.esa.int/Gaia/gdr3/</code></td>
+<td>GET</td>
+<td>HTTP / S3</td>
+</tr>
+<tr>
+<td>4</td>
+<td>IRSA TAP</td>
+<td>NASA/IPAC</td>
+<td>Tablas SPHEREx (<code>spherex.*</code>, <code>splices</code>), Gaia DR3 espejo, 2MASS, WISE, Euclid… (~1,015 tablas)</td>
+<td><code>https://irsa.ipac.caltech.edu/TAP</code></td>
+<td>GET / POST</td>
+<td>IVOA TAP 1.1</td>
+</tr>
+<tr>
+<td>5</td>
+<td>IRSA SIA2</td>
+<td>NASA/IPAC</td>
+<td>Búsqueda de imágenes SPHEREx (DR1, QR3, cubo)</td>
+<td><code>https://irsa.ipac.caltech.edu/SIA</code></td>
+<td>GET</td>
+<td>IVOA SIA 2.0</td>
+</tr>
+<tr>
+<td>6</td>
+<td>IRSA IBE Cutouts</td>
+<td>NASA/IPAC</td>
+<td>Recortes de imágenes SPHEREx</td>
+<td><code>https://irsa.ipac.caltech.edu/ibe/data/spherex/...fits?center=&amp;size=</code></td>
+<td>GET</td>
+<td>HTTP</td>
+</tr>
+<tr>
+<td>7</td>
+<td>IRSA IBE directorios</td>
+<td>NASA/IPAC</td>
+<td>Todos los archivos SPHEREx navegables</td>
+<td><code>https://irsa.ipac.caltech.edu/ibe/data/spherex/</code></td>
+<td>GET</td>
+<td>HTTP</td>
+</tr>
+<tr>
+<td>8</td>
+<td>AWS S3 (Open Data)</td>
+<td>NASA/IPAC en AWS</td>
+<td>Copia de todos los archivos SPHEREx (~208 TB)</td>
+<td><code>s3://nasa-irsa-spherex</code> = <code>https://nasa-irsa-spherex.s3.amazonaws.com/</code></td>
+<td>GET (+ Range)</td>
+<td>S3 REST</td>
+</tr>
+</tbody>
+</table>
+<p>Herramientas del proyecto que envuelven estas APIs:</p>
+<ul>
+<li><code>scripts/gaia_api.py</code>: APIs 1 y 2.</li>
+<li><code>scripts/spherex_api.py</code>: APIs 4, 5, 6 y 8. El comando <code>espectro</code> combina las APIs 1, 5 y 8.</li>
+</ul>
+<hr />
+<h2 id="2-conceptos-comunes">2. Conceptos comunes</h2>
+<h3 id="21-tap-y-adql">2.1 TAP y ADQL</h3>
+<p><strong>TAP</strong> (Table Access Protocol) es el estándar IVOA para consultar tablas astronómicas por HTTP. El lenguaje de consulta es <strong>ADQL</strong>, que es SQL con extensiones geométricas:</p>
+<table>
+<thead>
+<tr>
+<th>ADQL</th>
+<th>Equivalente / nota</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SELECT TOP 100 ...</code></td>
+<td><code>LIMIT 100</code></td>
+</tr>
+<tr>
+<td><code>1 = CONTAINS(POINT('ICRS', ra, dec), CIRCLE('ICRS', 56.75, 24.12, 0.5))</code></td>
+<td>búsqueda en cono (grados)</td>
+</tr>
+<tr>
+<td><code>1 = INTERSECTS(s_region, CIRCLE(...))</code></td>
+<td>regiones que se tocan</td>
+</tr>
+<tr>
+<td><code>DISTANCE(POINT(...), POINT(...))</code></td>
+<td>separación angular en grados</td>
+</tr>
+<tr>
+<td><code>GROUP BY alias</code></td>
+<td>en el Archivo Gaia agrupa por alias, no por expresión</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Modos de un servicio TAP:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Modo</th>
+<th>URL</th>
+<th>Uso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Síncrono</td>
+<td><code>&lt;base&gt;/sync</code></td>
+<td>La respuesta llega en la misma petición. Para consultas cortas.</td>
+</tr>
+<tr>
+<td>Asíncrono (UWS)</td>
+<td><code>&lt;base&gt;/async</code></td>
+<td>Se crea un <em>job</em>, se consulta su estado y luego se descarga el resultado. Para consultas largas o grandes.</td>
+</tr>
+<tr>
+<td>Metadatos</td>
+<td><code>&lt;base&gt;/tables</code>, <code>&lt;base&gt;/capabilities</code>, <code>&lt;base&gt;/availability</code>, <code>&lt;base&gt;/examples</code></td>
+<td>Lista de tablas/columnas, capacidades y ejemplos del servicio.</td>
+</tr>
+<tr>
+<td>TAP_SCHEMA</td>
+<td>consulta ADQL a <code>TAP_SCHEMA.tables</code> / <code>TAP_SCHEMA.columns</code></td>
+<td>Lo mismo que <code>/tables</code>, pero como tabla filtrable.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parámetros de <code>/sync</code> y <code>/async</code> (POST <code>application/x-www-form-urlencoded</code> o GET con query string):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parámetro</th>
+<th>Valores</th>
+<th>Obligatorio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>REQUEST</code></td>
+<td><code>doQuery</code></td>
+<td>Gaia: sí. IRSA: opcional.</td>
+</tr>
+<tr>
+<td><code>LANG</code></td>
+<td><code>ADQL</code></td>
+<td>sí</td>
+</tr>
+<tr>
+<td><code>QUERY</code></td>
+<td>texto ADQL (URL-encoded)</td>
+<td>sí</td>
+</tr>
+<tr>
+<td><code>FORMAT</code> (o <code>RESPONSEFORMAT</code>)</td>
+<td><code>votable</code>, <code>csv</code>, <code>json</code>, <code>fits</code>, <code>ipac</code> (IRSA)</td>
+<td>no (por defecto VOTable)</td>
+</tr>
+<tr>
+<td><code>MAXREC</code></td>
+<td>máximo de filas</td>
+<td>no</td>
+</tr>
+<tr>
+<td><code>PHASE</code></td>
+<td><code>RUN</code> (solo <code>/async</code>, arranca el job al crearlo)</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Ciclo de vida de un job asíncrono (UWS):</strong></p>
+<pre><code class="language-text">POST &lt;base&gt;/async  (QUERY=..., PHASE=RUN)  -&gt; 303 See Other, Location: &lt;base&gt;/async/&lt;jobid&gt;
+GET  &lt;base&gt;/async/&lt;jobid&gt;/phase            -&gt; PENDING | QUEUED | EXECUTING | COMPLETED | ERROR | ABORTED
+GET  &lt;base&gt;/async/&lt;jobid&gt;/results/result   -&gt; la tabla de resultados
+GET  &lt;base&gt;/async/&lt;jobid&gt;/error            -&gt; mensaje de error (si phase=ERROR)
+DELETE &lt;base&gt;/async/&lt;jobid&gt;                 -&gt; borra el job (o POST ACTION=DELETE)
+</code></pre>
+<h3 id="22-votable-csv-fits">2.2 VOTable, CSV, FITS</h3>
+<ul>
+<li><strong>VOTable</strong>: XML con tipos, unidades y UCD por columna. Es el formato más completo y el que usan astroquery/pyvo.</li>
+<li><strong>CSV</strong>: el más simple, pero sin unidades.</li>
+<li><strong>FITS</strong>: binario astronómico. SPHEREx entrega sus imágenes en FITS multi-extensión (MEF).</li>
+</ul>
+<h3 id="23-identificadores-que-enlazan-todo">2.3 Identificadores que enlazan todo</h3>
+<table>
+<thead>
+<tr>
+<th>Llave</th>
+<th>Dónde</th>
+<th>Enlaza</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>source_id</code> (BIGINT)</td>
+<td>Gaia</td>
+<td><code>gaiadr3.*</code>, productos DataLink, <code>proyecto.espectro_spherex</code>, espejo <code>gaia.gaia_dr3_source</code> en IRSA</td>
+</tr>
+<tr>
+<td><code>obs_publisher_did</code></td>
+<td>SPHEREx</td>
+<td><code>spherex.obscore</code>, <code>spherex.plane</code>, <code>spherex.imagenes</code>, <code>spherex.recortes</code>, <code>proyecto.espectro_spherex</code></td>
+</tr>
+<tr>
+<td><code>obs_id</code></td>
+<td>SPHEREx</td>
+<td>Exposición: <code>&lt;periodo&gt;_&lt;giro grande&gt;_&lt;giro pequeño&gt;</code>, p. ej. <code>2026W34_2A_0036_1</code></td>
+</tr>
+<tr>
+<td><code>ra</code>, <code>dec</code> (ICRS, grados)</td>
+<td>ambos</td>
+<td>Cruce espacial entre misiones</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-api-1-gaia-tap-esa">3. API 1: Gaia TAP (ESA)</h2>
+<p><strong>Qué tiene:</strong> las 91 tablas del esquema <code>gaiadr3</code>. Las principales son <code>gaia_source</code> (1,811,709,771 fuentes, 152 columnas), <code>astrophysical_parameters</code>, variabilidad (<code>vari_*</code>), binarias (<code>nss_*</code>), QSO y galaxias, sistema solar, cruces con 2MASS/AllWISE/Pan-STARRS/SDSS/Hipparcos, etc. El detalle está en <code>docs/catalogo_tablas.md</code> y <code>docs/diccionario_columnas.csv</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Recurso</th>
+<th>Método</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Consulta síncrona</td>
+<td>GET/POST</td>
+<td><code>https://gea.esac.esa.int/tap-server/tap/sync</code></td>
+</tr>
+<tr>
+<td>Consulta asíncrona</td>
+<td>POST (crear), GET (estado/resultado), DELETE</td>
+<td><code>https://gea.esac.esa.int/tap-server/tap/async</code></td>
+</tr>
+<tr>
+<td>Tablas y columnas</td>
+<td>GET</td>
+<td><code>https://gea.esac.esa.int/tap-server/tap/tables</code></td>
+</tr>
+<tr>
+<td>Capacidades</td>
+<td>GET</td>
+<td><code>https://gea.esac.esa.int/tap-server/tap/capabilities</code></td>
+</tr>
+<tr>
+<td>Disponibilidad</td>
+<td>GET</td>
+<td><code>https://gea.esac.esa.int/tap-server/tap/availability</code></td>
+</tr>
+<tr>
+<td>Ejemplos oficiales</td>
+<td>GET</td>
+<td><code>https://gea.esac.esa.int/tap-server/tap/examples/</code></td>
+</tr>
+<tr>
+<td>Interfaz web</td>
+<td>navegador</td>
+<td><code>https://gea.esac.esa.int/archive/</code> → <em>Search</em> → <em>Advanced (ADQL)</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Límites oficiales</strong> (<a href="https://www.cosmos.esa.int/web/gaia-users/archive/collaborate#GaiaArchiveUserQuotas">Gaia Archive user quotas</a>):</p>
+<table>
+<thead>
+<tr>
+<th>Concepto</th>
+<th>Anónimo</th>
+<th>Con cuenta (gratis)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Time-out consulta síncrona</td>
+<td>60 s</td>
+<td>60 s</td>
+</tr>
+<tr>
+<td>Time-out consulta asíncrona</td>
+<td>1 min</td>
+<td>120 min</td>
+</tr>
+<tr>
+<td>Filas por consulta</td>
+<td>50,000</td>
+<td>sin límite</td>
+</tr>
+<tr>
+<td>Fuentes por petición DataLink</td>
+<td>50</td>
+<td>5,000</td>
+</tr>
+<tr>
+<td>Retención de jobs</td>
+<td>24 h</td>
+<td>ilimitada</td>
+</tr>
+<tr>
+<td>Espacio de usuario (resultados / tablas subidas)</td>
+<td>—</td>
+<td>20 GB / 1 GB</td>
+</tr>
+</tbody>
+</table>
+<p><strong>curl, síncrono (POST):</strong></p>
+<pre><code class="language-bash">curl -s &quot;https://gea.esac.esa.int/tap-server/tap/sync&quot; \
+  -d REQUEST=doQuery -d LANG=ADQL -d FORMAT=csv \
+  --data-urlencode &quot;QUERY=SELECT TOP 5 source_id, ra, dec, parallax, phot_g_mean_mag
+                         FROM gaiadr3.gaia_source WHERE phot_g_mean_mag &lt; 6&quot;
+</code></pre>
+<p><strong>curl, asíncrono:</strong></p>
+<pre><code class="language-bash">JOB=$(curl -s -o /dev/null -w &quot;%{redirect_url}&quot; &quot;https://gea.esac.esa.int/tap-server/tap/async&quot; \
+  -d REQUEST=doQuery -d LANG=ADQL -d FORMAT=csv -d PHASE=RUN \
+  --data-urlencode &quot;QUERY=SELECT source_id, ra, dec FROM gaiadr3.gaia_source WHERE parallax &gt; 50&quot;)
+curl -s &quot;$JOB/phase&quot;                         # repetir hasta COMPLETED
+curl -sL &quot;$JOB/results/result&quot; -o cercanas.csv
+</code></pre>
+<p><strong>Listar tablas y columnas con ADQL:</strong></p>
+<pre><code class="language-sql">SELECT table_name, description, size FROM tap_schema.tables WHERE schema_name = 'gaiadr3';
+SELECT column_name, datatype, unit, ucd, description FROM tap_schema.columns
+WHERE table_name = 'gaiadr3.gaia_source';
+</code></pre>
+<p><strong>Python (astroquery):</strong></p>
+<pre><code class="language-python">from astroquery.gaia import Gaia
+# Gaia.login(user=&quot;...&quot;, password=&quot;...&quot;)   # opcional: cuotas de usuario registrado
+job = Gaia.launch_job_async(&quot;&quot;&quot;
+    SELECT source_id, ra, dec, parallax, phot_g_mean_mag
+    FROM gaiadr3.gaia_source
+    WHERE 1 = CONTAINS(POINT(ra, dec), CIRCLE(56.75, 24.12, 1)) AND parallax &gt; 6
+&quot;&quot;&quot;)
+tabla = job.get_results()          # astropy.table.Table
+</code></pre>
+<p><strong>Con el script del proyecto:</strong></p>
+<pre><code class="language-bash">python3 scripts/gaia_api.py adql --archivo sql/ejemplos_adql/02_cono_pleyades.sql --db postgresql:///gaia_spherex_v2 --tabla pleyades
+</code></pre>
+<hr />
+<h2 id="4-api-2-gaia-datalink-esa">4. API 2: Gaia DataLink (ESA)</h2>
+<p><strong>Qué tiene:</strong> productos por fuente que no son tablas ADQL normales:</p>
+<table>
+<thead>
+<tr>
+<th><code>RETRIEVAL_TYPE</code></th>
+<th>Tabla local</th>
+<th>Contenido</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>EPOCH_PHOTOMETRY</code></td>
+<td><code>gaiadr3.epoch_photometry</code></td>
+<td>Curvas de luz G, BP, RP por tránsito</td>
+</tr>
+<tr>
+<td><code>XP_CONTINUOUS</code></td>
+<td><code>gaiadr3.xp_continuous_mean_spectrum</code></td>
+<td>Coeficientes del espectro BP/RP</td>
+</tr>
+<tr>
+<td><code>XP_SAMPLED</code></td>
+<td><code>gaiadr3.xp_sampled_mean_spectrum</code></td>
+<td>Espectro BP/RP muestreado 336–1020 nm</td>
+</tr>
+<tr>
+<td><code>RVS</code></td>
+<td><code>gaiadr3.rvs_mean_spectrum</code></td>
+<td>Espectro RVS 846–870 nm</td>
+</tr>
+<tr>
+<td><code>MCMC_GSPPHOT</code></td>
+<td><code>gaiadr3.mcmc_samples_gsp_phot</code></td>
+<td>Cadenas MCMC de GSP-Phot</td>
+</tr>
+<tr>
+<td><code>MCMC_MSC</code></td>
+<td><code>gaiadr3.mcmc_samples_msc</code></td>
+<td>Cadenas MCMC de MSC</td>
+</tr>
+<tr>
+<td><code>ALL</code></td>
+<td>—</td>
+<td>Todos los anteriores disponibles</td>
+</tr>
+</tbody>
+</table>
+<p>Para saber si una fuente tiene cada producto, revisa estas columnas de <code>gaia_source</code>: <code>has_epoch_photometry</code>, <code>has_xp_continuous</code>, <code>has_xp_sampled</code>, <code>has_rvs</code>, <code>has_mcmc_gspphot</code>, <code>has_mcmc_msc</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Recurso</th>
+<th>Método</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Descarga de productos</td>
+<td>GET / POST</td>
+<td><code>https://gea.esac.esa.int/data-server/data</code></td>
+</tr>
+<tr>
+<td>Lista de enlaces DataLink de una fuente</td>
+<td>GET</td>
+<td><code>https://gea.esac.esa.int/data-server/datalink/links?ID=Gaia+DR3+&lt;source_id&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parámetros de <code>/data-server/data</code>:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parámetro</th>
+<th>Valores</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ID</code></td>
+<td><code>source_id</code> separados por comas (máx. 50 anónimo / 5,000 con cuenta)</td>
+</tr>
+<tr>
+<td><code>RELEASE</code></td>
+<td><code>Gaia DR3</code></td>
+</tr>
+<tr>
+<td><code>RETRIEVAL_TYPE</code></td>
+<td>uno de la tabla anterior o <code>ALL</code> (no acepta listas separadas por comas)</td>
+</tr>
+<tr>
+<td><code>DATA_STRUCTURE</code></td>
+<td><code>DATAMODEL_STANDARD</code> o <code>DATAMODEL_GAIA</code> (<code>INDIVIDUAL</code> y <code>COMBINED</code> ya están deprecados/rechazados)</td>
+</tr>
+<tr>
+<td><code>FORMAT</code></td>
+<td><code>votable</code>, <code>votable_plain</code>, <code>fits</code>, <code>csv</code>, <code>ecsv</code></td>
+</tr>
+<tr>
+<td><code>USE_ZIP_ALWAYS</code></td>
+<td><code>true</code>: la respuesta es un ZIP con un archivo por producto</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash">curl -s &quot;https://gea.esac.esa.int/data-server/data&quot; -o curva.zip \
+  -d ID=233786241137174272 -d &quot;RELEASE=Gaia DR3&quot; -d RETRIEVAL_TYPE=EPOCH_PHOTOMETRY \
+  -d DATA_STRUCTURE=DATAMODEL_STANDARD -d FORMAT=csv -d USE_ZIP_ALWAYS=true
+unzip -l curva.zip     # EPOCH_PHOTOMETRY_Gaia_DR3_233786241137174272.csv
+</code></pre>
+<pre><code class="language-python">from astroquery.gaia import Gaia
+datos = Gaia.load_data(ids=[233786241137174272], data_release=&quot;Gaia DR3&quot;,
+                       retrieval_type=&quot;ALL&quot;, data_structure=&quot;DATAMODEL_STANDARD&quot;, format=&quot;votable&quot;)
+</code></pre>
+<pre><code class="language-bash">python3 scripts/gaia_api.py datalink --ids 233786241137174272 --tipos EPOCH_PHOTOMETRY XP_SAMPLED --db postgresql:///gaia_spherex_v2
+</code></pre>
+<hr />
+<h2 id="5-api-3-gaia-cdn-descarga-masiva">5. API 3: Gaia CDN (descarga masiva)</h2>
+<p><strong>Qué tiene:</strong> las mismas tablas en archivos <code>.csv.gz</code> o ECSV partidos por HEALPix: 60 tablas DR3 y ~9.75 TB comprimidos (solo <code>gaia_source</code> son 753 GB). Las tablas heredadas de EDR3 están en <code>Gaia/gedr3/</code>. Para este proyecto <strong>no se recomienda</strong>. Solo conviene si alguna vez necesitas una tabla completa.</p>
+<table>
+<thead>
+<tr>
+<th>Recurso</th>
+<th>Método</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Navegador</td>
+<td>GET</td>
+<td><code>https://cdn.gea.esac.esa.int/?prefix=Gaia/gdr3/</code></td>
+</tr>
+<tr>
+<td>Archivo directo</td>
+<td>GET (admite <code>Range</code>)</td>
+<td><code>https://cdn.gea.esac.esa.int/Gaia/gdr3/&lt;carpeta&gt;/&lt;archivo&gt;.csv.gz</code></td>
+</tr>
+<tr>
+<td>Listado tipo S3 (XML)</td>
+<td>GET</td>
+<td><code>https://gaia.eu-1.cdn77-storage.com/?prefix=Gaia/gdr3/&amp;delimiter=/</code></td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash">curl -s &quot;https://gaia.eu-1.cdn77-storage.com/?prefix=Gaia/gdr3/Variability/&amp;delimiter=/&quot;
+</code></pre>
+<p><code>scripts/01_actualizar_metadatos.py</code> usa este CDN solo para leer tamaños y cabeceras: con <code>Range</code> lee los primeros KB de cada archivo, sin descargar las tablas.</p>
+<hr />
+<h2 id="6-spherex-que-es-y-que-datos-hay">6. SPHEREx: qué es y qué datos hay</h2>
+<p>SPHEREx (NASA, lanzado en marzo de 2025) hace el primer mapa espectral de todo el cielo entre <strong>0.75 y 5 µm</strong>. A diferencia de Gaia, <strong>no publica (todavía) un catálogo de estrellas</strong>: entrega <strong>imágenes espectrales</strong>. Cada imagen tiene 2040×2040 píxeles de 6.15″, y su longitud de onda cambia a lo largo del detector (filtro LVF). El espectro de una estrella se arma juntando muchas imágenes donde cae en posiciones distintas. El catálogo de fuentes está planeado para 2027.</p>
+<p><strong>Publicaciones (releases) disponibles en IRSA/AWS:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Release</th>
+<th>Contenido</th>
+<th>Tamaño en S3</th>
+<th>Estado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dr1</code></td>
+<td>Surveys 1 y 2 reprocesados + <strong>All-Sky Cube</strong> (12,288 cubos HEALPix de 102 canales)</td>
+<td>80.8 TB (76.9 TB imágenes, 3.9 TB cubos)</td>
+<td>vigente (nov. 2026)</td>
+</tr>
+<tr>
+<td><code>qr3</code></td>
+<td>Surveys 3 y 4, publicación semanal</td>
+<td>29.2 TB (448,824 archivos)</td>
+<td>vigente (desde sep. 2026)</td>
+</tr>
+<tr>
+<td><code>qr2</code></td>
+<td>Quick Release 2</td>
+<td>98.0 TB</td>
+<td>reemplazado por DR1+QR3; descarga directa hasta feb. 2027, ya no aparece en búsquedas</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Detectores y bandas</strong> (6 detectores = 6 bandas):</p>
+<table>
+<thead>
+<tr>
+<th>Detector</th>
+<th>λ (µm)</th>
+<th>R</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D1</td>
+<td>0.75–1.09</td>
+<td>39</td>
+</tr>
+<tr>
+<td>D2</td>
+<td>1.10–1.62</td>
+<td>41</td>
+</tr>
+<tr>
+<td>D3</td>
+<td>1.63–2.41</td>
+<td>41</td>
+</tr>
+<tr>
+<td>D4</td>
+<td>2.42–3.82</td>
+<td>35</td>
+</tr>
+<tr>
+<td>D5</td>
+<td>3.83–4.41</td>
+<td>112</td>
+</tr>
+<tr>
+<td>D6</td>
+<td>4.42–5.00</td>
+<td>128</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Imagen espectral (MEF, ~70 MB), extensiones:</strong> <code>IMAGE</code> (MJy/sr, sin restar zodiacal), <code>FLAGS</code> (bits, definidos en la cabecera con <code>MSKNnnnn</code>/<code>MSKMnnnn</code>), <code>VARIANCE</code>, <code>ZODI</code> (modelo de luz zodiacal), <code>EPSF</code> (PSF efectiva por zona), <code>WCS-WAVE</code> (tabla de longitud de onda y ancho de banda por píxel).</p>
+<p><strong>Productos de calibración</strong> (solo por directorios/S3, no por SIA2): <code>abs_gain_matrix</code>, <code>dark</code>, <code>dichroic</code>, <code>epsf</code>, <code>gain_factors</code>, <code>nonfunc_v2</code>, <code>nonlinear_pars</code>, <code>readnoise_pars</code>, <code>solid_angle_pixel_map</code>, <code>spectral_wcs</code>, <code>spectral_channels</code>, <code>sip</code>, plantillas <code>aurora_template</code>, <code>he_template</code> y <code>shuttle_glow_template</code>, <code>xtalk_class1/2</code>, <code>zodi_scaling_v2</code>, <code>l3_flux_corrections</code>. Los tamaños por producto están en <code>data/spherex/tamanos_s3.csv</code>.</p>
+<blockquote>
+<p>El enlace <code>https://registry.opendata.aws/spherex-qr3/</code> responde 404. La ficha oficial está en <a href="https://registry.opendata.aws/spherex-qr/">https://registry.opendata.aws/spherex-qr/</a>. El bucket es el mismo (<code>nasa-irsa-spherex</code>) y ahí están <code>qr3/</code> y <code>dr1/</code>.</p>
+</blockquote>
+<hr />
+<h2 id="7-apis-de-spherex-nasaipac-irsa">7. APIs de SPHEREx (NASA/IPAC IRSA)</h2>
+<h3 id="71-api-4-irsa-tap">7.1 API 4: IRSA TAP</h3>
+<p><strong>Qué tiene (esquema <code>spherex</code>):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Tabla</th>
+<th>Columnas</th>
+<th>Contenido</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>spherex.obscore</code></td>
+<td>62</td>
+<td>Una fila por producto (imagen por detector, cubo) con posición, polígono <code>s_region</code>, rango espectral <code>em_min/em_max</code>, tiempos y <code>access_url</code>. Estándar IVOA ObsCore.</td>
+</tr>
+<tr>
+<td><code>spherex.plane</code></td>
+<td>54</td>
+<td>Modelo CAOM: parámetros por plano/banda (<code>energy_bounds_*</code>, <code>time_exposure</code>, <code>quality_flag</code>, métricas de fondo).</td>
+</tr>
+<tr>
+<td><code>spherex.artifact</code></td>
+<td>12</td>
+<td>Archivos asociados a cada plano (<code>uri</code>, <code>contentlength</code>, <code>contentchecksum</code>).</td>
+</tr>
+<tr>
+<td><code>spherex.observation</code></td>
+<td>41</td>
+<td>Datos por observación (colección, <code>target_name</code>, instrumento, intención).</td>
+</tr>
+<tr>
+<td><code>spherex.provenance_input</code></td>
+<td>2</td>
+<td>Relación entre imágenes y archivos de calibración usados.</td>
+</tr>
+<tr>
+<td><code>splices</code></td>
+<td>157</td>
+<td><strong>SPLICES</strong>: lista de 9,925,660 fuentes objetivo para estudiar hielos, con fotometría 2MASS/WISE/Spitzer.</td>
+</tr>
+</tbody>
+</table>
+<p>Además, el mismo servicio tiene <strong>Gaia DR3</strong> (<code>gaia.gaia_dr3_source</code>, <code>gaia.gaia_dr3_astrophys_param</code>…), <strong>2MASS</strong> (<code>fp_psc</code>), <strong>AllWISE</strong> (<code>allwise_p3as_psd</code>), <strong>Euclid</strong> (<code>euclid.*</code>) y unas 1,000 tablas más. Con eso se pueden hacer cruces entre misiones en una sola consulta.</p>
+<table>
+<thead>
+<tr>
+<th>Recurso</th>
+<th>Método</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Síncrono</td>
+<td>GET/POST</td>
+<td><code>https://irsa.ipac.caltech.edu/TAP/sync</code></td>
+</tr>
+<tr>
+<td>Asíncrono</td>
+<td>POST/GET/DELETE</td>
+<td><code>https://irsa.ipac.caltech.edu/TAP/async</code></td>
+</tr>
+<tr>
+<td>Tablas</td>
+<td>GET</td>
+<td><code>https://irsa.ipac.caltech.edu/TAP/tables</code></td>
+</tr>
+<tr>
+<td>Capacidades</td>
+<td>GET</td>
+<td><code>https://irsa.ipac.caltech.edu/TAP/capabilities</code> (time-out máx. 259,200 s = 72 h)</td>
+</tr>
+<tr>
+<td>Ejemplos</td>
+<td>GET</td>
+<td><code>https://irsa.ipac.caltech.edu/TAP/examples</code></td>
+</tr>
+<tr>
+<td>Documentación</td>
+<td>—</td>
+<td><a href="https://irsa.ipac.caltech.edu/docs/program_interface/TAP.html">https://irsa.ipac.caltech.edu/docs/program_interface/TAP.html</a></td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash"># Metadatos (responde en ~1 s)
+curl -s &quot;https://irsa.ipac.caltech.edu/TAP/sync&quot; -d LANG=ADQL -d FORMAT=csv \
+  --data-urlencode &quot;QUERY=SELECT table_name, description FROM TAP_SCHEMA.tables WHERE schema_name='spherex'&quot;
+
+# Datos: asíncrono recomendado
+JOB=$(curl -s -o /dev/null -w &quot;%{redirect_url}&quot; &quot;https://irsa.ipac.caltech.edu/TAP/async&quot; \
+  -d LANG=ADQL -d FORMAT=csv -d PHASE=RUN \
+  --data-urlencode &quot;QUERY=$(grep -v '^--' sql/ejemplos_adql_irsa/03_splices_region.sql)&quot;)   # sin comentarios
+curl -s &quot;$JOB/phase&quot;; curl -sL &quot;$JOB/results/result&quot;
+</code></pre>
+<pre><code class="language-python">import pyvo
+tap = pyvo.dal.TAPService(&quot;https://irsa.ipac.caltech.edu/TAP&quot;)
+t = tap.run_async(&quot;SELECT TOP 10 * FROM splices&quot;).to_table()
+</code></pre>
+<pre><code class="language-bash">python3 scripts/spherex_api.py tap --archivo sql/ejemplos_adql_irsa/01_obscore_pleyades.sql --salida obscore.csv
+</code></pre>
+<blockquote>
+<p><strong>Importante (verificado el 14/11/2026):</strong>
+- El TAP de IRSA <strong>no acepta comentarios</strong> <code>-- ...</code> en la consulta y responde <em>"Invalid or unsupported ADQL query string"</em>. Los scripts del proyecto los quitan automáticamente; si usas <code>curl</code> o <code>pyvo</code> directo, quítalos tú.
+- Las consultas a tablas de datos tardan <strong>~3 minutos</strong> aunque sean pequeñas, por la cola del servicio. Las de <code>TAP_SCHEMA</code> responden en &lt;1 s. Usa el modo asíncrono o un time-out largo; con <code>curl</code> y <code>-m 60</code> parece que "no carga".
+- Con <code>pyvo.run_async()</code> el sondeo largo (<code>WAIT=59</code>) provoca <strong>"502 Proxy Error"</strong>. <code>spherex_api.py tap</code> hace su propio sondeo cada 5 s y reintenta los 502/503 con espera creciente.
+- No lances muchas consultas a la vez: con 5 en paralelo, IRSA rechazó 3 con 502 al crearlas. En secuencia funcionaron todas.
+- Para buscar imágenes SPHEREx es mejor <strong>SIA2</strong> (1–3 s) que <code>spherex.obscore</code> por TAP.</p>
+</blockquote>
+<h3 id="72-api-5-irsa-sia2-busqueda-de-imagenes">7.2 API 5: IRSA SIA2 (búsqueda de imágenes)</h3>
+<p><strong>Qué tiene:</strong> las imágenes SPHEREx y los cubos, buscables por posición, banda, tiempo, etc. Devuelve una tabla ObsCore con <code>access_url</code> (HTTPS) y <code>cloud_access</code> (bucket/key en S3).</p>
+<table>
+<thead>
+<tr>
+<th>Recurso</th>
+<th>Método</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Búsqueda</td>
+<td>GET</td>
+<td><code>https://irsa.ipac.caltech.edu/SIA?COLLECTION=...&amp;POS=...</code></td>
+</tr>
+<tr>
+<td>Documentación</td>
+<td>—</td>
+<td><a href="https://irsa.ipac.caltech.edu/ibe/sia.html">https://irsa.ipac.caltech.edu/ibe/sia.html</a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Colecciones SPHEREx:</strong> <code>spherex_dr1</code> (Wide), <code>spherex_dr1_deep</code> (Deep), <code>spherex_dr1_cube</code> (All-Sky Cube), <code>spherex_qr3</code> (Wide), <code>spherex_qr3_deep</code> (Deep).</p>
+<p><strong>Parámetros principales:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parámetro</th>
+<th>Ejemplo</th>
+<th>Significado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>COLLECTION</code></td>
+<td><code>spherex_qr3</code></td>
+<td>obligatorio en la práctica (sin él busca en ~1,000 millones de registros)</td>
+</tr>
+<tr>
+<td><code>POS</code></td>
+<td><code>CIRCLE 56.75 24.12 0.01</code>, <code>RANGE ra1 ra2 dec1 dec2</code>, <code>POLYGON ...</code></td>
+<td>región (grados)</td>
+</tr>
+<tr>
+<td><code>BAND</code></td>
+<td><code>2.2e-6</code>, <code>1.5e-6 2.5e-6</code></td>
+<td>longitud de onda en <strong>metros</strong></td>
+</tr>
+<tr>
+<td><code>TIME</code></td>
+<td><code>61270 61280</code></td>
+<td>intervalo MJD</td>
+</tr>
+<tr>
+<td><code>CALIB</code></td>
+<td><code>2</code></td>
+<td>nivel de calibración</td>
+</tr>
+<tr>
+<td><code>ID</code></td>
+<td><code>ivo://irsa.ipac/spherex_qr3?2026W34_2A_0036_1/D1</code></td>
+<td>producto concreto</td>
+</tr>
+<tr>
+<td><code>CLOSEST</code></td>
+<td><code>COLLECTION</code></td>
+<td>solo la imagen más cercana al centro por grupo</td>
+</tr>
+<tr>
+<td><code>MAXREC</code></td>
+<td><code>100</code></td>
+<td>máximo de filas</td>
+</tr>
+<tr>
+<td><code>RESPONSEFORMAT</code></td>
+<td><code>VOTABLE</code> (defecto), <code>HTML</code>, <code>CSV</code></td>
+<td>formato</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash">curl -s &quot;https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_qr3&amp;POS=circle+56.75+24.12+0.01&amp;RESPONSEFORMAT=CSV&quot; -o imagenes.csv
+</code></pre>
+<pre><code class="language-python">from pyvo.dal.sia2 import SIA2Service
+sia = SIA2Service(&quot;https://irsa.ipac.caltech.edu/SIA&quot;)
+t = sia.search(pos=(56.75, 24.12, 0.01), collection=&quot;spherex_qr3&quot;).to_table()
+print(t[&quot;obs_id&quot;, &quot;energy_bandpassname&quot;, &quot;access_url&quot;])
+# Alternativa: from astroquery.ipac.irsa import Irsa; Irsa.query_sia(pos=..., collection=&quot;spherex_qr3&quot;)
+</code></pre>
+<pre><code class="language-bash">python3 scripts/spherex_api.py imagenes --ra 56.75 --dec 24.12 --radio 0.01 --db postgresql:///gaia_spherex_v2
+</code></pre>
+<h3 id="73-api-6-irsa-ibe-cutouts-recortes">7.3 API 6: IRSA IBE Cutouts (recortes)</h3>
+<p><strong>Qué da:</strong> un FITS con las mismas extensiones que la imagen original, pero solo con el recuadro pedido. Un recorte de 0.02° pesa ~4 MB, contra ~70 MB de la imagen completa; casi todo ese peso es la extensión EPSF.</p>
+<table>
+<thead>
+<tr>
+<th>Recurso</th>
+<th>Método</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Recorte</td>
+<td>GET</td>
+<td><code>&lt;access_url&gt;?center=&lt;ra&gt;,&lt;dec&gt;&amp;size=&lt;grados&gt;</code></td>
+</tr>
+<tr>
+<td>Documentación</td>
+<td>—</td>
+<td><a href="https://irsa.ipac.caltech.edu/ibe/cutouts.html">https://irsa.ipac.caltech.edu/ibe/cutouts.html</a></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Parámetro</th>
+<th>Ejemplo</th>
+<th>Nota</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>center</code></td>
+<td><code>56.75,24.12</code> (grados), <code>570,900pix</code></td>
+<td>centro</td>
+</tr>
+<tr>
+<td><code>size</code></td>
+<td><code>0.02</code>, <code>1arcmin</code>, <code>100pix</code>, <code>0.02,0.04</code></td>
+<td>lado (o ancho,alto)</td>
+</tr>
+<tr>
+<td><code>gzip</code></td>
+<td><code>false</code></td>
+<td>SPHEREx nunca se comprime</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash">curl -o recorte.fits &quot;https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W34_2A/l2b-v27-2026-243/1/level2_2026W34_2A_0036_1D1_spx_l2b-v27-2026-243.fits?center=56.75,24.12&amp;size=0.02&quot;
+</code></pre>
+<pre><code class="language-bash">python3 scripts/spherex_api.py recorte --ra 56.75 --dec 24.12 --tamano 0.02 --max 6 --dir recortes --db postgresql:///gaia_spherex_v2
+</code></pre>
+<blockquote>
+<p>El servicio a veces responde <code>503 Service Unavailable</code> y al reintentar funciona. El script reintenta hasta 5 veces.</p>
+</blockquote>
+<h3 id="74-api-7-irsa-ibe-directorios-navegables">7.4 API 7: IRSA IBE, directorios navegables</h3>
+<table>
+<thead>
+<tr>
+<th>Recurso</th>
+<th>Método</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Raíz SPHEREx</td>
+<td>GET</td>
+<td><code>https://irsa.ipac.caltech.edu/ibe/data/spherex/</code></td>
+</tr>
+<tr>
+<td>Imágenes</td>
+<td>GET</td>
+<td><code>.../&lt;release&gt;/level2/&lt;periodo&gt;/l2b-v&lt;ver&gt;-&lt;fecha&gt;/&lt;detector&gt;/level2_&lt;obs_id&gt;D&lt;det&gt;_spx_l2b-v&lt;ver&gt;-&lt;fecha&gt;.fits</code></td>
+</tr>
+<tr>
+<td>Cubo DR1</td>
+<td>GET</td>
+<td><code>.../dr1/hips5_cube/hips_20261026/Norder5/Dir&lt;N&gt;/Npix&lt;pix&gt;_cube.fits</code></td>
+</tr>
+<tr>
+<td>Calibraciones</td>
+<td>GET</td>
+<td><code>.../&lt;release&gt;/&lt;producto&gt;/&lt;versión&gt;/&lt;detector&gt;/...</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="75-api-8-aws-s3-open-data-nasa-irsa-spherex">7.5 API 8: AWS S3 Open Data (<code>nasa-irsa-spherex</code>)</h3>
+<p><strong>Qué tiene:</strong> copia exacta de los directorios IBE (<code>dr1/</code>, <code>qr3/</code>, <code>qr2/</code>), región <code>us-east-1</code>. Es <strong>sin cuenta y sin costo</strong> (<code>RequesterPays: False</code>). Admite <code>Range</code>, así que se pueden leer solo las cabeceras o unos cuantos píxeles de una imagen. El comando <code>espectro</code> del proyecto trabaja así.</p>
+<table>
+<thead>
+<tr>
+<th>Operación</th>
+<th>Método</th>
+<th>URL / comando</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Listar carpeta</td>
+<td>GET</td>
+<td><code>https://nasa-irsa-spherex.s3.amazonaws.com/?list-type=2&amp;prefix=qr3/&amp;delimiter=/</code></td>
+</tr>
+<tr>
+<td>Metadatos de archivo</td>
+<td>HEAD</td>
+<td><code>https://nasa-irsa-spherex.s3.amazonaws.com/&lt;key&gt;</code></td>
+</tr>
+<tr>
+<td>Descargar archivo</td>
+<td>GET</td>
+<td><code>https://nasa-irsa-spherex.s3.amazonaws.com/&lt;key&gt;</code></td>
+</tr>
+<tr>
+<td>Leer solo bytes</td>
+<td>GET + <code>Range: bytes=0-28799</code></td>
+<td>lee la cabecera FITS sin bajar los 70 MB</td>
+</tr>
+<tr>
+<td>AWS CLI</td>
+<td>—</td>
+<td><code>aws s3 ls --no-sign-request s3://nasa-irsa-spherex/qr3/</code></td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash">curl -s &quot;https://nasa-irsa-spherex.s3.amazonaws.com/?list-type=2&amp;prefix=dr1/&amp;delimiter=/&quot;
+curl -s -r 0-28799 &quot;https://nasa-irsa-spherex.s3.amazonaws.com/qr3/level2/2026W34_2A/l2b-v27-2026-243/1/level2_2026W34_2A_0036_1D1_spx_l2b-v27-2026-243.fits&quot; | head -c 2880
+</code></pre>
+<pre><code class="language-python">from astropy.io import fits
+url = &quot;s3://nasa-irsa-spherex/qr3/level2/2026W34_2A/l2b-v27-2026-243/1/level2_2026W34_2A_0036_1D1_spx_l2b-v27-2026-243.fits&quot;
+with fits.open(url, use_fsspec=True, fsspec_kwargs={&quot;anon&quot;: True}) as h:
+    trozo = h[&quot;IMAGE&quot;].section[700:715, 1475:1490]   # solo descarga esos píxeles
+</code></pre>
+<pre><code class="language-bash">python3 scripts/spherex_api.py s3 ls dr1/
+python3 scripts/spherex_api.py s3 get qr3/spectral_channels/cal-sch-v2-2026-229/spectral_channels_spx_cal-sch-v2-2026-229.fits --dir cal
+</code></pre>
+<h3 id="76-spherex-data-explorer-interfaz-web">7.6 SPHEREx Data Explorer (interfaz web)</h3>
+<p>Interfaz gráfica para buscar, ver y descargar imágenes o recortes: <a href="https://irsa.ipac.caltech.edu/applications/spherex">https://irsa.ipac.caltech.edu/applications/spherex</a>. No es una API, pero sirve para explorar antes de programar.</p>
+<hr />
+<h2 id="8-integracion-gaia-spherex-v2">8. Integración Gaia + SPHEREx (v2)</h2>
+<p>El comando <code>spherex_api.py espectro</code> combina las APIs así:</p>
+<pre><code class="language-text">source_id ──(1) Gaia TAP──► ra, dec, pmra, pmdec (época 2016.0)
+          ──(5) SIA2──────► imágenes SPHEREx DR1+QR3 que contienen la posición (~330 por estrella en las Pléyades)
+          ──(8) S3 Range──► por imagen: cabecera + 15×15 píxeles de IMAGE/VARIANCE/FLAGS/ZODI + tabla WCS-WAVE
+          ──local─────────► posición propagada a la fecha de la imagen, λ y ancho de banda en ese píxel,
+                            fotometría de apertura (r=2 px) menos fondo (anillo 4–7 px), flujo en µJy
+          ──► proyecto.espectro_spherex (una fila por estrella × imagen) + spherex.imagenes
+</code></pre>
+<p>Ejemplo:</p>
+<pre><code class="language-bash">python3 scripts/spherex_api.py espectro --ids 65207709611941376 --db postgresql:///gaia_spherex_v2 --salida espectro.csv
+</code></pre>
+<pre><code class="language-sql">SELECT g.source_id, g.phot_g_mean_mag, e.longitud_onda_um, e.flujo_ujy, e.error_flujo_ujy
+FROM proyecto.espectro_spherex e JOIN gaiadr3.gaia_source g USING (source_id)
+WHERE NOT e.flag_malo ORDER BY e.longitud_onda_um;
+</code></pre>
+<p>Notas sobre esta fotometría:</p>
+<ul>
+<li>Es una <strong>fotometría de apertura simple</strong>, útil para explorar. No es la fotometría oficial: el catálogo oficial SPHEREx está planeado para 2027. Para trabajos de precisión, usa la PSF (<code>EPSF</code>) siguiendo los tutoriales de IRSA.</li>
+<li>Las estrellas muy brillantes (G ≲ 8) <strong>saturan</strong> en las bandas cortas. Esas mediciones quedan con <code>flag_malo = true</code>, y el píxel central puede salir <code>NaN</code>.</li>
+<li>Usa el ángulo sólido nominal del píxel (6.15″)². Para mayor exactitud, consulta el producto <code>solid_angle_pixel_map</code>.</li>
+<li>Tiempo medido: 1 min 43 s para una estrella con 332 imágenes (8 hilos, ~2.4 s por imagen y por hilo). <code>--max-imagenes</code> sirve para hacer pruebas rápidas.</li>
+</ul>
+<hr />
+<h2 id="9-pruebas-realizadas-14112026">9. Pruebas realizadas (14/11/2026)</h2>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Prueba</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gaia TAP</td>
+<td>6 consultas de ejemplo (<code>sql/ejemplos_adql/</code>)</td>
+<td>OK; la más grande devolvió 15,021 filas</td>
+</tr>
+<tr>
+<td>Gaia DataLink</td>
+<td><code>curl</code> a <code>/data-server/data</code> y <code>gaia_api.py datalink</code> con los 6 tipos</td>
+<td>OK (ZIP con CSV; arreglos guardados en PostgreSQL)</td>
+</tr>
+<tr>
+<td>IRSA SIA2</td>
+<td>Pléyades, 5 colecciones</td>
+<td>DR1: 227, QR3: 114, cubo: 2, deep: 0; ~1–2 s</td>
+</tr>
+<tr>
+<td>IRSA Cutouts</td>
+<td>3 recortes de 0.02°</td>
+<td>OK, ~4 MB cada uno; un 503 intermitente se resolvió al reintentar</td>
+</tr>
+<tr>
+<td>AWS S3</td>
+<td>listado, <code>HEAD</code>, <code>Range</code> y <code>astropy</code> <code>.section</code></td>
+<td>OK, ~2.4 s por imagen</td>
+</tr>
+<tr>
+<td>IRSA TAP</td>
+<td><code>TAP_SCHEMA</code></td>
+<td>OK (&lt;1 s)</td>
+</tr>
+<tr>
+<td>IRSA TAP</td>
+<td>los 5 ejemplos de <code>sql/ejemplos_adql_irsa/</code></td>
+<td>OK con el script corregido: obscore 123 filas, imágenes que contienen el punto 334, splices 732, plane D4 269,707, Gaia en IRSA 41 (entre 1.5 y 7 min cada una)</td>
+</tr>
+<tr>
+<td>IRSA TAP</td>
+<td><code>pyvo.run_async()</code> directo / 5 consultas en paralelo</td>
+<td>502 Proxy Error; corregido con sondeo propio y reintentos</td>
+</tr>
+<tr>
+<td>IRSA TAP</td>
+<td>consulta con comentarios <code>--</code></td>
+<td>rechazada por IRSA; corregido en los scripts (se quitan los comentarios)</td>
+</tr>
+<tr>
+<td>Integración</td>
+<td><code>espectro</code> de 2 estrellas de las Pléyades (40 imágenes)</td>
+<td>73 mediciones de 0.74 a 4.39 µm guardadas en <code>proyecto.espectro_spherex</code></td>
+</tr>
+<tr>
+<td>Integración</td>
+<td><code>espectro</code> de 1 estrella con todas sus imágenes (332, DR1+QR3)</td>
+<td>331 mediciones en 1 min 43 s, sin errores</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-referencias">10. Referencias</h2>
+<ul>
+<li>Archivo Gaia: <a href="https://gea.esac.esa.int/archive/">https://gea.esac.esa.int/archive/</a>. Modelo de datos DR3: <a href="https://gea.esac.esa.int/archive/documentation/GDR3/Gaia_archive/chap_datamodel/">https://gea.esac.esa.int/archive/documentation/GDR3/Gaia_archive/chap_datamodel/</a>.</li>
+<li>Cuotas Gaia: <a href="https://www.cosmos.esa.int/web/gaia-users/archive/collaborate#GaiaArchiveUserQuotas">https://www.cosmos.esa.int/web/gaia-users/archive/collaborate#GaiaArchiveUserQuotas</a>. FAQ: <a href="https://www.cosmos.esa.int/web/gaia-users/archive/faq">https://www.cosmos.esa.int/web/gaia-users/archive/faq</a>.</li>
+<li>Licencia y cita Gaia: <a href="https://www.cosmos.esa.int/web/gaia-users/license">https://www.cosmos.esa.int/web/gaia-users/license</a>, <a href="https://www.cosmos.esa.int/web/gaia-users/credits">https://www.cosmos.esa.int/web/gaia-users/credits</a>.</li>
+<li>SPHEREx en IRSA: <a href="https://irsa.ipac.caltech.edu/Missions/spherex.html">https://irsa.ipac.caltech.edu/Missions/spherex.html</a>. Guía del archivo: <a href="https://caltech-ipac.github.io/spherex-archive-documentation/">https://caltech-ipac.github.io/spherex-archive-documentation/</a>.</li>
+<li>Explanatory Supplement: <a href="https://irsa.ipac.caltech.edu/data/SPHEREx/docs/SPHEREx_Expsupp.pdf">https://irsa.ipac.caltech.edu/data/SPHEREx/docs/SPHEREx_Expsupp.pdf</a>.</li>
+<li>Tutoriales Python: <a href="https://caltech-ipac.github.io/irsa-tutorials/spherex-intro/">https://caltech-ipac.github.io/irsa-tutorials/spherex-intro/</a>.</li>
+<li>Acceso en la nube: <a href="https://irsa.ipac.caltech.edu/cloud_access/">https://irsa.ipac.caltech.edu/cloud_access/</a>. Registro AWS: <a href="https://registry.opendata.aws/spherex-qr/">https://registry.opendata.aws/spherex-qr/</a>.</li>
+<li>Uso de datos IRSA y cita SPHEREx: <a href="https://irsa.ipac.caltech.edu/data_use_terms.html">https://irsa.ipac.caltech.edu/data_use_terms.html</a>. DOI QR1: 10.26131/IRSA629; DOI QR2: 10.26131/IRSA652. Consulta en IRSA los DOI de DR1 y QR3.</li>
+</ul></body></html>
