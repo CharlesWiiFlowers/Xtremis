@@ -1,0 +1,2 @@
+# Evita que Git en Windows convierta los finales de línea (rompe Dockerfiles y .sql)
+* text=auto eol=lf
