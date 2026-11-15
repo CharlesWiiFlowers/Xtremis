@@ -700,7 +700,8 @@ curl -s &quot;https://irsa.ipac.caltech.edu/TAP/sync&quot; -d LANG=ADQL -d FORMA
 
 # Datos: asíncrono recomendado
 JOB=$(curl -s -o /dev/null -w &quot;%{redirect_url}&quot; &quot;https://irsa.ipac.caltech.edu/TAP/async&quot; \
-  -d LANG=ADQL -d FORMAT=csv -d PHASE=RUN --data-urlencode &quot;QUERY@sql/ejemplos_adql_irsa/03_splices_region.sql&quot;)
+  -d LANG=ADQL -d FORMAT=csv -d PHASE=RUN \
+  --data-urlencode &quot;QUERY=$(grep -v '^--' sql/ejemplos_adql_irsa/03_splices_region.sql)&quot;)   # sin comentarios
 curl -s &quot;$JOB/phase&quot;; curl -sL &quot;$JOB/results/result&quot;
 </code></pre>
 <pre><code class="language-python">import pyvo
@@ -710,7 +711,12 @@ t = tap.run_async(&quot;SELECT TOP 10 * FROM splices&quot;).to_table()
 <pre><code class="language-bash">python3 scripts/spherex_api.py tap --archivo sql/ejemplos_adql_irsa/01_obscore_pleyades.sql --salida obscore.csv
 </code></pre>
 <blockquote>
-<p>Nota de la prueba del 14/11/2026: las consultas a <code>TAP_SCHEMA</code> respondieron en ~1 s. En cambio, las consultas a tablas de datos (<code>spherex.plane</code>, <code>splices</code>, <code>fp_psc</code>, <code>gaia.gaia_dr3_source</code>) se quedaron en cola (<code>QUEUED</code>) más de 4 minutos, o sea que IRSA estaba saturado. Para buscar imágenes conviene usar <strong>SIA2</strong>, que respondió en ~1–2 s. Si TAP está lento, usa siempre el modo asíncrono.</p>
+<p><strong>Importante (verificado el 14/11/2026):</strong>
+- El TAP de IRSA <strong>no acepta comentarios</strong> <code>-- ...</code> en la consulta y responde <em>"Invalid or unsupported ADQL query string"</em>. Los scripts del proyecto los quitan automáticamente; si usas <code>curl</code> o <code>pyvo</code> directo, quítalos tú.
+- Las consultas a tablas de datos tardan <strong>~3 minutos</strong> aunque sean pequeñas, por la cola del servicio. Las de <code>TAP_SCHEMA</code> responden en &lt;1 s. Usa el modo asíncrono o un time-out largo; con <code>curl</code> y <code>-m 60</code> parece que "no carga".
+- Con <code>pyvo.run_async()</code> el sondeo largo (<code>WAIT=59</code>) provoca <strong>"502 Proxy Error"</strong>. <code>spherex_api.py tap</code> hace su propio sondeo cada 5 s y reintenta los 502/503 con espera creciente.
+- No lances muchas consultas a la vez: con 5 en paralelo, IRSA rechazó 3 con 502 al crearlas. En secuencia funcionaron todas.
+- Para buscar imágenes SPHEREx es mejor <strong>SIA2</strong> (1–3 s) que <code>spherex.obscore</code> por TAP.</p>
 </blockquote>
 <h3 id="72-api-5-irsa-sia2-busqueda-de-imagenes">7.2 API 5: IRSA SIA2 (búsqueda de imágenes)</h3>
 <p><strong>Qué tiene:</strong> las imágenes SPHEREx y los cubos, buscables por posición, banda, tiempo, etc. Devuelve una tabla ObsCore con <code>access_url</code> (HTTPS) y <code>cloud_access</code> (bucket/key en S3).</p>
@@ -1005,12 +1011,22 @@ WHERE NOT e.flag_malo ORDER BY e.longitud_onda_um;
 <tr>
 <td>IRSA TAP</td>
 <td><code>TAP_SCHEMA</code></td>
-<td>OK (~1 s)</td>
+<td>OK (&lt;1 s)</td>
 </tr>
 <tr>
 <td>IRSA TAP</td>
-<td><code>spherex.plane</code>, <code>splices</code>, <code>fp_psc</code>, <code>gaia.gaia_dr3_source</code></td>
-<td>en cola más de 4 min (servicio saturado ese día)</td>
+<td>los 5 ejemplos de <code>sql/ejemplos_adql_irsa/</code></td>
+<td>OK con el script corregido: obscore 123 filas, imágenes que contienen el punto 334, splices 732, plane D4 269,707, Gaia en IRSA 41 (entre 1.5 y 7 min cada una)</td>
+</tr>
+<tr>
+<td>IRSA TAP</td>
+<td><code>pyvo.run_async()</code> directo / 5 consultas en paralelo</td>
+<td>502 Proxy Error; corregido con sondeo propio y reintentos</td>
+</tr>
+<tr>
+<td>IRSA TAP</td>
+<td>consulta con comentarios <code>--</code></td>
+<td>rechazada por IRSA; corregido en los scripts (se quitan los comentarios)</td>
 </tr>
 <tr>
 <td>Integración</td>

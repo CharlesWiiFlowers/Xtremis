@@ -293,7 +293,8 @@ curl -s "https://irsa.ipac.caltech.edu/TAP/sync" -d LANG=ADQL -d FORMAT=csv \
 
 # Datos: asíncrono recomendado
 JOB=$(curl -s -o /dev/null -w "%{redirect_url}" "https://irsa.ipac.caltech.edu/TAP/async" \
-  -d LANG=ADQL -d FORMAT=csv -d PHASE=RUN --data-urlencode "QUERY@sql/ejemplos_adql_irsa/03_splices_region.sql")
+  -d LANG=ADQL -d FORMAT=csv -d PHASE=RUN \
+  --data-urlencode "QUERY=$(grep -v '^--' sql/ejemplos_adql_irsa/03_splices_region.sql)")   # sin comentarios
 curl -s "$JOB/phase"; curl -sL "$JOB/results/result"
 ```
 
@@ -307,7 +308,12 @@ t = tap.run_async("SELECT TOP 10 * FROM splices").to_table()
 python3 scripts/spherex_api.py tap --archivo sql/ejemplos_adql_irsa/01_obscore_pleyades.sql --salida obscore.csv
 ```
 
-> Nota de la prueba del 14/11/2026: las consultas a `TAP_SCHEMA` respondieron en ~1 s. En cambio, las consultas a tablas de datos (`spherex.plane`, `splices`, `fp_psc`, `gaia.gaia_dr3_source`) se quedaron en cola (`QUEUED`) más de 4 minutos, o sea que IRSA estaba saturado. Para buscar imágenes conviene usar **SIA2**, que respondió en ~1–2 s. Si TAP está lento, usa siempre el modo asíncrono.
+> **Importante (verificado el 14/11/2026):**
+> - El TAP de IRSA **no acepta comentarios** `-- ...` en la consulta y responde *"Invalid or unsupported ADQL query string"*. Los scripts del proyecto los quitan automáticamente; si usas `curl` o `pyvo` directo, quítalos tú.
+> - Las consultas a tablas de datos tardan **~3 minutos** aunque sean pequeñas, por la cola del servicio. Las de `TAP_SCHEMA` responden en <1 s. Usa el modo asíncrono o un time-out largo; con `curl` y `-m 60` parece que "no carga".
+> - Con `pyvo.run_async()` el sondeo largo (`WAIT=59`) provoca **"502 Proxy Error"**. `spherex_api.py tap` hace su propio sondeo cada 5 s y reintenta los 502/503 con espera creciente.
+> - No lances muchas consultas a la vez: con 5 en paralelo, IRSA rechazó 3 con 502 al crearlas. En secuencia funcionaron todas.
+> - Para buscar imágenes SPHEREx es mejor **SIA2** (1–3 s) que `spherex.obscore` por TAP.
 
 ### 7.2 API 5: IRSA SIA2 (búsqueda de imágenes)
 
@@ -462,8 +468,10 @@ Notas sobre esta fotometría:
 | IRSA SIA2 | Pléyades, 5 colecciones | DR1: 227, QR3: 114, cubo: 2, deep: 0; ~1–2 s |
 | IRSA Cutouts | 3 recortes de 0.02° | OK, ~4 MB cada uno; un 503 intermitente se resolvió al reintentar |
 | AWS S3 | listado, `HEAD`, `Range` y `astropy` `.section` | OK, ~2.4 s por imagen |
-| IRSA TAP | `TAP_SCHEMA` | OK (~1 s) |
-| IRSA TAP | `spherex.plane`, `splices`, `fp_psc`, `gaia.gaia_dr3_source` | en cola más de 4 min (servicio saturado ese día) |
+| IRSA TAP | `TAP_SCHEMA` | OK (<1 s) |
+| IRSA TAP | los 5 ejemplos de `sql/ejemplos_adql_irsa/` | OK con el script corregido: obscore 123 filas, imágenes que contienen el punto 334, splices 732, plane D4 269,707, Gaia en IRSA 41 (entre 1.5 y 7 min cada una) |
+| IRSA TAP | `pyvo.run_async()` directo / 5 consultas en paralelo | 502 Proxy Error; corregido con sondeo propio y reintentos |
+| IRSA TAP | consulta con comentarios `--` | rechazada por IRSA; corregido en los scripts (se quitan los comentarios) |
 | Integración | `espectro` de 2 estrellas de las Pléyades (40 imágenes) | 73 mediciones de 0.74 a 4.39 µm guardadas en `proyecto.espectro_spherex` |
 | Integración | `espectro` de 1 estrella con todas sus imágenes (332, DR1+QR3) | 331 mediciones en 1 min 43 s, sin errores |
 

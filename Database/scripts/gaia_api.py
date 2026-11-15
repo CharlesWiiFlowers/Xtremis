@@ -48,7 +48,14 @@ def gaia():
 
 
 # ---------------------------------------------------------------- obtención de datos
+def limpiar_adql(consulta):
+    """Quita comentarios '-- ...' y líneas vacías: algunos servicios TAP (IRSA) no aceptan comentarios."""
+    lineas = (re.sub(r"--.*$", "", l).rstrip() for l in consulta.splitlines())
+    return "\n".join(l for l in lineas if l.strip())
+
+
 def ejecutar_adql(consulta):
+    consulta = limpiar_adql(consulta)
     print("Consultando el Archivo Gaia...", file=sys.stderr)
     tabla = gaia().launch_job_async(consulta).get_results()
     print(f"{len(tabla)} filas recibidas", file=sys.stderr)

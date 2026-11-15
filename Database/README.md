@@ -81,7 +81,7 @@ Ayuda de cada comando: `python3 spherex_api.py espectro -h`.
 
 - **Gaia, sin cuenta**: 50,000 filas por consulta, 1 min por consulta asíncrona y 50 fuentes por petición DataLink. Con una cuenta gratuita no hay límite de filas, las consultas pueden durar 120 min y DataLink acepta 5,000 fuentes. El script usa la cuenta si defines `GAIA_USUARIO` y `GAIA_CONTRASENA`.
 - **SPHEREx** no tiene todavía catálogo de fuentes (sale en 2027). `espectro` hace una fotometría de apertura simple sobre los píxeles, útil para explorar. Las estrellas con G ≲ 8 saturan en las bandas cortas (`flag_malo = true`).
-- **IRSA TAP** puede quedarse en cola cuando está saturado. Para buscar imágenes usa `imagenes` (SIA2), que es rápido.
+- **IRSA TAP** funciona, pero cada consulta a tablas de datos tarda ~3 min por la cola del servicio, y no acepta comentarios `--` (los scripts los quitan solos). Para buscar imágenes usa `imagenes` (SIA2), que es rápido.
 - Los detalles están en la guía de APIs.
 
 ## Licencias y cita

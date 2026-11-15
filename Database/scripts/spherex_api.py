@@ -33,7 +33,7 @@ from astropy.table import Table, unique, vstack
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from comun import (COLECCIONES_SPHEREX, ESQUEMA_PROYECTO, ESQUEMA_SPHEREX, IRSA_SIA, IRSA_TAP,  # noqa: E402
                    S3_BUCKET, TABLAS_V2)
-from gaia_api import Destino, ejecutar_adql, guardar_archivo  # noqa: E402
+from gaia_api import Destino, ejecutar_adql, guardar_archivo, limpiar_adql  # noqa: E402
 
 log.setLevel("ERROR")
 warnings.simplefilter("ignore")
@@ -71,12 +71,47 @@ def buscar_imagenes(ra, dec, radio, colecciones, banda=None, tiempo=None, maxrec
     return res
 
 
-def ejecutar_tap_irsa(consulta, asincrono):
+def reintentar(funcion, intentos=8, espera=10):
+    """IRSA a veces responde 502/503 (proxy) aunque el job siga vivo: reintenta antes de rendirse."""
+    from pyvo.dal.exceptions import DALServiceError
+    for i in range(intentos):
+        try:
+            return funcion()
+        except DALServiceError as e:
+            if i == intentos - 1:
+                raise
+            pausa = min(espera * 2 ** i, 120)
+            print(f"  IRSA respondió con error temporal ({str(e)[:60]}); reintento {i + 1}/{intentos - 1} en {pausa} s",
+                  file=sys.stderr)
+            time.sleep(pausa)
+
+
+def ejecutar_tap_irsa(consulta, asincrono, limite_seg=3600):
     import pyvo
     servicio = pyvo.dal.TAPService(IRSA_TAP)
-    print("Consultando el TAP de IRSA...", file=sys.stderr)
-    r = servicio.run_async(consulta) if asincrono else servicio.run_sync(consulta)
-    t = r.to_table()
+    consulta = limpiar_adql(consulta)
+    print("Consultando el TAP de IRSA (puede tardar varios minutos si el servicio está saturado)...", file=sys.stderr)
+    if not asincrono:
+        t = reintentar(lambda: servicio.run_sync(consulta)).to_table()
+    else:
+        # Sondeo propio con pausas cortas: el long-polling de pyvo (WAIT=59) provoca "502 Proxy Error" en IRSA.
+        job = reintentar(lambda: servicio.submit_job(consulta))
+        reintentar(job.run)
+        inicio = time.time()
+        while True:
+            fase = reintentar(lambda: job.phase)
+            if fase in ("COMPLETED", "ERROR", "ABORTED"):
+                break
+            if time.time() - inicio > limite_seg:
+                sys.exit(f"La consulta sigue en fase {fase} tras {limite_seg} s; job: {job.url}")
+            time.sleep(5)
+        print(f"  job {job.url} terminó en {time.time() - inicio:.0f} s ({fase})", file=sys.stderr)
+        job.raise_if_error()
+        t = reintentar(job.fetch_result).to_table()
+        try:
+            job.delete()
+        except Exception:
+            pass
     print(f"{len(t)} filas recibidas", file=sys.stderr)
     return t
 
@@ -230,10 +265,18 @@ def s3(args):
             tam = f"{e['size'] / 1e6:10.1f} MB" if e["type"] == "file" else "   (carpeta)"
             print(f"{tam}  s3://{e['name']}")
     else:
-        destino = Path(args.dir) / Path(ruta).name
-        destino.parent.mkdir(parents=True, exist_ok=True)
-        fs.get(ruta, str(destino))
-        print(f"descargado {destino} ({destino.stat().st_size / 1e6:.1f} MB)", file=sys.stderr)
+        ruta = ruta.rstrip("/")
+        archivos = fs.find(ruta, detail=True) if fs.isdir(ruta) else {ruta: fs.info(ruta)}
+        total = sum(a["size"] for a in archivos.values())
+        print(f"{len(archivos)} archivo(s), {total / 1e6:.1f} MB", file=sys.stderr)
+        if total > args.max_mb * 1e6:
+            sys.exit(f"Son más de {args.max_mb} MB; usa --max-mb para confirmar la descarga.")
+        base = Path(ruta).parent
+        for clave in archivos:
+            destino = Path(args.dir) / Path(clave).relative_to(base)
+            destino.parent.mkdir(parents=True, exist_ok=True)
+            fs.get(clave, str(destino))
+            print(f"descargado {destino} ({destino.stat().st_size / 1e6:.1f} MB)", file=sys.stderr)
 
 
 # ---------------------------------------------------------------- CLI
@@ -305,6 +348,7 @@ def main():
     s.add_argument("accion", choices=["ls", "get"])
     s.add_argument("ruta", nargs="?", default="")
     s.add_argument("--dir", default=".")
+    s.add_argument("--max-mb", type=float, default=500, help="tope de descarga sin confirmar (default 500 MB)")
     args = ap.parse_args()
 
     if args.comando == "s3":
