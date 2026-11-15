@@ -1,7 +1,0 @@
-table_index,schema_name,irsa_schema_name,table_name,description,table_type,utype,irsa_dbms,irsa_pos,irsa_sptlevel,irsa_missionid,irsa_groupid,irsa_access_flag,irsa_nrows,irsa_odbc_datasource,irsa_spatial_idx_name
-400,spherex,spherex,splices,The SPHEREx Target List of Ice Sources (SPLICES),table,,21,y,20,-1,-1,30,9925660,spherex,DBIN_1770408346_040548_6
-848,spherex,spherex,spherex.obscore,IRSA ObsCore table of SPHEREx products,view,,22,y,20,-1,-1,30,0,spherex_postgres,
-849,spherex,spherex,spherex.observation,SPHEREx CAOM Observation Table,view,,22,n,20,-1,-1,30,0,spherex_postgres,
-850,spherex,spherex,spherex.plane,SPHEREx CAOM Plane Table,view,,22,y,20,-1,-1,30,1116,spherex_postgres,
-851,spherex,spherex,spherex.artifact,SPHEREx CAOM Artifact Table,view,,22,n,20,-1,-1,30,0,spherex_postgres,
-852,spherex,spherex,spherex.provenance_input,Join tables for SPHEREx calibration files,view,,22,n,20,-1,-1,30,0,spherex_postgres,
