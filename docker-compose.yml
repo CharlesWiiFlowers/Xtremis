@@ -1,13 +1,109 @@
+# Xtremis · programa unificado
+#   docker compose up --build   ->   http://localhost:8080
+#
+#   web      Nginx: visor SPHEREx + puerta única (/, /orbital/, /api/v1/*, /api/*)
+#   backend  FastAPI: imágenes, espectros de 102 bandas, Gaia/WISE para el visor
+#   orbital  Node.js: simulador ORBITAL + API /api/v1
+#   python   FastAPI: consultas en vivo a Gaia/WISE/SPHEREx (lo usa orbital)
+#   mysql    MySQL 8: catálogo de APIs, estrellas y fuentes guardadas
+
+name: xtremis
+
 services:
-  xtremis-frontend:
-    container_name: xtremis-frontend
+  web:
     build:
-      context: ./frontend-prototipo3
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: viewer/Dockerfile
       args:
-        VITE_USE_MOCK: "true"
-        VITE_API_URL: ""
-        VITE_MODEL_URL: ""
+        VITE_USE_MOCK: ${VITE_USE_MOCK:-true}
+        VITE_MODEL_URL: ${VITE_MODEL_URL:-}
     ports:
-      - "8080:80"
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      backend: { condition: service_started }
+      orbital: { condition: service_started }
     restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: Backend/Dockerfile
+    environment:
+      XTREMIS_OFFLINE: ${XTREMIS_OFFLINE:-0}
+      XTREMIS_DOWNLOAD_WORKERS: ${XTREMIS_DOWNLOAD_WORKERS:-8}
+    volumes:
+      - spherex_cache:/data/cache
+    restart: unless-stopped
+
+  orbital:
+    build:
+      context: .
+      dockerfile: orbital/Dockerfile
+    environment:
+      PORT: "3010"
+      PYTHON_SERVICE_URL: http://python:8001
+      MYSQL_HOST: mysql
+      MYSQL_PORT: "3306"
+      MYSQL_USER: ${MYSQL_USER:-astro}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-astro_local_change_me}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-astro}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+    ports:
+      - "${ORBITAL_PORT:-3010}:3010"   # acceso directo a ORBITAL como antes (http://localhost:3010)
+    depends_on:
+      python: { condition: service_started }
+    restart: unless-stopped
+
+  python:
+    build:
+      context: .
+      dockerfile: python/Dockerfile
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: "3306"
+      MYSQL_USER: ${MYSQL_USER:-astro}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-astro_local_change_me}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-astro}
+    depends_on:
+      mysql: { condition: service_healthy }
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_local_change_me}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-astro}
+      MYSQL_USER: ${MYSQL_USER:-astro}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-astro_local_change_me}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./Database/mysql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    ports:
+      - "127.0.0.1:${MYSQL_HOST_PORT:-3307}:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    restart: unless-stopped
+
+  # Opcional, para publicar con dominio y HTTPS:  DOMAIN=astro.midominio.com docker compose --profile https up -d
+  caddy:
+    image: caddy:2-alpine
+    profiles: ["https"]
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on: [web]
+    restart: unless-stopped
+
+volumes:
+  caddy_data:
+  mysql_data:
+  spherex_cache:
