@@ -1,4 +1,4 @@
-# Xtremis · programa unificado
+# CygnusX · programa unificado
 #   docker compose up --build   ->   http://localhost:8080
 #
 #   web      Nginx: visor SPHEREx + puerta única (/, /orbital/, /api/v1/*, /api/*)
@@ -7,7 +7,7 @@
 #   python   FastAPI: consultas en vivo a Gaia/WISE/SPHEREx (lo usa orbital)
 #   mysql    MySQL 8: catálogo de APIs, estrellas y fuentes guardadas
 
-name: xtremis
+name: cygnusx
 
 services:
   web:
@@ -29,8 +29,8 @@ services:
       context: .
       dockerfile: Backend/Dockerfile
     environment:
-      XTREMIS_OFFLINE: ${XTREMIS_OFFLINE:-0}
-      XTREMIS_DOWNLOAD_WORKERS: ${XTREMIS_DOWNLOAD_WORKERS:-8}
+      CYGNUSX_OFFLINE: ${CYGNUSX_OFFLINE:-0}
+      CYGNUSX_DOWNLOAD_WORKERS: ${CYGNUSX_DOWNLOAD_WORKERS:-8}
     volumes:
       - spherex_cache:/data/cache
     restart: unless-stopped

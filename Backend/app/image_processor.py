@@ -30,7 +30,7 @@ from . import spherex_adapter as spherex
 
 logger = logging.getLogger(__name__)
 
-CACHE_DIR = Path(os.environ.get("XTREMIS_CACHE_DIR", Path(__file__).resolve().parents[1] / "cache"))
+CACHE_DIR = Path(os.environ.get("CYGNUSX_CACHE_DIR", Path(__file__).resolve().parents[1] / "cache"))
 CUTOUT_DIR = CACHE_DIR / "cutouts"
 SEARCH_DIR = CACHE_DIR / "searches"
 RENDER_DIR = CACHE_DIR / "renders"
@@ -38,7 +38,7 @@ RENDER_DIR = CACHE_DIR / "renders"
 DETECTORS = [f"D{i}" for i in range(1, 7)]
 PIPELINE_VERSION = 4
 SEARCH_RADIUS_DEG = 0.0005          # only images that actually contain the target
-DOWNLOAD_WORKERS = int(os.environ.get("XTREMIS_DOWNLOAD_WORKERS", "8"))
+DOWNLOAD_WORKERS = int(os.environ.get("CYGNUSX_DOWNLOAD_WORKERS", "8"))
 MIN_PNG_SIZE_PX = 512
 CUTOUT_EXTENSIONS = ("IMAGE", "FLAGS", "VARIANCE", "ZODI", "WCS-WAVE")   # EPSF (~4 MB) is dropped
 

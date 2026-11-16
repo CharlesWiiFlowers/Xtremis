@@ -2,7 +2,7 @@
 
 The legacy scripts import each other with flat names (``comun``, ``gaia_api``) and mutate
 global state on import (``sys.path``, astropy log level, warning filters). This module loads
-them under a private ``xtremis_db`` namespace and restores that global state afterwards, so the
+them under a private ``cygnusx_db`` namespace and restores that global state afterwards, so the
 rest of the backend never sees those names.
 """
 import importlib.util
@@ -17,7 +17,7 @@ from astropy import log as astropy_log
 from . import offline
 
 SCRIPTS_DIR = Path(__file__).resolve().parents[2] / "Database" / "scripts"
-_NAMESPACE = "xtremis_db"
+_NAMESPACE = "cygnusx_db"
 _FLAT_NAMES = ("comun", "gaia_api")
 
 

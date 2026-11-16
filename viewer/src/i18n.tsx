@@ -65,7 +65,7 @@ const es = {
   surveysList: 'Barridos {list}',
   surveyOne: 'Barrido {n}',
   dragHint: 'Arrastra el planeta',
-  appName: 'Xtremis',
+  appName: 'CygnusX',
   tagline: 'El cielo infrarrojo de SPHEREx, en movimiento',
   heroTitle: 'Descubre lo que se mueve en el cielo',
   heroSub:
@@ -214,7 +214,7 @@ const en: Record<I18nKey, string> = {
   surveysList: 'Surveys {list}',
   surveyOne: 'Survey {n}',
   dragHint: 'Drag the planet',
-  appName: 'Xtremis',
+  appName: 'CygnusX',
   tagline: 'The SPHEREx infrared sky, in motion',
   heroTitle: 'Discover what moves in the sky',
   heroSub:
@@ -310,7 +310,7 @@ const I18nContext = createContext<I18nValue | null>(null);
 
 function initialLang(): Lang {
   try {
-    const saved = localStorage.getItem('xtremis.lang');
+    const saved = localStorage.getItem('cygnusx.lang');
     if (saved === 'es' || saved === 'en') return saved;
   } catch {
     /* storage unavailable */
@@ -330,7 +330,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
         setLangState(l);
         document.documentElement.lang = l;
         try {
-          localStorage.setItem('xtremis.lang', l);
+          localStorage.setItem('cygnusx.lang', l);
         } catch {
           /* ignore */
         }
