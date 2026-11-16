@@ -140,7 +140,12 @@ const es = {
   date: 'Fecha',
   spectrumHelp: 'Cuánta luz emite el objeto en cada color infrarrojo. Las caídas revelan moléculas como agua o metano.',
   lightcurveHelp: 'Brillo del objeto en cada observación. Si sube y baja, es una estrella variable.',
-  shortcuts: 'Explorar: Flechas = mover la mira · Shift + flechas = rápido · al acercarte al borde se carga otra zona · Enter = seleccionar · Espacio = reproducir · [ ] = cambiar de año · Esc = salir de pantalla completa',
+  shortcuts: 'Explorar: Flechas = mover la mira · Shift + flechas = rápido · al acercarte al borde se carga otra zona · Enter = seleccionar · Espacio = reproducir · [ ] = cambiar de año · Rueda o + − = zoom · Arrastrar = mover la imagen · 0 = sin zoom · Esc = salir de pantalla completa',
+  quickTargets: 'Objetos de prueba',
+  zoom: 'Zoom',
+  zoomIn: 'Acercar',
+  zoomOut: 'Alejar',
+  zoomReset: 'Restablecer zoom',
   loadingChart: 'Calculando…',
 } as const;
 
@@ -284,7 +289,12 @@ const en: Record<I18nKey, string> = {
   date: 'Date',
   spectrumHelp: 'How much light the object emits in each infrared color. Dips reveal molecules like water or methane.',
   lightcurveHelp: "The object's brightness in each observation. If it rises and falls, it's a variable star.",
-  shortcuts: 'Explore: Arrows = move the aim · Shift + arrows = faster · a new sky area loads near the edge · Enter = select · Space = play · [ ] = change year · Esc = exit full screen',
+  shortcuts: 'Explore: Arrows = move the aim · Shift + arrows = faster · a new sky area loads near the edge · Enter = select · Space = play · [ ] = change year · Wheel or + − = zoom · Drag = pan · 0 = reset zoom · Esc = exit full screen',
+  quickTargets: 'Test objects',
+  zoom: 'Zoom',
+  zoomIn: 'Zoom in',
+  zoomOut: 'Zoom out',
+  zoomReset: 'Reset zoom',
   loadingChart: 'Computing…',
 };
 
