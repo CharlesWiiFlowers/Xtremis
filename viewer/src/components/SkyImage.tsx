@@ -153,9 +153,13 @@ export function SkyImage(props: Props) {
         d.moved = true;
         const rect = ref.current.getBoundingClientRect();
         setView(bounded({ ...d.view, cx: d.view.cx - dx / rect.width / d.view.z, cy: d.view.cy - dy / rect.height / d.view.z }));
-        return;
       }
     }
+  };
+
+  // El panel de coordenadas sigue al ratón (el panel flotante corta este evento para poder leerlo)
+  const handleMove = (e: MouseEvent<HTMLDivElement>) => {
+    if (drag.current?.moved) return;
     if (usingKeys) setUsingKeys(false);
     const c = fromEvent(e);
     if (c) onCursor(c);
@@ -219,6 +223,7 @@ export function SkyImage(props: Props) {
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
+        onMouseMove={handleMove}
         onMouseLeave={() => !usingKeys && !drag.current?.moved && onCursor(null)}
         onKeyDown={handleKey}
       >
@@ -285,6 +290,7 @@ export function SkyImage(props: Props) {
           onClick={(e) => e.stopPropagation()}
           onPointerDown={(e) => e.stopPropagation()}
           onPointerMove={(e) => e.stopPropagation()}
+          onMouseMove={(e) => e.stopPropagation()}
         >
           <button type="button" onClick={() => setView((v) => zoomAt(v, v.z / ZOOM_STEP))} disabled={z <= ZOOM_MIN} aria-label={t('zoomOut')} title={t('zoomOut')}>
             −
