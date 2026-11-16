@@ -135,3 +135,10 @@ export function targetOffsetAt(t: Target, year: number): { x: number; y: number 
   const dt = year - TARGET_POSITION_EPOCH;
   return { x: (t.pm?.ra ?? 0) * dt, y: (t.pm?.dec ?? 0) * dt };
 }
+
+/** Objetos de prueba cuyo nombre o alias contiene el texto escrito (para autocompletar). */
+export function matchTargets(query: string): Target[] {
+  const q = normalizeName(query);
+  if (!q) return [];
+  return TARGETS.filter((t) => normalizeName(t.name).includes(q) || t.aliases.some((a) => a.includes(q)));
+}

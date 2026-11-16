@@ -47,7 +47,11 @@ export function Viewer({ params, onChange, onOpen, onHome, onSection }: Props) {
   const { ra, dec, fov, det, mode } = params;
   const center = useMemo<SkyCoord>(() => ({ ra, dec }), [ra, dec]);
 
-  const [epochs, setEpochs] = useState<Epoch[] | null>(null);
+  // Las épocas se guardan junto al campo al que pertenecen: al cambiar de objetivo,
+  // las del campo anterior dejan de valer en ese mismo render y no se piden cuadros con ellas.
+  const fieldKey = `${ra},${dec},${fov}`;
+  const [loaded, setLoaded] = useState<{ key: string; epochs: Epoch[] } | null>(null);
+  const epochs = loaded?.key === fieldKey ? loaded.epochs : null;
   const [epochError, setEpochError] = useState(false);
   const [group, setGroup] = useState<FrameGroup>('year');
   const [index, setIndex] = useState(0);
@@ -68,7 +72,6 @@ export function Viewer({ params, onChange, onOpen, onHome, onSection }: Props) {
   // 1) Épocas disponibles para esta zona (NEOWISE + SPHEREx)
   useEffect(() => {
     let alive = true;
-    setEpochs(null);
     setEpochError(false);
     setSelected(null);
     // La mira principal siempre parte del centro de la nueva zona.
@@ -78,7 +81,7 @@ export function Viewer({ params, onChange, onOpen, onHome, onSection }: Props) {
       .getEpochs({ ra, dec, fov })
       .then((e) => {
         if (!alive) return;
-        setEpochs(e);
+        setLoaded({ key: `${ra},${dec},${fov}`, epochs: e });
         setIndex(0);
         setPlaying(e.length > 1); // arranca reproduciendo: es "un video"
       })
