@@ -1,19 +1,19 @@
-// Puente de comunicación entre Xtremis y otros visores (p. ej. el modelo 3D del equipo).
+// Puente de comunicación entre CygnusX y otros visores (p. ej. el modelo 3D del equipo).
 //
-// Xtremis EMITE eventos cada vez que cambia lo que el usuario ve:
-//   { source: 'xtremis', type: 'view',   ra, dec, fov, channel, frame }   ← cambió zona, banda o año
-//   { source: 'xtremis', type: 'cursor', ra, dec }                        ← el cursor se movió
-//   { source: 'xtremis', type: 'select', ra, dec }                        ← el usuario eligió un punto
+// CygnusX EMITE eventos cada vez que cambia lo que el usuario ve:
+//   { source: 'cygnusx', type: 'view',   ra, dec, fov, channel, frame }   ← cambió zona, banda o año
+//   { source: 'cygnusx', type: 'cursor', ra, dec }                        ← el cursor se movió
+//   { source: 'cygnusx', type: 'select', ra, dec }                        ← el usuario eligió un punto
 //
-// Xtremis ESCUCHA comandos de otros visores:
-//   { source: 'xtremis-model', type: 'goto',   ra, dec, fov?, name? }     ← ir a una zona del cielo
-//   { source: 'xtremis-model', type: 'cursor', ra, dec }                  ← mover el cursor
-//   { source: 'xtremis-model', type: 'select', ra, dec }                  ← seleccionar un punto
+// CygnusX ESCUCHA comandos de otros visores:
+//   { source: 'cygnusx-model', type: 'goto',   ra, dec, fov?, name? }     ← ir a una zona del cielo
+//   { source: 'cygnusx-model', type: 'cursor', ra, dec }                  ← mover el cursor
+//   { source: 'cygnusx-model', type: 'select', ra, dec }                  ← seleccionar un punto
 //
 // Funciona en tres casos sin cambiar código:
 //   1. Dentro de la misma app (módulos que llamen a onSkyEvent / sendSkyCommand).
-//   2. El modelo incrustado como <iframe> dentro de Xtremis (ver ExternalModel.tsx).
-//   3. Xtremis incrustado como <iframe> dentro de la página del modelo (se avisa a window.parent).
+//   2. El modelo incrustado como <iframe> dentro de CygnusX (ver ExternalModel.tsx).
+//   3. CygnusX incrustado como <iframe> dentro de la página del modelo (se avisa a window.parent).
 // Documentación completa: INTEGRACION_MODELO.md
 
 import { useEffect, useRef } from 'react';
@@ -52,7 +52,7 @@ export function registerModelWindow(win: Window): () => void {
 
 export function emitSkyEvent(e: SkyEvent): void {
   eventListeners.forEach((l) => l(e));
-  const msg = { source: 'xtremis', ...e };
+  const msg = { source: 'cygnusx', ...e };
   try {
     if (window.parent && window.parent !== window) window.parent.postMessage(msg, '*');
     frames.forEach((w) => w.postMessage(msg, '*'));
@@ -66,7 +66,7 @@ export function onSkyEvent(l: Listener<SkyEvent>): () => void {
   return () => eventListeners.delete(l);
 }
 
-/** Envía un comando a Xtremis desde código de la misma página. */
+/** Envía un comando a CygnusX desde código de la misma página. */
 export function sendSkyCommand(c: SkyCommand): void {
   commandListeners.forEach((l) => l(c));
 }
@@ -76,7 +76,7 @@ const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFin
 function parseCommand(data: unknown): SkyCommand | null {
   if (!data || typeof data !== 'object') return null;
   const d = data as Record<string, unknown>;
-  if (d.source !== 'xtremis-model' || !isNum(d.ra) || !isNum(d.dec)) return null;
+  if (d.source !== 'cygnusx-model' || !isNum(d.ra) || !isNum(d.dec)) return null;
   if (d.ra < 0 || d.ra >= 360 || d.dec < -90 || d.dec > 90) return null;
   if (d.type === 'goto') {
     return {

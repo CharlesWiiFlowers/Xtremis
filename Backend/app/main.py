@@ -1,4 +1,4 @@
-"""Xtremis SPHEREx backend (FastAPI).
+"""CygnusX SPHEREx backend (FastAPI).
 
 Run from the Backend/ folder:  uvicorn app.main:app --reload --port 8000
 """
@@ -17,8 +17,8 @@ from . import spherex_adapter as spherex
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
-app = FastAPI(title="Xtremis SPHEREx API", version="0.1.0",
-              description="SPHEREx infrared images and 102-channel spectra (IRSA/AWS) for the NASA Space Apps 2026 Xtremis project.")
+app = FastAPI(title="CygnusX SPHEREx API", version="0.1.0",
+              description="SPHEREx infrared images and 102-channel spectra (IRSA/AWS) for the NASA Space Apps 2026 CygnusX project.")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 app.include_router(frontend_adapter.router)
 offline.seed_cache(images.CACHE_DIR)

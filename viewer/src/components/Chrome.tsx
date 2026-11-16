@@ -64,7 +64,7 @@ export function DemoBadge() {
 
 export type Section = 'sky' | 'orbital';
 
-/** Selector de sección: Xtremis es un solo programa con dos secciones. */
+/** Selector de sección: CygnusX es un solo programa con dos secciones. */
 export function SectionNav({ current, onSelect }: { current: Section; onSelect: (s: Section) => void }) {
   const { t } = useI18n();
   const items: { id: Section; label: string }[] = [

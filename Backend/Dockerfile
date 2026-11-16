@@ -1,6 +1,6 @@
 # API SPHEREx (FastAPI). Reutiliza Database/scripts, por eso el contexto de build es la raíz del repo.
 FROM python:3.12-slim
-ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 XTREMIS_CACHE_DIR=/data/cache MPLBACKEND=Agg MPLCONFIGDIR=/tmp/mpl
+ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 CYGNUSX_CACHE_DIR=/data/cache MPLBACKEND=Agg MPLCONFIGDIR=/tmp/mpl
 WORKDIR /srv
 COPY Backend/requirements.txt Backend/requirements.txt
 RUN pip install -r Backend/requirements.txt

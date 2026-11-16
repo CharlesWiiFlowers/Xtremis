@@ -1,4 +1,4 @@
-# Xtremis — Space Apps Challenge 2026 · *Planet X and SPHEREx*
+# CygnusX — Space Apps Challenge 2026 · *Planet X and SPHEREx*
 
 Un solo programa, un solo comando, una sola dirección.
 
@@ -10,7 +10,7 @@ Abre **http://localhost:8080**. La primera vez tarda unos minutos (compila el vi
 
 | Dirección | Qué es |
 |---|---|
-| `http://localhost:8080/` | **Xtremis, un solo programa con dos secciones** (selector arriba: *Imágenes del cielo* · *Sistema solar*) |
+| `http://localhost:8080/` | **CygnusX, un solo programa con dos secciones** (selector arriba: *Imágenes del cielo* · *Sistema solar*) |
 | ↳ *Imágenes del cielo* | Visor SPHEREx: imágenes reales como "video", espectro de 102 bandas, curva de luz, capas Gaia/WISE |
 | ↳ *Sistema solar* (`/?view=orbital`) | ORBITAL: simulador 2D de planetas y laboratorio local, dentro de la misma interfaz |
 | `http://localhost:8080/orbital/` | ORBITAL como página completa e independiente |
@@ -54,7 +54,7 @@ docker compose down -v           # detener y BORRAR MySQL y caché
 Copia `.env.example` a `.env`. Lo más útil:
 
 - `WEB_PORT=8080`: puerto público.
-- `XTREMIS_OFFLINE=1`: sin internet. Sirve solo lo que está en caché; el paquete demo (`Backend/offline/demo_cache.tar.gz`) cubre los 5 objetos de prueba en su posición de la pantalla de inicio, campo de 10′. Cualquier otra coordenada devuelve 503 de inmediato.
+- `CYGNUSX_OFFLINE=1`: sin internet. Sirve solo lo que está en caché; el paquete demo (`Backend/offline/demo_cache.tar.gz`) cubre los 5 objetos de prueba en su posición de la pantalla de inicio, campo de 10′. Cualquier otra coordenada devuelve 503 de inmediato.
 - `VITE_USE_MOCK=true|false`: fuente inicial de datos del visor. `true` (por defecto) = **simulados**, como la primera versión: instantáneos, se mueven con las flechas y cargan zona por zona. `false` = reales del backend. En la barra superior hay un interruptor **Simulados | Reales** que lo cambia sin recompilar (se recuerda en el navegador; también `?data=real`).
 - `VITE_MODEL_URL=`: solo si quieres incrustar OTRO modelo externo en el visor (ORBITAL ya es una sección).
 - Contraseñas de MySQL: cámbialas antes de publicarlo en internet.

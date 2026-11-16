@@ -1,6 +1,6 @@
 // Vista opcional del modelo 3D del equipo, incrustado como <iframe>.
 // Solo aparece si se define VITE_MODEL_URL (ver INTEGRACION_MODELO.md). Sin esa variable,
-// Xtremis funciona igual que siempre y esta pestaña no se muestra.
+// CygnusX funciona igual que siempre y esta pestaña no se muestra.
 
 import { useEffect, useRef, useState } from 'react';
 import { registerModelWindow } from './skyBus';

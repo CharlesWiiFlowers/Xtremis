@@ -1,6 +1,6 @@
 """Offline / outage fallback: a no-network mode and a portable cache bundle.
 
-``XTREMIS_OFFLINE=1`` makes every IRSA, S3, Gaia and Sesame call fail fast with ``OfflineError`` (HTTP 503), so the
+``CYGNUSX_OFFLINE=1`` makes every IRSA, S3, Gaia and Sesame call fail fast with ``OfflineError`` (HTTP 503), so the
 API serves only what is already in ``Backend/cache`` instead of hanging on timeouts. On startup the cache is
 seeded (missing files only) from the committed demo dataset ``Backend/offline/demo_cache.tar.gz``.
 
@@ -19,7 +19,7 @@ from fastapi import HTTPException
 
 logger = logging.getLogger(__name__)
 
-ENABLED = os.environ.get("XTREMIS_OFFLINE", "").strip().lower() in {"1", "true", "yes", "on"}
+ENABLED = os.environ.get("CYGNUSX_OFFLINE", "").strip().lower() in {"1", "true", "yes", "on"}
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 DEMO_BUNDLE = BACKEND_DIR / "offline" / "demo_cache.tar.gz"
 SEED_GAIA_DIR = Path(__file__).resolve().parent / "data" / "gaia"   # Gaia DR3 rows of the benchmark presets
@@ -33,7 +33,7 @@ class OfflineError(RuntimeError):
 
 def guard(what: str) -> None:
     if ENABLED:
-        raise OfflineError(f"offline mode (XTREMIS_OFFLINE=1): {what} is not available from the local cache")
+        raise OfflineError(f"offline mode (CYGNUSX_OFFLINE=1): {what} is not available from the local cache")
 
 
 MAX_FAILED_FRACTION = 0.1   # results with more failed frames than this are not cached (upstream outage)

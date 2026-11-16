@@ -10,7 +10,7 @@ import type { SkyApi } from './types';
  * El valor inicial viene de VITE_USE_MOCK (true = demo).
  */
 export type DataSource = 'demo' | 'real';
-const KEY = 'xtremis-data';
+const KEY = 'cygnusx-data';
 const DEFAULT_SOURCE: DataSource = import.meta.env.VITE_USE_MOCK === 'false' ? 'real' : 'demo';
 
 function readSource(): DataSource {

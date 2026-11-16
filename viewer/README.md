@@ -1,6 +1,6 @@
-# Xtremis · Frontend (prototipo 3)
+# CygnusX · Frontend (prototipo 3)
 
-> **Xtremis** es un nombre tentativo. Para cambiarlo: `appName` en `src/i18n.tsx` (español e inglés) y el `<title>` y el texto de carga en `index.html`.
+> **CygnusX** ([cygnus.earth](https://cygnus.earth)). Para cambiar el nombre: `appName` en `src/i18n.tsx` (español e inglés) y el `<title>` y el texto de carga en `index.html`.
 
 Visor web público de imágenes de SPHEREx (NASA Space Apps Challenge 2026, reto *Planet X and SPHEREx*).
 React + TypeScript + Vite, sin librerías de UI ni de gráficas: solo `react` y `react-dom`.
@@ -13,7 +13,7 @@ Desde la carpeta principal del repositorio (donde está `docker-compose.yml`):
 docker compose up --build
 ```
 
-Abre **http://localhost:8080**. El contenedor `xtremis-frontend` sirve la versión compilada mediante Nginx (puerto 80 del contenedor publicado como puerto 8080 en tu equipo). El modo demo está activado, así que no requiere backend. Para detenerlo, usa `Ctrl + C` o ejecuta `docker compose down` desde la raíz.
+Abre **http://localhost:8080**. El contenedor `cygnusx-frontend` sirve la versión compilada mediante Nginx (puerto 80 del contenedor publicado como puerto 8080 en tu equipo). El modo demo está activado, así que no requiere backend. Para detenerlo, usa `Ctrl + C` o ejecuta `docker compose down` desde la raíz.
 
 ## Arrancar
 

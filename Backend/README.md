@@ -1,4 +1,4 @@
-# Xtremis SPHEREx backend
+# CygnusX SPHEREx backend
 
 FastAPI service that serves real SPHEREx images and 102-channel spectra (IRSA + public AWS S3) and Gaia DR3 data to
 the React viewer in `../viewer`. It reuses the IRSA/S3/Gaia query code in `../Database/scripts` through
@@ -33,11 +33,11 @@ fail intermittently. The backend handles this with:
 - **Bundled Gaia DR3 rows** for the presets (`app/data/gaia/`): resolving a benchmark target never needs Gaia.
 - **Gaia fallback chain** for other lookups: ESA async (`gaia_api.ejecutar_adql`) → MAST mirror → ESA sync, each
   with a 45 s deadline. IRSA searches are retried.
-- **Offline mode** `XTREMIS_OFFLINE=1`: no network calls at all. Cached requests are served as usual; anything else
+- **Offline mode** `CYGNUSX_OFFLINE=1`: no network calls at all. Cached requests are served as usual; anything else
   returns HTTP 503 immediately instead of waiting for timeouts.
 
 ```bash
-XTREMIS_OFFLINE=1 uvicorn app.main:app --port 8000     # Windows PowerShell: $env:XTREMIS_OFFLINE=1; uvicorn ...
+CYGNUSX_OFFLINE=1 uvicorn app.main:app --port 8000     # Windows PowerShell: $env:CYGNUSX_OFFLINE=1; uvicorn ...
 curl http://localhost:8000/api/health                  # {"status":"ok","offline":true,"demo_bundle":true}
 ```
 
@@ -54,7 +54,7 @@ python warm_cache.py --fov 10 20              # several fields of view (arcmin)
 
 A cold target takes 1.5–3 minutes (cutouts are downloaded from IRSA); afterwards its requests are answered from
 `Backend/cache/` in under 0.1 s. The cache is plain files: delete the folder to reset it, or set
-`XTREMIS_CACHE_DIR` to move it.
+`CYGNUSX_CACHE_DIR` to move it.
 
 ## Run
 
