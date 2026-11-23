@@ -14,18 +14,18 @@ estilo "OSIRIS") muestra **el contexto completo**. Los dos se mantienen sincroni
 
 ## Cómo activarlo
 
-1. El modelo debe poder abrirse en una URL propia, por ejemplo `https://modelo.cygnus.earth/`.
+1. El modelo debe poder abrirse en una URL propia, por ejemplo `https://modelo.cygnusx.earth/`.
 2. En `viewer/.env.local` agregar:
 
    ```
-   VITE_MODEL_URL=https://modelo.cygnus.earth/
+   VITE_MODEL_URL=https://modelo.cygnusx.earth/
    ```
 
 3. Volver a correr `npm run dev` (o `npm run build`). Aparece un selector **Imagen | Modelo 3D** encima de la imagen.
    Sin esa variable, el selector no aparece y CygnusX funciona igual que siempre.
 
 El modelo se carga dentro de un `<iframe>` con la posición inicial en la URL:
-`https://modelo.cygnus.earth/?ra=269.45208&dec=4.69339&fov=10`
+`https://modelo.cygnusx.earth/?ra=269.45208&dec=4.69339&fov=10`
 
 ## Mensajes (`window.postMessage`)
 
@@ -78,7 +78,7 @@ window.addEventListener('message', (e) => {
 
 Si el modelo es la página principal y **CygnusX va dentro de un iframe**, funciona igual: CygnusX envía sus
 eventos a `window.parent` y escucha los comandos del padre.
-`<iframe src="https://visor.cygnus.earth/?ra=269.45&dec=4.69&fov=10"></iframe>`
+`<iframe src="https://visor.cygnusx.earth/?ra=269.45&dec=4.69&fov=10"></iframe>`
 
 ## Pendiente cuando llegue el modelo
 
